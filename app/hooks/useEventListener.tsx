@@ -11,7 +11,7 @@ export function useEventListener<K extends keyof EventMap>(
   handler: (event: EventMap[K]) => void,
   element: HTMLElement | Window = window
 ) {
-  const savedHandler = useRef<(event: EventMap[K]) => void>();
+  const savedHandler = useRef<(event: EventMap[K]) => void>(null);
 
   useEffect(() => {
     savedHandler.current = handler;

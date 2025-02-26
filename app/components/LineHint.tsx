@@ -6,14 +6,14 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
-import styles from './LineHint.module.scss';
 import type { LineData } from '@/components/Mesh';
+import styles from './LineHint.module.scss';
 
 export function LineHint() {
   const { line } = useApp();
   const htmlRef = useRef<HTMLDivElement>(null!);
-  const hintGroup = useRef<THREE.Group>(null!);
-  const lineGroup = useRef<THREE.Group>(null!);
+  const hintGroup = useRef<THREE.Group>(null);
+  const lineGroup = useRef<THREE.Group>(null);
   const lastLine = useRef<LineData | null>(null);
 
   useFrame(() => {

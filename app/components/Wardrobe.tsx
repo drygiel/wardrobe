@@ -1,9 +1,9 @@
 'use client';
 
 import * as THREE from 'three';
-import { type ElementRef, useRef } from 'react';
+import { type ComponentRef, useRef } from 'react';
 import { useAnimations, useGLTF, Line } from '@react-three/drei';
-import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { type ThreeElements, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { GLTF } from 'three-stdlib';
 import { Mesh, type LineData } from './Mesh';
 import { useApp } from '@/contexts/AppContext';
@@ -107,8 +107,8 @@ type GLTFResult = GLTF & {
 
 const path = '/models/Wardrobe.glb';
 
-export function Model(props: JSX.IntrinsicElements['group']) {
-  const lineRef = useRef<ElementRef<typeof Line>>(null!);
+export function Model(props: ThreeElements['group']) {
+  const lineRef = useRef<ComponentRef<typeof Line>>(null!);
   const sceneGroup = useRef<THREE.Group>(null!);
   const lineGroup = useRef<THREE.Group>(null!);
   const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());

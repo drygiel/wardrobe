@@ -1,12 +1,12 @@
 ﻿'use client';
 
-import { type MeshProps } from '@react-three/fiber';
+import { type ThreeElements } from '@react-three/fiber';
 import { useCursor, useTexture, Line, Edges } from '@react-three/drei';
 import * as THREE from 'three';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '@/contexts/AppContext';
 
-export function Mesh(props: MeshProps) {
+export function Mesh(props: ThreeElements['mesh']) {
   const texture = useTexture('/models/Wardrobe.jpg');
   const { wireframe } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
@@ -118,7 +118,7 @@ export function Mesh(props: MeshProps) {
         onClick={event => {
           if (wireframe || !props.onClick) return;
           materials.textured.color.set(getColor());
-          props.onClick?.(event);
+          if (typeof props.onClick === 'function') props.onClick(event);
         }}
         onPointerEnter={event => {
           if (wireframe || !props.onClick) return;
