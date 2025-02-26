@@ -1,0 +1,78 @@
+$offsetX: 8px;
+$offsetY: 4px;
+$arrow-size: 4px;
+
+.hint {
+    pointer-events: none;
+    user-select: none;
+    --bg-color-edge: rgba(0, 0, 0, 0.8);
+    --bg-color: rgba(0, 0, 0, 1);
+    --font-color: white;
+
+    &.hidden > div {
+        max-width: 0;
+        opacity: 0;
+        transition: max-width 150ms 60ms, opacity 70ms 140ms;
+    }
+
+    > div {
+        position: relative;
+        max-width: 70px;
+        overflow: hidden;
+        transform: translateY(calc(-50% - #{$offsetY}));
+
+        // Arrow Down
+        > div::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            left: 50%;
+            bottom: 1px;
+            border: $arrow-size solid transparent;
+            border-top-color: var(--bg-color);
+            transform: translate(-50%, 50%);
+        }
+    }
+
+    &.vertical > div {
+        transform: translateX(calc(50% + #{$offsetX}));
+
+        > div {
+            background: radial-gradient(at left, var(--bg-color) 5%, var(--bg-color-edge) 60%);
+            margin-bottom: 0;
+            margin-left: $arrow-size;
+
+            // Left Arrow
+            &::before {
+                top: 50%;
+                left: 1px;
+                bottom: auto;
+                border: $arrow-size solid transparent;
+                border-right-color: var(--bg-color);
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+
+    > div > div {
+        background: radial-gradient(at bottom, var(--bg-color) 5%, var(--bg-color-edge) 60%);
+        border-radius: 2px;
+        font-family: Consolas, monospace;
+        font-size: 0.8em;
+        color: var(--font-color);
+        white-space: nowrap;
+        padding: 0 0.3em;
+        margin-bottom: 5px;
+
+        span.value {
+            font-weight: bold;
+        }
+
+        span.unit {
+            font-weight: normal;
+            padding-left: 2px;
+            opacity: 0.7;
+        }
+    }
+}

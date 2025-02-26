@@ -1,0 +1,41 @@
+﻿.App {
+    background-color: #fff;
+
+    .tools {
+        padding: 10px;
+        position: absolute;
+        inset: 0 0 auto 0;
+        display: flex;
+        flex-direction: row;
+        color: white;
+        z-index: 100;
+        align-items: center;
+        gap: 1em;
+        background: rgba(0, 0, 0, 0.5);
+        transition: transform 0.3s;
+
+        &.hidden {
+            visibility: hidden;
+            transform: translateY(-100%);
+        }
+
+        > main {
+            display: flex;
+            gap: 1em;
+            align-items: center;
+        }
+    }
+
+    > div:last-of-type {
+        width: 100vw !important;
+        height: 100vh !important;
+    }
+}
+
+.stats {
+    //right: 0;
+    //left: unset !important;
+    left: 200px !important;
+    top: unset !important;
+    bottom: 0;
+}
