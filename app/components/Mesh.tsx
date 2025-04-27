@@ -1,14 +1,13 @@
 ﻿'use client';
 
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import * as THREE from 'three';
 import { type ThreeElements } from '@react-three/fiber';
 import { useCursor, useTexture, Line, Edges } from '@react-three/drei';
-import * as THREE from 'three';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 
 export function Mesh(props: ThreeElements['mesh']) {
-  const basePath = process.env.BASEPATH ?? '';
-  const texture = useTexture(basePath + '/models/Wardrobe.jpg');
+  const texture = useTexture(`${process.env.BASEPATH}/models/Wardrobe.jpg`);
   const { wireframe } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
   const wireframeGroup = useRef<THREE.Group>(null!);
@@ -157,7 +156,7 @@ export interface LineData {
   midPoint: THREE.Vector3;
   width: number;
   points: [THREE.Vector3, THREE.Vector3];
-  meshRef: React.MutableRefObject<THREE.Mesh>;
+  meshRef: React.RefObject<THREE.Mesh>;
   onHover: () => void;
   onBlur: () => void;
 }
