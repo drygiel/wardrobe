@@ -16,8 +16,8 @@ export default function Intro() {
   const images = Array.from({ length: 33 }).map(
     (_, i) =>
       ({
-        original: `/images/${i + 1}.jpg`,
-        thumbnail: `/images/${i + 1}.jpg`,
+        original: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
+        thumbnail: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
         originalHeight: 2080,
       }) as ReactImageGalleryItem,
   );

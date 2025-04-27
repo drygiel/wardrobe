@@ -5,10 +5,7 @@ const nextConfig: NextConfig = {
   distDir: 'dist',
   basePath: process.env.NEXT_PUBLIC_BASEPATH || '',
   eslint: {
-    ignoreDuringBuilds: process.env.GITHUB_PAGES === 'true',
-  },
-  env: {
-    NEXT_PUBLIC_BASEPATH: process.env.NEXT_PUBLIC_BASEPATH || '',
+    ignoreDuringBuilds: !!process.env.GITHUB_PAGES,
   },
 };
 
