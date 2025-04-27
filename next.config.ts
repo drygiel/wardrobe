@@ -1,5 +1,7 @@
 import type { NextConfig } from 'next';
 
+console.log('🍉 BASEPATH', process.env.BASEPATH);
+
 const nextConfig: NextConfig = {
   output: 'export',
   distDir: 'dist',

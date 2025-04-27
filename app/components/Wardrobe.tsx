@@ -105,7 +105,7 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[];
 };
 
-const path = `${process.env.BASEPATH}/models/Wardrobe.glb`;
+const path = `${process.env.BASEPATH ?? ''}/models/Wardrobe.glb`;
 
 export function Model(props: ThreeElements['group']) {
   const lineRef = useRef<ComponentRef<typeof Line>>(null!);
