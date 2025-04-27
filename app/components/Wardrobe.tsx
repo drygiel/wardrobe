@@ -105,14 +105,15 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[];
 };
 
-const path = '/models/Wardrobe.glb';
+const basePath = process.env.BASEPATH ?? '';
+const path = basePath + '/models/Wardrobe.glb';
 
 export function Model(props: ThreeElements['group']) {
   const lineRef = useRef<ComponentRef<typeof Line>>(null!);
   const sceneGroup = useRef<THREE.Group>(null!);
   const lineGroup = useRef<THREE.Group>(null!);
   const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());
-  const { nodes, animations } = useGLTF(path) as GLTFResult;
+  const { nodes, animations } = useGLTF(path) as unknown as GLTFResult;
   const { actions } = useAnimations(animations, sceneGroup);
   const { wireframe, line, hideFronts } = useApp();
 

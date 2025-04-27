@@ -1,13 +1,12 @@
 ﻿'use client';
 
-import { useRef } from "react";
-import ImageGallery, { type ReactImageGalleryItem } from "react-image-gallery";
-import cn from "classnames";
-import { Button } from "antd";
-import '@ant-design/v5-patch-for-react-19';
-import { LoginOutlined, PictureOutlined } from "@ant-design/icons";
-import { useApp } from "@/contexts/AppContext";
-import styles from "./Intro.module.scss";
+import { useRef } from 'react';
+import ImageGallery, { type ReactImageGalleryItem } from 'react-image-gallery';
+import cn from 'classnames';
+import { Button } from 'antd';
+import { LoginOutlined, PictureOutlined } from '@ant-design/icons';
+import { useApp } from '@/contexts/AppContext';
+import styles from './Intro.module.scss';
 
 export default function Intro() {
   const { view, setView, setGizmo } = useApp();
@@ -28,7 +27,7 @@ export default function Intro() {
   };
 
   const openEditor = () => {
-    introRef.current.style.display = "none";
+    introRef.current.style.display = 'none';
     setGizmo(true);
   };
 
@@ -36,7 +35,7 @@ export default function Intro() {
     <>
       <section
         ref={introRef}
-        className={cn(styles.intro, { [styles.leftSide]: view == "left-side" })}
+        className={cn(styles.intro, { [styles.leftSide]: view == 'left-side' })}
       >
         <main>
           <h1>
@@ -49,11 +48,7 @@ export default function Intro() {
             Kliknij na przycisk "Wireframe" aby przełączyć widok.
           </p>
           <p className={styles.actions}>
-            <Button
-              icon={<PictureOutlined />}
-              type="primary"
-              onClick={() => openGallery()}
-            >
+            <Button icon={<PictureOutlined />} type="primary" onClick={() => openGallery()}>
               Zobacz zdjęcia
             </Button>
 
@@ -61,7 +56,7 @@ export default function Intro() {
               icon={<LoginOutlined />}
               type="default"
               onClick={() => {
-                setView((v) => (v === "initial" ? "left-side" : "initial"));
+                setView(v => (v === 'initial' ? 'left-side' : 'initial'));
               }}
             >
               Zobacz etapy
@@ -71,15 +66,11 @@ export default function Intro() {
         <aside>
           <h1>Drewniana Rama</h1>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
-            auctor, nunc nec ultricies.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nunc nec
+            ultricies.
           </p>
           <p className={styles.actions}>
-            <Button
-              icon={<LoginOutlined />}
-              type="primary"
-              onClick={() => openEditor()}
-            >
+            <Button icon={<LoginOutlined />} type="primary" onClick={() => openEditor()}>
               Pomiary
             </Button>
 
@@ -87,7 +78,7 @@ export default function Intro() {
               icon={<LoginOutlined />}
               type="default"
               onClick={() => {
-                setView((v) => (v === "initial" ? "left-side" : "initial"));
+                setView(v => (v === 'initial' ? 'left-side' : 'initial'));
               }}
             >
               Wstecz
@@ -96,23 +87,15 @@ export default function Intro() {
         </aside>
       </section>
 
-      <section
-        id="gallery"
-        className={styles.gallery}
-        style={{ display: "none" }}
-      >
+      <section id="gallery" className={styles.gallery} style={{ display: 'none' }}>
         <ImageGallery
           ref={galleryRef}
           items={images}
           showThumbnails={false}
           showPlayButton={false}
           infinite
-          onScreenChange={(fullScreen) => {
-            // if (!fullScreen) {
-            document.getElementById("gallery")!.style.display = fullScreen
-              ? "block"
-              : "none";
-            // }
+          onScreenChange={fullScreen => {
+            document.getElementById('gallery')!.style.display = fullScreen ? 'block' : 'none';
           }}
         />
       </section>

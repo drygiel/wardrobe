@@ -7,7 +7,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 
 export function Mesh(props: ThreeElements['mesh']) {
-  const texture = useTexture('/models/Wardrobe.jpg');
+  const basePath = process.env.BASEPATH ?? '';
+  const texture = useTexture(basePath + '/models/Wardrobe.jpg');
   const { wireframe } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
   const wireframeGroup = useRef<THREE.Group>(null!);
@@ -38,6 +39,7 @@ export function Mesh(props: ThreeElements['mesh']) {
       }),
       textured: new THREE.MeshPhysicalMaterial({ map: texture }),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [texture]);
 
   const edgesGeometry = useMemo(
@@ -97,6 +99,7 @@ export function Mesh(props: ThreeElements['mesh']) {
         layers={visible ? 1 : 2}
       />
     ));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edgesGeometry, visible]);
 
   return (

@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { Suspense, useEffect, useMemo, ElementRef, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import {
@@ -52,7 +52,7 @@ export default function Scene() {
 
   const app = useApp();
   const { camera } = useThree();
-  const controls = useThree(state => state.controls as ElementRef<typeof OrbitControls>);
+  const controls = useThree(state => state.controls as ComponentRef<typeof OrbitControls>);
   const perCamRef = useRef<THREE.PerspectiveCamera>(null!);
   const orthoCamRef = useRef<THREE.OrthographicCamera>(null!);
   const target = useRef(camState.target);
@@ -72,7 +72,6 @@ export default function Scene() {
   const tweens = useRef<TWEEN.Group>(new TWEEN.Group());
 
   useNonInitialEffect(() => {
-    console.log('🍉 ' + app.view, controls); // eslint-disable-line
     if (!controls) return;
 
     tweens.current.removeAll();
@@ -110,6 +109,7 @@ export default function Scene() {
     orthoCamRef.current.left = -halfWidth;
     orthoCamRef.current.right = halfWidth;
     orthoCamRef.current.zoom = Math.min(Math.max(1, perCamRef.current.zoom), 3);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.orthographic]);
 
   useFrame(() => {
@@ -165,7 +165,7 @@ export default function Scene() {
           //     .map(n => n.toFixed(2))
           //     .join(', '),
           //   z: controls.object.zoom.toFixed(2),
-          // }); // eslint-disable-line
+          // });
 
           if (
             !app.orthographic &&

@@ -2,6 +2,7 @@
 
 import { Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
+import '@ant-design/v5-patch-for-react-19';
 import { Switch, InputNumber, Button, Layout } from 'antd';
 import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
