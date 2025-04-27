@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev --turbopack --port 4000",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start --port 4001",
+    "lint": "next lint",
+    "transform": "tsx transform.ts",
+    "deploy": "tsx deploy.ts"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
@@ -27,12 +29,15 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-image-gallery": "^1.2.4",
+    "basic-ftp": "^5.0.5",
+    "dotenv": "^16.5.0",
     "colors": "^1.4.0",
     "eslint": "^9",
     "eslint-config-next": "~15.1.7",
     "prettier": "^3.5.2",
     "sass": "^1.85.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.3"
   },
   "packageManager": "yarn@1.22.22",
   "prettier": "./prettierrc.mjs"

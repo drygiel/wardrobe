@@ -25,7 +25,7 @@
 ## Optional
 - [x] Measure edges tool
 - [x] Limit camera controls
-- [ ] Push repo to github
+- [x] Push repo to github
 - [ ] Smooth scroll
 - [ ] Render Video
 - [ ] Vertex measure tape
