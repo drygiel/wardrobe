@@ -7,7 +7,7 @@ import { useCursor, useTexture, Line, Edges } from '@react-three/drei';
 import { useApp } from '@/contexts/AppContext';
 
 export function Mesh(props: ThreeElements['mesh']) {
-  const texture = useTexture(`${process.env.BASEPATH ?? ''}/models/Wardrobe.jpg`);
+  const texture = useTexture(`${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/models/Wardrobe.jpg`);
   const { wireframe } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
   const wireframeGroup = useRef<THREE.Group>(null!);

@@ -1,12 +1,14 @@
 import type { NextConfig } from 'next';
 
-console.log('🍉 BASEPATH', process.env.BASEPATH);
-
 const nextConfig: NextConfig = {
   output: 'export',
   distDir: 'dist',
+  basePath: process.env.NEXT_PUBLIC_BASEPATH || '',
+  eslint: {
+    ignoreDuringBuilds: process.env.GITHUB_PAGES === 'true',
+  },
   env: {
-    BASEPATH: process.env.BASEPATH || '',
+    NEXT_PUBLIC_BASEPATH: process.env.NEXT_PUBLIC_BASEPATH || '',
   },
 };
 

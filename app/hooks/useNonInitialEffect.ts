@@ -15,5 +15,6 @@ export const useNonInitialEffect = (
     }
 
     return effect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 };

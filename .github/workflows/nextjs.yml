@@ -28,8 +28,6 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
-    env:
-      BASEPATH: '/wardrobe'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -78,11 +76,10 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      - name: Create .env file
-        run: echo "BASEPATH=${{ env.BASEPATH }}" > .env
-
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
+        env:
+          NEXT_PUBLIC_BASEPATH: '/wardrobe'
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
