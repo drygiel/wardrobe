@@ -1,10 +1,10 @@
+# Wardrobe 2025
+[Demo](https://drygiel.github.io/wardrobe/)
+
 # TODO
 
-
 ## Must have
-- [x] All doors animations (fix speed)
 - [ ] texture/solid/xray/wireframe mode
-- [x] Orthographic camera views (3D Cube)
 - [ ] Camera animations on site scroll
 - [ ] Project stages
 - [ ] Wardrobe only renders
@@ -23,9 +23,6 @@
 
 
 ## Optional
-- [x] Measure edges tool
-- [x] Limit camera controls
-- [x] Push repo to github
 - [ ] Smooth scroll
 - [ ] Render Video
 - [ ] Vertex measure tape

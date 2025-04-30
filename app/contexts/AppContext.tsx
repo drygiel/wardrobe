@@ -7,9 +7,9 @@ const useAppStore = () => {
   const [grid, setGrid] = useState(true);
   const [wireframe, setWireframe] = useState(false);
   const [orthographic, setOrthographic] = useState(false);
-  const [hideFronts, setHideFronts] = useState(false);
+  const [hideFronts, setHideFronts] = useState(true);
   const [view, setView] = useState<SceneView>('initial');
-  const [gizmo, setGizmo] = useState(false);
+  const [gizmo, setGizmo] = useState(true);
   const [layer, setLayer] = useState(0);
   const line = useRef<LineData | null>(null);
 
