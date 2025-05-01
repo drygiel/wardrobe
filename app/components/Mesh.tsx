@@ -36,7 +36,12 @@ export function Mesh(props: ThreeElements['mesh']) {
       solid: new THREE.MeshPhongMaterial({
         color: getColor(),
       }),
-      textured: new THREE.MeshPhysicalMaterial({ map: texture }),
+      textured: new THREE.MeshPhysicalMaterial({
+        map: texture,
+        roughness: 1,
+        metalness: 0,
+        reflectivity: 0,
+      }),
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [texture]);

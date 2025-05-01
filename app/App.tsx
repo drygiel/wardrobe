@@ -68,6 +68,9 @@ function App() {
           <Button type="primary" onClick={() => fullscreen()}>
             Full Screen
           </Button>
+          <Button type="primary" onClick={() => app.setView(app.view === 'initial' ? 'left-side' : 'initial')}>
+            Reset Camera
+          </Button>
           <Button onClick={() => app.xr.enterVR()}>VR</Button>
           <Button onClick={() => app.xr.enterAR()}>AR</Button>
           <Button onClick={() => app.xr.enterXR('immersive-ar')}>XR</Button>
@@ -80,7 +83,7 @@ function App() {
         <XR store={app.xr}>
           <Scene />
         </XR>
-        <Stats className={styles.stats} />
+        {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}
       </Canvas>
     </div>
   );

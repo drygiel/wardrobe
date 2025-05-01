@@ -17,7 +17,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Model as Wardrobe } from '../components/Wardrobe';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useNonInitialEffect } from '@/hooks/useNonInitialEffect';
-import { IfInSessionMode } from '@react-three/xr';
+import { IfInSessionMode, XROrigin } from '@react-three/xr';
 
 interface ViewState {
   position: THREE.Vector3;
@@ -52,7 +52,7 @@ export default function Scene() {
   }, []);
 
   const app = useApp();
-  const { camera } = useThree();
+  const camera = useThree(t => t.camera);
   const controls = useThree(state => state.controls as ComponentRef<typeof OrbitControls>);
   const perCamRef = useRef<THREE.PerspectiveCamera>(null!);
   const orthoCamRef = useRef<THREE.OrthographicCamera>(null!);
@@ -205,6 +205,8 @@ export default function Scene() {
 
       <ambientLight intensity={app.wireframe ? 1 : 10} />
       <pointLight position={[0.8, 2.2, -1.5]} color="white" intensity={app.wireframe ? 2 : 10} />
+
+      <XROrigin position={[1, 0, -0.5]} />
 
       <Suspense
         fallback={

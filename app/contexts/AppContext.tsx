@@ -1,19 +1,21 @@
 ﻿'use client';
 
-import { createXRStore } from '@react-three/xr'
+import { createXRStore } from '@react-three/xr';
 import type { LineData } from '@/components/Mesh';
 import { createContext, ReactNode, use, useRef, useState } from 'react';
+import type { RootState } from '@react-three/fiber';
 export type SceneView = 'initial' | 'left-side';
 
 const xr = createXRStore();
 
 const useAppStore = () => {
+  const [three, setThree] = useState<RootState>();
   const [grid, setGrid] = useState(true);
   const [wireframe, setWireframe] = useState(false);
   const [orthographic, setOrthographic] = useState(false);
-  const [hideFronts, setHideFronts] = useState(false);
+  const [hideFronts, setHideFronts] = useState(process.env.NODE_ENV === 'development');
   const [view, setView] = useState<SceneView>('initial');
-  const [gizmo, setGizmo] = useState(false);
+  const [gizmo, setGizmo] = useState(process.env.NODE_ENV === 'development');
   const [layer, setLayer] = useState(0);
   const line = useRef<LineData | null>(null);
 
@@ -31,9 +33,11 @@ const useAppStore = () => {
     line,
     gizmo,
     setGizmo,
-    view, 
+    view,
     setView,
     xr,
+    three,
+    setThree,
   };
 };
 

@@ -179,17 +179,6 @@ export function Model(props: ThreeElements['group']) {
     line.current = lineData;
     showRedLine(lineData);
     line.current.onHover();
-
-    // Hide ocluded
-
-    // line.points.forEach(p => {
-    //   const worldPoint = line.meshRef.current.localToWorld(p.clone());
-    //
-    //   raycaster.layers.set(0);
-    //   raycaster.firstHitOnly = false;
-    //   // raycaster.set()FromCamera(new THREE.Vector2(worldPoint.x, worldPoint.y).normalize(), camera);
-    //   // const intersects = raycaster.intersectObject(sceneGroup.current, true);
-    // });
   });
 
   const showRedLine = ({ meshRef, points }: LineData) => {
