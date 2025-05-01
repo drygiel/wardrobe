@@ -1,7 +1,4 @@
-﻿@import 'react-image-gallery/styles/css/image-gallery.css';
-
-
-.intro {
+﻿.intro {
     display: block;
     padding: 0;
     position: fixed;
@@ -74,7 +71,7 @@
 
 .gallery {
     position: fixed;
-    width: 100vw;//calc(100vw - 17px);
+    width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
@@ -88,7 +85,10 @@
         }
     }
 
+    :global(.image-gallery-content .image-gallery-slide .image-gallery-image),
     .image-gallery-content .image-gallery-slide .image-gallery-image {
         max-height: 100vh !important;
+        width: 100%;
+        object-fit: contain;
     }
 }

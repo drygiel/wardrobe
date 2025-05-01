@@ -6,6 +6,7 @@ import cn from 'classnames';
 import { Button } from 'antd';
 import { LoginOutlined, PictureOutlined } from '@ant-design/icons';
 import { useApp } from '@/contexts/AppContext';
+import 'react-image-gallery/styles/css/image-gallery.css';
 import styles from './Intro.module.scss';
 
 export default function Intro() {
