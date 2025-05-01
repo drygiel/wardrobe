@@ -1,7 +1,11 @@
 ﻿'use client';
+
+import { createXRStore } from '@react-three/xr'
 import type { LineData } from '@/components/Mesh';
 import { createContext, ReactNode, use, useRef, useState } from 'react';
 export type SceneView = 'initial' | 'left-side';
+
+const xr = createXRStore();
 
 const useAppStore = () => {
   const [grid, setGrid] = useState(true);
@@ -27,7 +31,9 @@ const useAppStore = () => {
     line,
     gizmo,
     setGizmo,
-    view, setView,
+    view, 
+    setView,
+    xr,
   };
 };
 

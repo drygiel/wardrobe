@@ -116,6 +116,7 @@ export function Model(props: ThreeElements['group']) {
   const { actions } = useAnimations(animations, sceneGroup);
   const { wireframe, line, hideFronts } = useApp();
 
+
   const ToggleAction = (name: ActionName, event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     const action = actions[name]!;
@@ -143,6 +144,7 @@ export function Model(props: ThreeElements['group']) {
   const { pointer, raycaster, camera } = useThree();
 
   useFrame(() => {
+    raycaster.camera = camera;
     if (isLMBPressed.current) return;
     if (!lineGroup.current || !lineRef.current || !sceneGroup.current) return;
     if (pointerPos.current.equals(pointer)) return;

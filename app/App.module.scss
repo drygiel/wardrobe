@@ -10,6 +10,7 @@
         color: white;
         z-index: 100;
         align-items: center;
+        justify-content: space-between;
         gap: 1em;
         background: rgba(0, 0, 0, 0.5);
         transition: transform 0.3s;
@@ -19,7 +20,13 @@
             transform: translateY(-100%);
         }
 
-        > main {
+        .main {
+            display: flex;
+            gap: 1em;
+            align-items: center;
+        }
+
+        .right {
             display: flex;
             gap: 1em;
             align-items: center;

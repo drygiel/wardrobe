@@ -94,6 +94,7 @@ export default function Intro() {
           items={images}
           showThumbnails={false}
           showPlayButton={false}
+          slideDuration={0}
           infinite
           onScreenChange={fullScreen => {
             document.getElementById('gallery')!.style.display = fullScreen ? 'block' : 'none';

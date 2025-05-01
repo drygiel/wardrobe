@@ -17,6 +17,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Model as Wardrobe } from '../components/Wardrobe';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useNonInitialEffect } from '@/hooks/useNonInitialEffect';
+import { IfInSessionMode } from '@react-three/xr';
 
 interface ViewState {
   position: THREE.Vector3;
@@ -141,64 +142,66 @@ export default function Scene() {
         far={1000}
         fov={71}
       />
-      <OrthographicCamera
-        makeDefault={app.orthographic}
-        ref={orthoCamRef}
-        position={camState.position}
-        zoom={camState.zoom}
-        near={0.01}
-        far={1000}
-      />
 
-      <OrbitControls
-        makeDefault
-        target={target.current}
-        zoomToCursor
-        onEnd={() => {
-          // console.log('target', {
-          //   p: controls.object.position
-          //     .toArray()
-          //     .map(n => n.toFixed(2))
-          //     .join(', '),
-          //   t: controls.target
-          //     .toArray()
-          //     .map(n => n.toFixed(2))
-          //     .join(', '),
-          //   z: controls.object.zoom.toFixed(2),
-          // });
+      <IfInSessionMode deny={['immersive-ar', 'immersive-vr']}>
+        <OrthographicCamera
+          makeDefault={app.orthographic}
+          ref={orthoCamRef}
+          position={camState.position}
+          zoom={camState.zoom}
+          near={0.01}
+          far={1000}
+        />
 
-          if (
-            !app.orthographic &&
-            Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
-            Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
-          ) {
-            controls.object.position.set(3, 1.4, 0);
-            controls.target.set(-1, 1.4, 0);
-            controls.object.zoom = 1.7;
-            app.setOrthographic(true);
-            return;
-          }
+        <OrbitControls
+          makeDefault
+          target={target.current}
+          zoomToCursor
+          onEnd={() => {
+            // console.log('target', {
+            //   p: controls.object.position
+            //     .toArray()
+            //     .map(n => n.toFixed(2))
+            //     .join(', '),
+            //   t: controls.target
+            //     .toArray()
+            //     .map(n => n.toFixed(2))
+            //     .join(', '),
+            //   z: controls.object.zoom.toFixed(2),
+            // });
 
-          const camState = {
-            position: controls.object.position.toArray(),
-            target: controls.target.toArray(),
-            zoom: controls.object.zoom,
-          };
-          sessionStorage.setItem('camera', JSON.stringify(camState));
-        }}
-        maxDistance={6}
-        minDistance={0.3}
-        zoomSpeed={2}
-        enableDamping
-        dampingFactor={0.05}
-        // maxPolarAngle={Math.PI/2}
-      />
+            if (
+              !app.orthographic &&
+              Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
+              Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
+            ) {
+              controls.object.position.set(3, 1.4, 0);
+              controls.target.set(-1, 1.4, 0);
+              controls.object.zoom = 1.7;
+              app.setOrthographic(true);
+              return;
+            }
 
-      {app.gizmo && (
-        <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-          <GizmoViewport hideNegativeAxes axisHeadScale={0.8} />
-        </GizmoHelper>
-      )}
+            const camState = {
+              position: controls.object.position.toArray(),
+              target: controls.target.toArray(),
+              zoom: controls.object.zoom,
+            };
+            sessionStorage.setItem('camera', JSON.stringify(camState));
+          }}
+          maxDistance={6}
+          minDistance={0.3}
+          zoomSpeed={2}
+          enableDamping
+          dampingFactor={0.05}
+          // maxPolarAngle={Math.PI/2}
+        />
+        {app.gizmo && (
+          <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+            <GizmoViewport hideNegativeAxes axisHeadScale={0.8} />
+          </GizmoHelper>
+        )}
+      </IfInSessionMode>
 
       <ambientLight intensity={app.wireframe ? 1 : 10} />
       <pointLight position={[0.8, 2.2, -1.5]} color="white" intensity={app.wireframe ? 2 : 10} />
