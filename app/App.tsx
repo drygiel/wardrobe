@@ -4,7 +4,7 @@ import { Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { XR, XROrigin } from '@react-three/xr';
 import { OrbitHandles } from '@react-three/handle';
-import { noEvents, PointerEvents } from '@react-three/xr';
+import { PointerEvents } from '@react-three/xr';
 import Button from 'antd/lib/button';
 import Switch from 'antd/lib/switch';
 import InputNumber from 'antd/lib/input-number';
@@ -79,11 +79,11 @@ function App() {
         </div>
       </Layout>
 
-      <Canvas shadows dpr={2} events={noEvents}>
+      <Canvas shadows dpr={2}>
         <PointerEvents />
         <OrbitHandles />
         <XR store={app.xr}>
-          <XROrigin position={[2, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1.5} />
+          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={10} />
           <Scene />
         </XR>
         {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}

@@ -144,7 +144,6 @@ export function Model(props: ThreeElements['group']) {
   const { pointer, raycaster, camera } = useThree();
 
   useFrame(() => {
-    raycaster.camera = camera;
     if (isLMBPressed.current) return;
     if (!lineGroup.current || !lineRef.current || !sceneGroup.current) return;
     if (pointerPos.current.equals(pointer)) return;
