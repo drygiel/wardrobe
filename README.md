@@ -9,11 +9,6 @@
 - [ ] Project stages
 - [ ] Wardrobe only renders
 - [ ] Full room renders
-- [ ] VR/AR support
-- [ ] Create website
-- [ ] Publish website
-- [ ] Fix UV map texture
-- [ ] Full screen button
 
 
 ## Nice to have
@@ -24,6 +19,6 @@
 
 ## Optional
 - [ ] Smooth scroll
-- [ ] Render Video
+- [ ] Render Videot
 - [ ] Vertex measure tape
 

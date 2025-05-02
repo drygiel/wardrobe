@@ -152,56 +152,56 @@ export default function Scene() {
           near={0.01}
           far={1000}
         />
-
-        <OrbitControls
-          makeDefault
-          target={target.current}
-          zoomToCursor
-          onEnd={() => {
-            // console.log('target', {
-            //   p: controls.object.position
-            //     .toArray()
-            //     .map(n => n.toFixed(2))
-            //     .join(', '),
-            //   t: controls.target
-            //     .toArray()
-            //     .map(n => n.toFixed(2))
-            //     .join(', '),
-            //   z: controls.object.zoom.toFixed(2),
-            // });
-
-            if (
-              !app.orthographic &&
-              Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
-              Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
-            ) {
-              controls.object.position.set(3, 1.4, 0);
-              controls.target.set(-1, 1.4, 0);
-              controls.object.zoom = 1.7;
-              app.setOrthographic(true);
-              return;
-            }
-
-            const camState = {
-              position: controls.object.position.toArray(),
-              target: controls.target.toArray(),
-              zoom: controls.object.zoom,
-            };
-            sessionStorage.setItem('camera', JSON.stringify(camState));
-          }}
-          maxDistance={6}
-          minDistance={0.3}
-          zoomSpeed={2}
-          enableDamping
-          dampingFactor={0.05}
-          // maxPolarAngle={Math.PI/2}
-        />
-        {app.gizmo && (
-          <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-            <GizmoViewport hideNegativeAxes axisHeadScale={0.8} />
-          </GizmoHelper>
-        )}
       </IfInSessionMode>
+
+      <OrbitControls
+        makeDefault
+        target={target.current}
+        zoomToCursor
+        onEnd={() => {
+          // console.log('target', {
+          //   p: controls.object.position
+          //     .toArray()
+          //     .map(n => n.toFixed(2))
+          //     .join(', '),
+          //   t: controls.target
+          //     .toArray()
+          //     .map(n => n.toFixed(2))
+          //     .join(', '),
+          //   z: controls.object.zoom.toFixed(2),
+          // });
+
+          if (
+            !app.orthographic &&
+            Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
+            Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
+          ) {
+            controls.object.position.set(3, 1.4, 0);
+            controls.target.set(-1, 1.4, 0);
+            controls.object.zoom = 1.7;
+            app.setOrthographic(true);
+            return;
+          }
+
+          const camState = {
+            position: controls.object.position.toArray(),
+            target: controls.target.toArray(),
+            zoom: controls.object.zoom,
+          };
+          sessionStorage.setItem('camera', JSON.stringify(camState));
+        }}
+        maxDistance={6}
+        minDistance={0.3}
+        zoomSpeed={2}
+        enableDamping
+        dampingFactor={0.05}
+        // maxPolarAngle={Math.PI/2}
+      />
+      {app.gizmo && (
+        <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+          <GizmoViewport hideNegativeAxes axisHeadScale={0.8} />
+        </GizmoHelper>
+      )}
 
       <ambientLight intensity={app.wireframe ? 1 : 10} />
       <pointLight position={[0.8, 2.2, -1.5]} color="white" intensity={app.wireframe ? 2 : 10} />
