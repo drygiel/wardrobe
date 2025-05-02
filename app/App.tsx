@@ -74,9 +74,8 @@ function App() {
           <Button type="primary" onClick={() => app.setView(app.view === 'initial' ? 'left-side' : 'initial')}>
             Reset View
           </Button>
-          <Button onClick={() => app.xr.enterXR('immersive-ar')}>XR</Button>
-          <Button onClick={() => app.xr.enterAR()}>AR</Button>
-          <Button onClick={() => app.xr.enterVR()}>VR</Button>
+          <Button type="primary" danger onClick={() => app.xr.enterAR()}>AR</Button>
+          <Button type="primary" danger onClick={() => app.xr.enterVR()}>VR</Button>
         </div>
       </Layout>
 
@@ -84,7 +83,7 @@ function App() {
         <PointerEvents />
         <OrbitHandles />
         <XR store={app.xr}>
-          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={0.5} />
+          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
           <Scene />
         </XR>
         {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}
