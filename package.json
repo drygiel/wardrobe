@@ -2,7 +2,6 @@
   "name": "wardrobe",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack --port 4000",
     "build": "next build",
