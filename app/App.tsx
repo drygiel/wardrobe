@@ -59,6 +59,7 @@ function App() {
           />
 
           <InputNumber
+            className={styles.layer}
             value={app.layer}
             onChange={value => app.setLayer(value ?? 0)}
             min={0}
@@ -71,11 +72,11 @@ function App() {
             Full Screen
           </Button>
           <Button type="primary" onClick={() => app.setView(app.view === 'initial' ? 'left-side' : 'initial')}>
-            Reset Camera
+            Reset View
           </Button>
-          <Button onClick={() => app.xr.enterVR()}>VR</Button>
-          <Button onClick={() => app.xr.enterAR()}>AR</Button>
           <Button onClick={() => app.xr.enterXR('immersive-ar')}>XR</Button>
+          <Button onClick={() => app.xr.enterAR()}>AR</Button>
+          <Button onClick={() => app.xr.enterVR()}>VR</Button>
         </div>
       </Layout>
 
@@ -83,7 +84,7 @@ function App() {
         <PointerEvents />
         <OrbitHandles />
         <XR store={app.xr}>
-          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={10} />
+          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={0.5} />
           <Scene />
         </XR>
         {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}

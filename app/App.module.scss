@@ -24,6 +24,10 @@
             display: flex;
             gap: 1em;
             align-items: center;
+            
+            .layer {
+                width: 50px;
+            }
         }
 
         .right {
