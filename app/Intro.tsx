@@ -3,8 +3,9 @@
 import { useRef } from 'react';
 import ImageGallery, { type ReactImageGalleryItem } from 'react-image-gallery';
 import cn from 'classnames';
-import { Button } from 'antd';
-import { LoginOutlined, PictureOutlined } from '@ant-design/icons';
+import Button from 'antd/lib/button';
+import LoginOutlined from '@ant-design/icons/LoginOutlined';
+import PictureOutlined from '@ant-design/icons/PictureOutlined';
 import { useApp } from '@/contexts/AppContext';
 import 'react-image-gallery/styles/css/image-gallery.css';
 import styles from './Intro.module.scss';
@@ -20,6 +21,7 @@ export default function Intro() {
         original: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
         thumbnail: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
         originalHeight: 2080,
+        loading: 'lazy',
       }) as ReactImageGalleryItem,
   );
 
@@ -71,10 +73,6 @@ export default function Intro() {
             ultricies.
           </p>
           <p className={styles.actions}>
-            <Button icon={<LoginOutlined />} type="primary" onClick={() => openEditor()}>
-              Pomiary
-            </Button>
-
             <Button
               icon={<LoginOutlined />}
               type="default"
@@ -83,6 +81,16 @@ export default function Intro() {
               }}
             >
               Wstecz
+            </Button>
+
+            <Button
+              icon={<LoginOutlined />}
+              type="primary"
+              danger
+              color="red"
+              onClick={() => openEditor()}
+            >
+              Pomiary
             </Button>
           </p>
         </aside>

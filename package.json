@@ -1,7 +1,8 @@
 {
   "name": "wardrobe",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack --port 4000",
     "build": "next build",
@@ -12,14 +13,13 @@
     "deploy": "tsx deploy.ts"
   },
   "dependencies": {
-    "@ant-design/nextjs-registry": "^1.0.2",
-    "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@ant-design/cssinjs": "^1.23.0",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
     "@react-three/handle": "^6.6.16",
     "@react-three/xr": "^6.6.16",
     "@tweenjs/tween.js": "^25.0.0",
-    "antd": "^5.24.8",
+    "antd": "^5.24.9",
     "next": "^15.3.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

@@ -2,11 +2,13 @@
 
 import { Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { XR } from '@react-three/xr';
+import { XR, XROrigin } from '@react-three/xr';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents } from '@react-three/xr';
-import '@ant-design/v5-patch-for-react-19';
-import { Switch, InputNumber, Button, Layout } from 'antd';
+import Button from 'antd/lib/button';
+import Switch from 'antd/lib/switch';
+import InputNumber from 'antd/lib/input-number';
+import Layout from 'antd/lib/layout';
 import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
 import Scene from '@/components/Scene';
@@ -81,6 +83,7 @@ function App() {
         <PointerEvents />
         <OrbitHandles />
         <XR store={app.xr}>
+          <XROrigin position={[2, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1.5} />
           <Scene />
         </XR>
         {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}
