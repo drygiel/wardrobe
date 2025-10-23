@@ -11,13 +11,13 @@ import {
   Loader,
   Html,
   OrthographicCamera,
-  PerspectiveCamera,
+  PerspectiveCamera
 } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Model as Wardrobe } from '../components/Wardrobe';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useNonInitialEffect } from '@/hooks/useNonInitialEffect';
-import { IfInSessionMode } from '@react-three/xr';
+import { useXR } from '@react-three/xr';
 
 interface ViewState {
   position: THREE.Vector3;
@@ -57,6 +57,8 @@ export default function Scene() {
   const perCamRef = useRef<THREE.PerspectiveCamera>(null!);
   const orthoCamRef = useRef<THREE.OrthographicCamera>(null!);
   const target = useRef(camState.target);
+  const xr = useXR();
+  const isPresenting = !!xr.session;
 
   useEffect(() => {
     camera?.layers.set(app.layer);
@@ -73,7 +75,7 @@ export default function Scene() {
   const tweens = useRef<TWEEN.Group>(new TWEEN.Group());
 
   useNonInitialEffect(() => {
-    if (!controls) return;
+    if (!controls || isPresenting) return;
 
     tweens.current.removeAll();
     tweens.current.add(
@@ -88,10 +90,10 @@ export default function Scene() {
         .interpolation(TWEEN.Interpolation.Bezier)
         .start(),
     );
-  }, [app.view]);
+  }, [app.view, isPresenting]);
 
   useEffect(() => {
-    if (!controls) return;
+    if (!controls || isPresenting) return;
     target.current.copy(controls.target);
 
     if (!app.orthographic) {
@@ -111,7 +113,7 @@ export default function Scene() {
     orthoCamRef.current.right = halfWidth;
     orthoCamRef.current.zoom = Math.min(Math.max(1, perCamRef.current.zoom), 3);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app.orthographic]);
+  }, [app.orthographic, isPresenting]);
 
   useFrame(() => {
     tweens.current?.update();
@@ -134,7 +136,7 @@ export default function Scene() {
       />
 
       <PerspectiveCamera
-        makeDefault={!app.orthographic}
+        makeDefault={!app.orthographic || isPresenting}
         ref={perCamRef}
         position={camState.position}
         zoom={camState.zoom}
@@ -143,7 +145,7 @@ export default function Scene() {
         fov={71}
       />
 
-      <IfInSessionMode deny={['immersive-ar', 'immersive-vr']}>
+      {!isPresenting && (
         <OrthographicCamera
           makeDefault={app.orthographic}
           ref={orthoCamRef}
@@ -152,51 +154,54 @@ export default function Scene() {
           near={0.01}
           far={1000}
         />
-      </IfInSessionMode>
+      )}
 
-      <OrbitControls
-        makeDefault
-        target={target.current}
-        zoomToCursor
-        onEnd={() => {
-          // console.log('target', {
-          //   p: controls.object.position
-          //     .toArray()
-          //     .map(n => n.toFixed(2))
-          //     .join(', '),
-          //   t: controls.target
-          //     .toArray()
-          //     .map(n => n.toFixed(2))
-          //     .join(', '),
-          //   z: controls.object.zoom.toFixed(2),
-          // });
+      {!isPresenting && (
+        <OrbitControls
+          makeDefault
+          target={target.current}
+          zoomToCursor
+          onEnd={() => {
+            // console.log('target', {
+            //   p: controls.object.position
+            //     .toArray()
+            //     .map(n => n.toFixed(2))
+            //     .join(', '),
+            //   t: controls.target
+            //     .toArray()
+            //     .map(n => n.toFixed(2))
+            //     .join(', '),
+            //   z: controls.object.zoom.toFixed(2),
+            // });
 
-          if (
-            !app.orthographic &&
-            Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
-            Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
-          ) {
-            controls.object.position.set(3, 1.4, 0);
-            controls.target.set(-1, 1.4, 0);
-            controls.object.zoom = 1.7;
-            app.setOrthographic(true);
-            return;
-          }
+            if (
+              !app.orthographic &&
+              Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
+              Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
+            ) {
+              controls.object.position.set(3, 1.4, 0);
+              controls.target.set(-1, 1.4, 0);
+              controls.object.zoom = 1.7;
+              app.setOrthographic(true);
+              return;
+            }
 
-          const camState = {
-            position: controls.object.position.toArray(),
-            target: controls.target.toArray(),
-            zoom: controls.object.zoom,
-          };
-          sessionStorage.setItem('camera', JSON.stringify(camState));
-        }}
-        maxDistance={6}
-        minDistance={0.3}
-        zoomSpeed={2}
-        enableDamping
-        dampingFactor={0.05}
-        // maxPolarAngle={Math.PI/2}
-      />
+            const camState = {
+              position: controls.object.position.toArray(),
+              target: controls.target.toArray(),
+              zoom: controls.object.zoom,
+            };
+            sessionStorage.setItem('camera', JSON.stringify(camState));
+          }}
+          maxDistance={6}
+          minDistance={0.3}
+          zoomSpeed={2}
+          enableDamping
+          dampingFactor={0.05}
+          // maxPolarAngle={Math.PI/2}
+        />
+      )}
+
       {app.gizmo && (
         <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
           <GizmoViewport hideNegativeAxes axisHeadScale={0.8} />
@@ -205,6 +210,14 @@ export default function Scene() {
 
       <ambientLight intensity={app.wireframe ? 1 : 10} />
       <pointLight position={[0.8, 2.2, -1.5]} color="white" intensity={app.wireframe ? 2 : 10} />
+      
+      {/* VR-specific elements */}
+      {isPresenting && (
+        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[10, 10]} />
+          <meshBasicMaterial color="white" transparent opacity={0.1} />
+        </mesh>
+      )}
 
       <Suspense
         fallback={
