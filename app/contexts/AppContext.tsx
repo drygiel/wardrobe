@@ -1,5 +1,3 @@
-﻿'use client';
-
 import { createXRStore } from '@react-three/xr';
 import type { LineData } from '@/components/Mesh';
 import { createContext, ReactNode, use, useRef, useState } from 'react';

@@ -1,5 +1,3 @@
-﻿'use client';
-
 import { Suspense, useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';

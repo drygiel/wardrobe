@@ -1,5 +1,3 @@
-'use client';
-
 import * as THREE from 'three';
 import { type ComponentRef, useRef } from 'react';
 import { useAnimations, useGLTF, Line } from '@react-three/drei';
@@ -105,7 +103,7 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[];
 };
 
-const path = `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/models/Wardrobe.glb`;
+const path = `${import.meta.env.BASE_URL}models/Wardrobe.glb`;
 
 export function Model(props: ThreeElements['group']) {
   const lineRef = useRef<ComponentRef<typeof Line>>(null!);

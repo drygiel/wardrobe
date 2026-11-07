@@ -1,11 +1,8 @@
-﻿'use client';
-
 import { useRef } from 'react';
 import ImageGallery, { type ReactImageGalleryItem } from 'react-image-gallery';
 import cn from 'classnames';
-import Button from 'antd/lib/button';
-import LoginOutlined from '@ant-design/icons/LoginOutlined';
-import PictureOutlined from '@ant-design/icons/PictureOutlined';
+import { Button } from 'antd';
+import { LoginOutlined, PictureOutlined } from '@ant-design/icons';
 import { useApp } from '@/contexts/AppContext';
 import 'react-image-gallery/styles/css/image-gallery.css';
 import styles from './Intro.module.scss';
@@ -18,8 +15,8 @@ export default function Intro() {
   const images = Array.from({ length: 33 }).map(
     (_, i) =>
       ({
-        original: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
-        thumbnail: `${process.env.NEXT_PUBLIC_BASEPATH ?? ''}/images/${i + 1}.jpg`,
+        original: `${import.meta.env.BASE_URL}images/${i + 1}.jpg`,
+        thumbnail: `${import.meta.env.BASE_URL}images/${i + 1}.jpg`,
         originalHeight: 2080,
         loading: 'lazy',
       }) as ReactImageGalleryItem,

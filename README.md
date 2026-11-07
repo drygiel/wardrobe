@@ -25,7 +25,7 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 
 ### Frontend
 - **React 19** - Modern React with latest features
-- **Next.js 15** - Full-stack React framework with Turbopack
+- **Vite 8** - Dev server and bundler (multi-page: `index.html`, `editor.html`)
 - **TypeScript** - Type-safe development
 - **Sass** - CSS preprocessing with modules
 
@@ -61,6 +61,8 @@ app/
 │   └── useNonInitialEffect.ts
 ├── Intro.tsx              # Landing page with project info
 ├── App.tsx                # Main application component
+├── main.tsx               # Entry for index.html
+├── editor.tsx             # Entry for editor.html
 └── *.module.scss          # Component-specific styles
 ```
 
@@ -105,14 +107,14 @@ yarn dev
 ```bash
 yarn dev          # Start development server (port 4000)
 yarn build         # Build for production
-yarn start         # Start production server (port 4001)
+yarn preview       # Preview production build (port 4001)
 yarn lint          # Run ESLint
 yarn deploy        # Deploy to production
 ```
 
 ### Environment Variables
 ```env
-NEXT_PUBLIC_BASEPATH=/your-base-path  # Optional base path for assets
+BASE_PATH=/your-base-path/  # Optional base path (Vite `base`)
 ```
 
 ## 🎨 Customization

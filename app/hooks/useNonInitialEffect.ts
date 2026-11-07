@@ -1,5 +1,3 @@
-﻿'use client';
-
 import { useEffect, useRef, EffectCallback, DependencyList } from 'react';
 
 export const useNonInitialEffect = (

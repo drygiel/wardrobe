@@ -13,10 +13,6 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
 # production
 /build
 
@@ -32,9 +28,6 @@ yarn-error.log*
 
 .env
 !.env.sample
-
-# vercel
-.vercel
 
 # typescript
 *.tsbuildinfo

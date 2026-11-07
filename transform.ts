@@ -83,7 +83,7 @@ async function prepare() {
 prepare();
 
 console.log('Watching...');
-watchFile(path, (curr, prev) => {
+watchFile(path, curr => {
   console.log('File changed'.yellow, { size: humanReadableSize(curr.size) });
   if (curr.size === 0) return;
   prepare();

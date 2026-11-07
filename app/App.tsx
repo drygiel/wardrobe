@@ -1,12 +1,7 @@
-'use client';
-
 import { Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { XR, XROrigin } from '@react-three/xr';
-import Button from 'antd/lib/button';
-import Switch from 'antd/lib/switch';
-import InputNumber from 'antd/lib/input-number';
-import Layout from 'antd/lib/layout';
+import { Button, InputNumber, Layout, Switch } from 'antd';
 import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
 import Scene from '@/components/Scene';
@@ -82,7 +77,7 @@ function App() {
           <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
           <Scene />
         </XR>
-        {process.env.NODE_ENV === 'development' && <Stats className={styles.stats} />}
+        {import.meta.env.DEV && <Stats className={styles.stats} />}
       </Canvas>
     </div>
   );
