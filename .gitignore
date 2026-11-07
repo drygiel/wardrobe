@@ -38,3 +38,5 @@ yarn-error.log*
 
 # IDE
 /.idea
+# Design tooling
+/.taste-skill

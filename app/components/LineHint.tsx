@@ -8,7 +8,7 @@ import type { LineData } from '@/components/Mesh';
 import styles from './LineHint.module.scss';
 
 export function LineHint() {
-  const { line } = useApp();
+  const { line, readout } = useApp();
   const htmlRef = useRef<HTMLDivElement>(null!);
   const hintGroup = useRef<THREE.Group>(null);
   const lineGroup = useRef<THREE.Group>(null);
@@ -35,6 +35,7 @@ export function LineHint() {
     const isVertical = yLen > xLen && yLen > zLen;
 
     htmlRef.current.querySelector(`.${styles.value}`)!.textContent = format(width);
+    if (readout.current) readout.current.textContent = `${format(width)} cm`;
 
     if (htmlRef.current.classList.contains(styles.vertical) === isVertical) return;
     htmlRef.current.style.visibility = 'hidden';
@@ -45,7 +46,7 @@ export function LineHint() {
   const format = (n: number | undefined) => {
     if (!n) return '';
     const result = (n * 100).toFixed(1);
-    return result.replace(/\.?0*$/, ''); // Remove trailing zeros and dot
+    return result.replace(/\.?0*$/, '').replace('.', ','); // Remove trailing zeros and dot, Polish decimal comma
   };
 
   return (

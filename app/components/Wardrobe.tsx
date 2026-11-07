@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { type ComponentRef, useRef } from 'react';
-import { useAnimations, useGLTF, Line } from '@react-three/drei';
-import { type ThreeElements, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { useRef } from 'react';
+import { useAnimations, useGLTF } from '@react-three/drei';
+import { type ThreeElements, type ThreeEvent } from '@react-three/fiber';
 import { GLTF } from 'three-stdlib';
-import { Mesh, type LineData } from './Mesh';
+import { Mesh } from './Mesh';
+import { Measurable } from './Measurable';
 import { useApp } from '@/contexts/AppContext';
-import { useEventListener } from '@/hooks/useEventListener';
-import { LineHint } from '@/components/LineHint';
+import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
 
 type ActionName =
   | 'OpenBShelve'
@@ -103,116 +103,42 @@ type GLTFResult = GLTF & {
   animations: GLTFAction[];
 };
 
-const path = `${import.meta.env.BASE_URL}models/Wardrobe.glb`;
+type FrameResult = GLTF & { nodes: Record<string, THREE.Mesh> };
 
-export function Model(props: ThreeElements['group']) {
-  const lineRef = useRef<ComponentRef<typeof Line>>(null!);
+// Plays a door clip forward or back; the open state lives on the clicked object
+export function toggleAction(action: THREE.AnimationAction, data: Record<string, unknown>) {
+  action.reset();
+
+  if (data.open) {
+    action.timeScale = -1;
+    action.time = action.getClip().duration / 3;
+  } else {
+    action.timeScale = 1;
+  }
+
+  action.setLoop(THREE.LoopOnce, 1);
+  action.clampWhenFinished = true;
+  action.play();
+  data.open = !data.open;
+}
+
+export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
   const sceneGroup = useRef<THREE.Group>(null!);
-  const lineGroup = useRef<THREE.Group>(null!);
-  const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());
-  const { nodes, animations } = useGLTF(path) as unknown as GLTFResult;
+  const { nodes, animations } = useGLTF(WARDROBE_GLB) as unknown as GLTFResult;
+  const frame = useGLTF(FRAME_GLB) as unknown as FrameResult;
   const { actions } = useAnimations(animations, sceneGroup);
-  const { wireframe, line, hideFronts } = useApp();
-
+  const { hideFronts } = useApp();
 
   const ToggleAction = (name: ActionName, event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    const action = actions[name]!;
-    const data = event.eventObject.userData;
-    action.reset();
-
-    if (data.open) {
-      action.timeScale = -1;
-      action.time = action.getClip().duration / 3;
-    } else {
-      action.timeScale = 1;
-    }
-
-    action.setLoop(THREE.LoopOnce, 1);
-    action.clampWhenFinished = true;
-    action.play();
-    data.open = !data.open;
-  };
-
-  const isLMBPressed = useRef(false);
-
-  useEventListener('pointerdown', () => (isLMBPressed.current = true));
-  useEventListener('pointerup', () => (isLMBPressed.current = false));
-
-  const { pointer, raycaster, camera } = useThree();
-
-  useFrame(() => {
-    if (isLMBPressed.current) return;
-    if (!lineGroup.current || !lineRef.current || !sceneGroup.current) return;
-    if (pointerPos.current.equals(pointer)) return;
-    pointerPos.current.copy(pointer);
-
-    if (!wireframe) {
-      line.current = null;
-      return;
-    }
-
-    raycaster.layers.set(1);
-    raycaster.firstHitOnly = true;
-    raycaster.setFromCamera(pointer, camera);
-    const intersects = raycaster.intersectObject(sceneGroup.current, true);
-    raycaster.layers.set(0);
-
-    // const line = intersects[0]?.object.userData as LineData;
-    const lineData = intersects.find(i => i.object.name.startsWith('line'))?.object
-      .userData as LineData;
-
-    if (!lineData) {
-      const onBlur = line.current?.onBlur;
-      line.current = null;
-      lineRef.current.visible = false;
-      onBlur?.();
-      return;
-    }
-
-    if (line.current === lineData) return;
-
-    line.current?.onBlur();
-    line.current = lineData;
-    showRedLine(lineData);
-    line.current.onHover();
-  });
-
-  const showRedLine = ({ meshRef, points }: LineData) => {
-    lineRef.current.position.copy(meshRef.current.position);
-    lineRef.current.rotation.copy(meshRef.current.rotation);
-    lineRef.current.geometry.setPositions(points.map(p => [p.x, p.y, p.z]).flat());
-
-    if (meshRef.current.parent?.type === 'Mesh') {
-      lineGroup.current.position.copy(meshRef.current.parent.position);
-      lineGroup.current.rotation.copy(meshRef.current.parent.rotation);
-    } else {
-      lineGroup.current.position.set(0, 0, 0);
-      lineGroup.current.rotation.set(0, 0, 0);
-    }
-    lineRef.current.visible = true;
-
-    // lineRef.current.geometry.setPositions(
-    //   points.map(p => meshRef.current.localToWorld(p.clone()).toArray()).flat(),
-    // );
+    toggleAction(actions[name]!, event.eventObject.userData);
   };
 
   return (
-    <group {...props} dispose={null}>
-      <group ref={lineGroup}>
-        <LineHint />
-        <Line
-          ref={lineRef}
-          visible={wireframe}
-          points={[0, 0, 0, 0, 0, 0]}
-          lineWidth={2.5}
-          color="red"
-          renderOrder={1000}
-        />
-      </group>
-
-      <group ref={sceneGroup} name="Scene">
-        <Mesh name="Frame" geometry={nodes.Frame.geometry} material={nodes.Frame.material} position={[-0.265, 1.6525, -1.0025]} />
+    <Measurable ref={sceneGroup} {...props}>
+        {FRAME_PIECES.map(name => (
+          <Mesh key={name} name={name} geometry={frame.nodes[name].geometry} position={frame.nodes[name].position} />
+        ))}
         <Mesh name="BackCap" geometry={nodes.BackCap.geometry} material={nodes.BackCap.material} position={[0.001, 1.323333, -1.0075]} />
         <Mesh name="AFront" onClick={event => ToggleAction('OpenBShelve', event)} visible={!hideFronts} geometry={nodes.AFront.geometry} material={nodes.AFront.material} position={[-0.5025, 0.045, -2.2925]} />
         <Mesh name="FrontsBBL" onClick={event => ToggleAction('OpenBL', event)} visible={!hideFronts} geometry={nodes.FrontsBBL.geometry} material={nodes.FrontsBBL.material} position={[-0.5025, 0.045, -2.2275]}>
@@ -289,9 +215,9 @@ export function Model(props: ThreeElements['group']) {
         <Mesh name="AShelves003" geometry={nodes.AShelves003.geometry} material={nodes.AShelves003.material} position={[-0.285, 1.421537, -2.456775]} />
         <Mesh name="AShelves004" geometry={nodes.AShelves004.geometry} material={nodes.AShelves004.material} position={[-0.285, 1.821537, -2.456775]} />
         <Mesh name="AShelves005" geometry={nodes.AShelves005.geometry} material={nodes.AShelves005.material} position={[-0.285, 2.221537, -2.456775]} />
-      </group>
-    </group>
+    </Measurable>
   );
 }
 
-useGLTF.preload(path);
+useGLTF.preload(WARDROBE_GLB);
+useGLTF.preload(FRAME_GLB);

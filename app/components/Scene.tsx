@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, type ComponentRef } from 'react';
+import { type ReactNode, Suspense, useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import {
@@ -12,7 +12,6 @@ import {
   PerspectiveCamera
 } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Model as Wardrobe } from '../components/Wardrobe';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useNonInitialEffect } from '@/hooks/useNonInitialEffect';
 import { useXR } from '@react-three/xr';
@@ -36,10 +35,12 @@ const Views: Record<SceneView, ViewState> = {
   },
 };
 
-export default function Scene() {
+export default function Scene({ children }: { children: ReactNode }) {
+  const app = useApp();
+
   const camState = useMemo(() => {
     const stored = sessionStorage.getItem('camera');
-    if (!stored) return Views.initial;
+    if (!stored) return Views[app.view];
     const state = JSON.parse(stored);
 
     return {
@@ -47,9 +48,9 @@ export default function Scene() {
       target: new THREE.Vector3(...state.target),
       zoom: state?.zoom as number,
     } as ViewState;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const app = useApp();
   const camera = useThree(t => t.camera);
   const controls = useThree(state => state.controls as ComponentRef<typeof OrbitControls>);
   const perCamRef = useRef<THREE.PerspectiveCamera>(null!);
@@ -61,6 +62,11 @@ export default function Scene() {
   useEffect(() => {
     camera?.layers.set(app.layer);
   }, [app.layer, camera]);
+
+  // OrbitControls blocks touch scrolling while connected; give the page back its scroll when inactive
+  useEffect(() => {
+    if (controls?.domElement) controls.domElement.style.touchAction = app.active ? 'none' : 'pan-y';
+  }, [app.active, controls]);
 
   const frustumHeightAtDistance = (camera: THREE.PerspectiveCamera, distance: number) => {
     const vFov = (camera.fov * Math.PI) / 180;
@@ -128,7 +134,8 @@ export default function Scene() {
         cellThickness={0.6}
         sectionSize={1}
         sectionThickness={1}
-        sectionColor="black"
+        cellColor="#3a3631"
+        sectionColor="#6b645a"
         fadeDistance={20}
         fadeStrength={3}
       />
@@ -157,6 +164,7 @@ export default function Scene() {
       {!isPresenting && (
         <OrbitControls
           makeDefault
+          enabled={app.active}
           target={target.current}
           zoomToCursor
           onEnd={() => {
@@ -222,16 +230,18 @@ export default function Scene() {
           <group position={[0, 1, 0]}>
             <Html prepend center>
               <Loader
-                dataStyles={{ color: 'black' }}
-                innerStyles={{ backgroundColor: 'gray' }}
-                barStyles={{ backgroundColor: 'black' }}
+                dataStyles={{ color: '#e4e1da' }}
+                innerStyles={{ backgroundColor: '#221f1b' }}
+                barStyles={{ backgroundColor: '#f0b35a' }}
                 dataInterpolation={p => `${p.toFixed(0)}%`}
               />
             </Html>
           </group>
         }
       >
-        <Wardrobe position={[-0.5, 0, -1.5]} rotation={[0, Math.PI, 0]} />
+        <group position={[-0.5, 0, -1.5]} rotation={[0, Math.PI, 0]}>
+          {children}
+        </group>
       </Suspense>
     </>
   );

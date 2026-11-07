@@ -3,9 +3,10 @@ import * as THREE from 'three';
 import { type ThreeElements } from '@react-three/fiber';
 import { useCursor, useTexture, Line, Edges } from '@react-three/drei';
 import { useApp } from '@/contexts/AppContext';
+import { ATLAS } from '@/assets';
 
 export function Mesh(props: ThreeElements['mesh']) {
-  const texture = useTexture(`${import.meta.env.BASE_URL}models/Wardrobe.jpg`);
+  const texture = useTexture(ATLAS);
   const { wireframe } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
   const wireframeGroup = useRef<THREE.Group>(null!);
@@ -60,7 +61,8 @@ export function Mesh(props: ThreeElements['mesh']) {
     wireframeGroup.current.rotation.copy(meshRef.current.rotation);
   }, [wireframe]);
 
-  const edges = useMemo(() => {
+  // One LineSegments2 per mesh; a hit's faceIndex selects the edge, same 5px pick width as before
+  const lines = useMemo(() => {
     const vec = new THREE.Vector3();
     const position = edgesGeometry.attributes.position;
     const lines: LineData[] = [];
@@ -88,21 +90,23 @@ export function Mesh(props: ThreeElements['mesh']) {
       lines.push(data);
     }
 
-    return lines.map(line => (
-      <Line
-        matrixAutoUpdate={false}
-        key={line.name}
-        name={line.name}
-        color="black"
-        depthTest={false}
-        points={line.points}
-        lineWidth={5}
-        userData={line}
-        layers={visible ? 1 : 2}
-      />
-    ));
+    return lines;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [edgesGeometry, visible]);
+  }, [edgesGeometry]);
+
+  const edges = lines && (
+    <Line
+      segments
+      matrixAutoUpdate={false}
+      name={`line_${props.name}`}
+      color="black"
+      depthTest={false}
+      points={lines.flatMap(line => line.points)}
+      lineWidth={5}
+      userData={{ lines }}
+      layers={visible ? 1 : 2}
+    />
+  );
 
   return (
     <>

@@ -1,0 +1,137 @@
+.plan {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gap);
+    padding: 0 var(--m);
+    margin-top: var(--section);
+    background: var(--bg);
+}
+
+.figure {
+    grid-column: 1 / 8;
+    position: sticky;
+    top: 8vh;
+    align-self: start;
+
+    figcaption {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+
+    :global {
+        svg.plan {
+            width: 100%;
+            height: auto;
+            max-height: 78vh;
+            overflow: visible;
+
+            rect.part {
+                fill: var(--surface);
+                stroke: var(--ink);
+            }
+
+            rect.dim {
+                fill: none;
+                stroke: #4d473f;
+            }
+
+            rect.board {
+                fill: #2a2622;
+                stroke: #4d473f;
+            }
+
+            rect.led {
+                fill: var(--accent);
+                stroke: var(--accent);
+            }
+
+            rect {
+                stroke-width: 1.2px;
+                vector-effect: non-scaling-stroke;
+            }
+
+            .dim path {
+                fill: none;
+                stroke: var(--muted);
+                stroke-width: 1px;
+                vector-effect: non-scaling-stroke;
+            }
+
+            .dim text {
+                fill: var(--muted);
+                font: 400 104px var(--font-text);
+                text-anchor: middle;
+            }
+        }
+    }
+}
+
+.loading {
+    aspect-ratio: 1;
+}
+
+.list {
+    grid-column: 9 / 13;
+
+    h2 {
+        font-size: clamp(2rem, 1.5rem + 1.6vw, 3rem);
+        margin-bottom: 40px;
+    }
+
+    ul {
+        list-style: none;
+    }
+
+    li {
+        color: var(--muted);
+        transition: color 200ms;
+
+        &.on {
+            color: var(--ink);
+        }
+
+        p {
+            max-width: 40ch;
+            padding-bottom: 14px;
+            color: var(--ink);
+        }
+    }
+
+    button {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+        padding: 14px 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+}
+
+.name {
+    font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+}
+
+.value {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .plan {
+        grid-template-columns: 1fr;
+    }
+
+    .figure,
+    .list {
+        grid-column: 1;
+        position: static;
+    }
+}

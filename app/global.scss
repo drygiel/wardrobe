@@ -1,43 +1,190 @@
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+// Self-hosted from Fontshare (ITF Free Font License)
+@font-face {
+    font-family: 'Switzer';
+    src: url('/fonts/switzer-400.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Switzer';
+    src: url('/fonts/switzer-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Switzer';
+    src: url('/fonts/switzer-600.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Erode';
+    src: url('/fonts/erode-500.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+// Design tokens: "dark room" direction, colours taken from the Blender renders
+:root {
+    --bg: #161412;
+    --surface: #221f1b;
+    --ink: #e4e1da;
+    --muted: #aaa194;
+    --accent: #f0b35a; // warm LED strip, used on the primary action and LED parts only
+    --accent-ink: #161412;
+
+    --font-display: 'Erode', Georgia, serif;
+    --font-text: 'Switzer', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+    --step-body: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+    --step-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    --step-head: clamp(2rem, 1.3rem + 3.2vw, 4rem);
+
+    --m: clamp(20px, 5vw, 72px);
+    --gap: 24px;
+    --section: clamp(120px, 14vw, 200px);
+    --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: 'Roboto', Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  
-  // Hide AR button
-  //& > div:empty {
-  //  display: none;
-  //}
+    font-size: var(--step-body);
+    line-height: 1.55;
+    overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-underline-offset: 0.2em;
 }
 
+button {
+    font: inherit;
+    color: inherit;
+}
 
-section {
-  position: relative;
-  display: grid;
-  width: 100vw;
-  min-height: 100vh;
-  scroll-snap-type: y mandatory;
-  padding: 0;
-  margin: 0;
-  align-items: stretch;
-  justify-content: space-between;
-  align-content: space-around;
-  justify-items: stretch;
-  overflow-x: hidden;
+h1,
+h2,
+h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+}
+
+// Shared controls
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 0;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font: 600 var(--step-body) / 1 var(--font-text);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        transform 160ms var(--ease),
+        background-color 160ms;
+
+    &:hover {
+        background: #f6c57a;
+    }
+
+    &:active {
+        transform: translateY(1px) scale(0.98);
+    }
+}
+
+.link {
+    border: 0;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    transition: color 160ms;
+
+    &:hover {
+        color: var(--accent);
+    }
+}
+
+.reveal > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+        opacity 600ms var(--ease),
+        transform 700ms var(--ease);
+}
+
+.reveal.in > * {
+    opacity: 1;
+    transform: none;
+
+    &:nth-child(2) {
+        transition-delay: 80ms;
+    }
+    &:nth-child(3) {
+        transition-delay: 160ms;
+    }
+    &:nth-child(4) {
+        transition-delay: 240ms;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition-duration: 0ms !important;
+    }
+
+    .reveal > * {
+        opacity: 1;
+        transform: none;
+    }
 }

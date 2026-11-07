@@ -37,7 +37,6 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 - **Tween.js** - Smooth animations
 
 ### UI Components
-- **Ant Design** - Professional UI component library
 - **React Image Gallery** - Photo gallery functionality
 
 ### Development Tools

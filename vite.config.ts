@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
         input: {
           index: resolve(import.meta.dirname, 'index.html'),
           editor: resolve(import.meta.dirname, 'editor.html'),
+          rama: resolve(import.meta.dirname, 'rama.html'),
         },
       },
     },

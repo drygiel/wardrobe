@@ -14,8 +14,11 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
   const [hideFronts, setHideFronts] = useState(initial?.hideFronts ?? false);
   const [view, setView] = useState<SceneView>(initial?.view ?? 'initial');
   const [gizmo, setGizmo] = useState(initial?.gizmo ?? false);
+  // Camera controls; an embedded stage enables them on click so the wheel keeps scrolling the page
+  const [active, setActive] = useState(initial?.active ?? true);
   const [layer, setLayer] = useState(0);
   const line = useRef<LineData | null>(null);
+  const readout = useRef<HTMLElement>(null);
 
   return {
     grid,
@@ -29,8 +32,11 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     layer,
     setLayer,
     line,
+    readout,
     gizmo,
     setGizmo,
+    active,
+    setActive,
     view,
     setView,
     xr,
@@ -46,6 +52,7 @@ type AppContextInitial = {
   hideFronts: boolean;
   view: SceneView;
   gizmo: boolean;
+  active: boolean;
 };
 
 type AppContextType = ReturnType<typeof useAppStore>;

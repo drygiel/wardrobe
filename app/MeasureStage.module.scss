@@ -1,0 +1,172 @@
+﻿.stage {
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.full {
+    width: 100vw;
+    height: 100svh;
+}
+
+.embedded {
+    z-index: 1;
+    height: 100svh;
+    min-height: 640px;
+    margin-top: var(--section);
+}
+
+.canvas {
+    position: absolute !important;
+    inset: 0;
+}
+
+.stats {
+    left: auto !important;
+    right: 0;
+}
+
+.toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+
+    label {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    input[type='checkbox'] {
+        accent-color: var(--accent);
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.layer {
+    width: 52px;
+    height: 32px;
+    padding: 0 6px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 1px solid #4d473f;
+    font: inherit;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+}
+
+// Editor: a plain bar over the scene
+.bar {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 32px;
+    padding: 14px var(--m);
+    background: var(--surface);
+    font-size: var(--step-small);
+
+    .actions {
+        margin-left: auto;
+    }
+}
+
+.home {
+    font-family: var(--font-display);
+    font-size: var(--step-lead);
+    text-decoration: none;
+}
+
+// Embedded: one column card over the full-bleed scene
+.card {
+    position: absolute;
+    z-index: 2;
+    right: var(--m);
+    top: 50%;
+    transform: translateY(-50%);
+    width: clamp(320px, 26vw, 400px);
+    display: grid;
+    gap: 18px;
+    padding: 32px;
+    background: var(--surface);
+
+    h2 {
+        font-size: clamp(1.875rem, 1.5rem + 1vw, 2.25rem);
+    }
+}
+
+.readout {
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 1.5rem + 1vw, 2.25rem);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.keys {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+
+    dt {
+        color: var(--muted);
+    }
+}
+
+.touchHint {
+    display: none;
+    color: var(--muted);
+}
+
+.hint {
+    position: absolute;
+    z-index: 2;
+    left: var(--m);
+    bottom: 32px;
+    color: var(--muted);
+    font-size: var(--step-small);
+    pointer-events: none;
+}
+
+@media (max-width: 767px) {
+    .embedded {
+        height: auto;
+        min-height: 0;
+
+        .canvas {
+            position: relative !important;
+            height: 70svh !important;
+        }
+    }
+
+    .card {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        width: auto;
+        margin: 0 20px;
+        padding: 24px;
+    }
+
+    .hint {
+        display: none;
+    }
+
+    .touchHint {
+        display: block;
+    }
+
+    .bar {
+        gap: 10px 20px;
+        padding: 10px 16px;
+    }
+}
