@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
+import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece, WARDROBE_GLB } from '@/assets';
+import { kindOf } from './Wardrobe';
 
 export type PlanView = 'front' | 'side' | 'top' | 'A' | 'B' | 'C' | 'D' | 'cut';
 
@@ -9,8 +10,9 @@ type Box = { name: string; min: THREE.Vector3; max: THREE.Vector3 };
 
 // Sections along model z (front view left to right); dividers taken at their centres
 const SECTIONS = { A: [-2.688, -2.28], B: [-2.28, -1.054], C: [-1.054, -0.694], D: [-0.694, 0] } as const;
-const isLed = (n: string) => /LED|Lisgts|LERR/.test(n) || n.startsWith('Lights');
-const isFront = (n: string) => n.startsWith('Fronts') || n === 'AFront';
+const isLed = (n: string) => kindOf(n) === 'led';
+const isFront = (n: string) => kindOf(n) === 'front' || kindOf(n) === 'handle';
+const isBoard = (n: string) => (FRAME_BOARDS as readonly string[]).includes(n);
 const mm = (m: number) => Math.round(m * 1000);
 
 function boxes(scene: THREE.Object3D, names?: readonly string[]) {
@@ -35,14 +37,11 @@ export function PlanDrawing({ view }: { view: PlanView }) {
   const frame = useGLTF(FRAME_GLB);
 
   const data = useMemo(() => {
-    const parts = [
-      ...boxes(wardrobe.scene).filter(b => b.name !== 'Frame' && b.name !== 'BackCap'),
-      ...boxes(frame.scene, FRAME_PIECES),
-    ];
+    const parts = [...boxes(wardrobe.scene), ...boxes(frame.scene, FRAME_PIECES)];
     // Boards first so the pieces are drawn on top of them
-    const plan = boxes(frame.scene)
-      .filter(b => b.name.startsWith('_') || (FRAME_BOARDS as readonly string[]).includes(b.name))
-      .sort((a, b) => Number(a.name.startsWith('_')) - Number(b.name.startsWith('_')));
+    const plan = boxes(frame.scene, [...FRAME_BOARDS, ...FRAME_PIECES.map(flatPiece)]).sort(
+      (a, b) => Number(isBoard(b.name)) - Number(isBoard(a.name)),
+    );
     return { parts, plan };
   }, [wardrobe, frame]);
 
@@ -70,11 +69,11 @@ export function PlanDrawing({ view }: { view: PlanView }) {
           y: mm(p.min.z - cut.min.z),
           w: mm(p.max.x - p.min.x),
           h: mm(p.max.z - p.min.z),
-          cls: p.name.startsWith('_') ? 'part' : 'board',
+          cls: isBoard(p.name) ? 'board' : 'part',
           title: p.name,
         }),
       );
-      const board = data.plan.find(p => !p.name.startsWith('_'))!;
+      const board = data.plan.find(p => isBoard(p.name))!;
       const bw = mm(board.max.x - board.min.x);
       const bh = mm(board.max.z - board.min.z);
       const by = mm(board.min.z - cut.min.z);

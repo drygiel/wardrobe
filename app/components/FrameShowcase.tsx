@@ -3,7 +3,7 @@ import { type RefObject, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
-import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES } from '@/assets';
+import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece } from '@/assets';
 import { damp, easeInOut, fitDistance, moveCamera, type Pose, poseAt, type ShowcaseProgress, smoothstep } from './schematic';
 
 type Result = GLTF & { nodes: Record<string, THREE.Mesh> };
@@ -50,7 +50,7 @@ export function FrameShowcase({ progress }: { progress: RefObject<ShowcaseProgre
     () =>
       FRAME_PIECES.map((name, i) => {
         const best = nodes[name];
-        const flat = nodes[`_${name}`];
+        const flat = nodes[flatPiece(name)];
         const laid = flat.position.clone().add(offset);
         const lifted = laid.clone().setY(laid.y + 0.12);
         const rising = lifted.clone().lerp(best.position, 0.55).setY(THREE.MathUtils.lerp(lifted.y, best.position.y, 0.55) + 0.35);

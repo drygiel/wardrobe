@@ -12,10 +12,8 @@ export function Mesh(props: ThreeElements['mesh']) {
   const wireframeGroup = useRef<THREE.Group>(null!);
   const [hovered, setHovered] = useState(false);
 
-  const hideLines = props.name === 'BackCap';
-
   const getColor = (hover = false) => {
-    const isWood = ['Drawer', 'Frame'].some(w => props.name?.includes(w));
+    const isWood = /^(DR|P\d\d)_/.test(props.name ?? '');
     if (hover) return isWood ? '#d2b98a' : '#bbb';
     return isWood ? '#e9d4ad' : 'white';
   };
@@ -67,8 +65,6 @@ export function Mesh(props: ThreeElements['mesh']) {
     const position = edgesGeometry.attributes.position;
     const lines: LineData[] = [];
 
-    if (hideLines) return null;
-
     for (let i = 0, l = position.count; i < l; i += 2) {
       const from = vec.fromBufferAttribute(position, i).clone();
       const to = vec.fromBufferAttribute(position, i + 1).clone();
@@ -94,7 +90,7 @@ export function Mesh(props: ThreeElements['mesh']) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [edgesGeometry]);
 
-  const edges = lines && (
+  const edges = (
     <Line
       segments
       matrixAutoUpdate={false}
@@ -144,7 +140,7 @@ export function Mesh(props: ThreeElements['mesh']) {
         {props.children}
         <Edges
           renderOrder={2}
-          visible={wireframe && visible && !hideLines}
+          visible={wireframe && visible}
           linewidth={1}
           threshold={0.27}
           color="#666"

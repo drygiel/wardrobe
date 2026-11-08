@@ -63,8 +63,8 @@ createRoot(document.getElementById('root')!).render(
         title="Rozkrój i wymiary"
         rows={[
           { view: 'cut', name: 'Rozkrój na płyty', value: '3 × 3000 × 620 mm', text: '14 formatek ułożonych tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz.' },
-          { view: 'front', name: 'Widok z przodu', value: '2688 × 2665 mm', text: 'Cała szafa bez frontów, rama razem z wnętrzem.' },
-          { view: 'side', name: 'Widok z boku', value: '561 × 2665 mm', text: 'Głębokość ramy 530 mm, razem z uchwytami 561 mm.' },
+          { view: 'front', name: 'Widok z przodu', value: '2688 × 2660 mm', text: 'Cała szafa bez frontów, rama razem z wnętrzem.' },
+          { view: 'side', name: 'Widok z boku', value: '560 × 2660 mm', text: 'Głębokość ramy 530 mm, razem z uchwytami 560 mm.' },
         ]}
       />
     </main>

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { useRef } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { type ThreeElements, type ThreeEvent } from '@react-three/fiber';
 import { GLTF } from 'three-stdlib';
@@ -8,99 +8,31 @@ import { Measurable } from './Measurable';
 import { useApp } from '@/contexts/AppContext';
 import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
 
-type ActionName =
-  | 'OpenBShelve'
-  | 'OpenBL'
-  | 'OpenBM'
-  | 'OpenTL'
-  | 'OpenTM'
-  | 'Fronts CargoAction'
-  | 'OpenBR'
-  | 'OpenTR';
+export type Kind = 'front' | 'handle' | 'led' | 'drawer' | 'support' | 'shelf' | 'aShelf' | 'aSide' | 'frame';
 
-interface GLTFAction extends THREE.AnimationClip {
-  name: ActionName;
-}
+// Part kind from its Szafa4.blend object name
+export const kindOf = (name: string): Kind => {
+  if (name.startsWith('LED_')) return 'led';
+  if (name.endsWith('_Handle')) return 'handle';
+  if (/^F\d\d_/.test(name)) return 'front';
+  if (name.startsWith('DR_')) return 'drawer';
+  if (/^IN_.*(Side|Divider|Strip)/.test(name)) return 'support';
+  if (name === 'A_Carcass') return 'aSide';
+  if (name.startsWith('A_')) return 'aShelf';
+  if (/^P\d\d_/.test(name)) return 'frame';
+  return 'shelf';
+};
 
-type GLTFResult = GLTF & {
-  nodes: {
-    Frame: THREE.Mesh;
-    BackCap: THREE.Mesh;
-    AFront: THREE.Mesh;
-    FrontsBBL: THREE.Mesh;
-    FrontsHandlesBBL: THREE.Mesh;
-    FrontsBBR: THREE.Mesh;
-    FrontsHandlesBBR: THREE.Mesh;
-    FrontsBTL: THREE.Mesh;
-    FrontsBTR: THREE.Mesh;
-    FrontsCB: THREE.Mesh;
-    FrontsDB: THREE.Mesh;
-    FrontsHandlesDBL: THREE.Mesh;
-    FrontsDCoverR: THREE.Mesh;
-    FrontsDT: THREE.Mesh;
-    LightsLEDCTR: THREE.Mesh;
-    LightsLEDCTL: THREE.Mesh;
-    LightsLEDATR: THREE.Mesh;
-    InBSupportL: THREE.Mesh;
-    InBSupportR: THREE.Mesh;
-    InBTopShelve: THREE.Mesh;
-    InBTopShelve001: THREE.Mesh;
-    InBTopShelve002: THREE.Mesh;
-    InBTopShelve003: THREE.Mesh;
-    InBTopShelve004: THREE.Mesh;
-    InBTopShelve005: THREE.Mesh;
-    InBTopShelve006: THREE.Mesh;
-    InBTopShelve007: THREE.Mesh;
-    InBTopShelve008: THREE.Mesh;
-    InBTopShelve010: THREE.Mesh;
-    InBTopShelve011: THREE.Mesh;
-    InBTopShelve012: THREE.Mesh;
-    InBTopShelve013: THREE.Mesh;
-    InBTopShelve014: THREE.Mesh;
-    InBTopLightsLEDL: THREE.Mesh;
-    InBTopLightsLERR: THREE.Mesh;
-    InBBottomSupportR: THREE.Mesh;
-    InBBottomSupportTop: THREE.Mesh;
-    InBBottomSupportMid: THREE.Mesh;
-    InBBottomShelveL: THREE.Mesh;
-    InBBottomSupportMid001: THREE.Mesh;
-    InBBottomSupportR001: THREE.Mesh;
-    InBBottomDrawersBigBR: THREE.Mesh;
-    InBBottomDrawersMediumR3: THREE.Mesh;
-    InBBottomDrawersMediumR3003: THREE.Mesh;
-    InBBottomDrawersLightsLEDTop: THREE.Mesh;
-    InBBottomDrawersMediumR3001: THREE.Mesh;
-    InBBottomDrawersMediumR3002: THREE.Mesh;
-    InBBottomDrawersMediumR3004: THREE.Mesh;
-    InBBottomDrawersBigBR001: THREE.Mesh;
-    InBBottomDrawersBigBR002: THREE.Mesh;
-    InCSvelve: THREE.Mesh;
-    InCSvelve001: THREE.Mesh;
-    InCSvelve002: THREE.Mesh;
-    InCSvelve003: THREE.Mesh;
-    InCSupportDrawerR: THREE.Mesh;
-    InCSupportR: THREE.Mesh;
-    InCLightsLED: THREE.Mesh;
-    InDSvelve: THREE.Mesh;
-    InDSvelve001: THREE.Mesh;
-    InDSvelve002: THREE.Mesh;
-    InDSvelve003: THREE.Mesh;
-    InDSvelve004: THREE.Mesh;
-    InDShelveMini: THREE.Mesh;
-    InDLisgtsLEDR: THREE.Mesh;
-    InDSupportMid001: THREE.Mesh;
-    InDShelveMini001: THREE.Mesh;
-    InDShelveMini002: THREE.Mesh;
-    InDShelveMini003: THREE.Mesh;
-    InDSvelve005: THREE.Mesh;
-    AShelves: THREE.Mesh;
-    AShelves002: THREE.Mesh;
-    AShelves003: THREE.Mesh;
-    AShelves004: THREE.Mesh;
-    AShelves005: THREE.Mesh;
-  };
-  materials: object;
-  animations: GLTFAction[];
+// Door mesh to its clip: hinged doors swing on their F0x_Pivot, the section A door rotates itself
+export const DOORS: Record<string, string> = {
+  'F01_B_Door-Bottom-L': 'Hinge.Pivot.B.BLAction',
+  'F02_B_Door-Bottom-R': 'Hinge.Pivot.B.BRAction',
+  'F03_B_Door-Top-L': 'Hinge.Pivot.B.TLAction',
+  'F04_B_Door-Top-R': 'Hinge.Pivot.B.TRAction',
+  'F05_C_Door-Bottom': 'Hinge.Pivot.C.BAction',
+  'F06_D_Door-Bottom': 'Hinge.Pivot.D.BAction',
+  'F07_D_Door-Top': 'Hinge.Pivot.D.TAction',
+  'F09_A_Door': 'OpenBShelve',
 };
 
 type FrameResult = GLTF & { nodes: Record<string, THREE.Mesh> };
@@ -111,7 +43,7 @@ export function toggleAction(action: THREE.AnimationAction, data: Record<string,
 
   if (data.open) {
     action.timeScale = -1;
-    action.time = action.getClip().duration / 3;
+    action.time = action.getClip().duration;
   } else {
     action.timeScale = 1;
   }
@@ -124,97 +56,48 @@ export function toggleAction(action: THREE.AnimationAction, data: Record<string,
 
 export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
   const sceneGroup = useRef<THREE.Group>(null!);
-  const { nodes, animations } = useGLTF(WARDROBE_GLB) as unknown as GLTFResult;
+  const { scene, animations } = useGLTF(WARDROBE_GLB) as unknown as GLTF;
   const frame = useGLTF(FRAME_GLB) as unknown as FrameResult;
   const { actions } = useAnimations(animations, sceneGroup);
   const { hideFronts } = useApp();
 
-  const ToggleAction = (name: ActionName, event: ThreeEvent<MouseEvent>) => {
+  const onDoorClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    toggleAction(actions[name]!, event.eventObject.userData);
+    toggleAction(actions[DOORS[event.eventObject.name]]!, event.eventObject.userData);
+  };
+
+  // Rebuilds the glTF tree; pivots stay groups with their names so the door clips find them
+  const part = (node: THREE.Object3D): ReactNode => {
+    const children = node.children.map(part);
+    if (!(node as THREE.Mesh).isMesh) {
+      return (
+        <group key={node.name} name={node.name} position={node.position} rotation={node.rotation}>
+          {children}
+        </group>
+      );
+    }
+    const door = node.name in DOORS;
+    return (
+      <Mesh
+        key={node.name}
+        name={node.name}
+        geometry={(node as THREE.Mesh).geometry}
+        position={node.position}
+        rotation={node.rotation}
+        visible={door || kindOf(node.name) === 'handle' ? !hideFronts : undefined}
+        onClick={door ? onDoorClick : undefined}
+      >
+        {children}
+      </Mesh>
+    );
   };
 
   return (
     <Measurable ref={sceneGroup} {...props}>
-        {FRAME_PIECES.map(name => (
-          <Mesh key={name} name={name} geometry={frame.nodes[name].geometry} position={frame.nodes[name].position} />
-        ))}
-        <Mesh name="BackCap" geometry={nodes.BackCap.geometry} material={nodes.BackCap.material} position={[0.001, 1.323333, -1.0075]} />
-        <Mesh name="AFront" onClick={event => ToggleAction('OpenBShelve', event)} visible={!hideFronts} geometry={nodes.AFront.geometry} material={nodes.AFront.material} position={[-0.5025, 0.045, -2.2925]} />
-        <Mesh name="FrontsBBL" onClick={event => ToggleAction('OpenBL', event)} visible={!hideFronts} geometry={nodes.FrontsBBL.geometry} material={nodes.FrontsBBL.material} position={[-0.5025, 0.045, -2.2275]}>
-          <Mesh name="FrontsHandlesBBL" visible={!hideFronts} geometry={nodes.FrontsHandlesBBL.geometry} material={nodes.FrontsHandlesBBL.material} position={[-0.034167, 0.972, 0.5]} />
-        </Mesh>
-        <Mesh name="FrontsBBR" onClick={event => ToggleAction('OpenBM', event)} visible={!hideFronts} geometry={nodes.FrontsBBR.geometry} material={nodes.FrontsBBR.material} position={[-0.5025, 0.045, -1.0575]}>
-          <Mesh name="FrontsHandlesBBR" visible={!hideFronts} geometry={nodes.FrontsHandlesBBR.geometry} material={nodes.FrontsHandlesBBR.material} position={[-0.034179, 0.972, -0.5]} />
-        </Mesh>
-        <Mesh name="FrontsBTL" onClick={event => ToggleAction('OpenTL', event)} visible={!hideFronts} geometry={nodes.FrontsBTL.geometry} material={nodes.FrontsBTL.material} position={[-0.5025, 2.025, -2.2275]} />
-        <Mesh name="FrontsBTR" onClick={event => ToggleAction('OpenTM', event)} visible={!hideFronts} geometry={nodes.FrontsBTR.geometry} material={nodes.FrontsBTR.material} position={[-0.5025, 2.025, -1.0575]} />
-        <Mesh name="FrontsCB" onClick={event => ToggleAction('Fronts CargoAction', event)} visible={!hideFronts} geometry={nodes.FrontsCB.geometry} material={nodes.FrontsCB.material} position={[-0.5025, 0.045, -0.6925]} />
-        <Mesh name="FrontsDB" onClick={event => ToggleAction('OpenBR', event)} visible={!hideFronts} geometry={nodes.FrontsDB.geometry} material={nodes.FrontsDB.material} position={[-0.5025, 0.045, -0.1575]}>
-          <Mesh name="FrontsHandlesDBL" visible={!hideFronts} geometry={nodes.FrontsHandlesDBL.geometry} material={nodes.FrontsHandlesDBL.material} position={[-0.034179, 0.972, -0.44]} />
-        </Mesh>
-        <Mesh name="FrontsDCoverR" geometry={nodes.FrontsDCoverR.geometry} material={nodes.FrontsDCoverR.material} position={[-0.501, 1.33, -0.095]} />
-        <Mesh name="FrontsDT" onClick={event => ToggleAction('OpenTR', event)} visible={!hideFronts} geometry={nodes.FrontsDT.geometry} material={nodes.FrontsDT.material} position={[-0.5025, 2.025, -0.1575]} />
-        <Mesh name="LightsLEDCTR" geometry={nodes.LightsLEDCTR.geometry} material={nodes.LightsLEDCTR.material} position={[-0.4325, 1.985, -0.7255]} />
-        <Mesh name="LightsLEDCTL" geometry={nodes.LightsLEDCTL.geometry} material={nodes.LightsLEDCTL.material} position={[-0.4325, 1.985, -1.0045]} />
-        <Mesh name="LightsLEDATR" geometry={nodes.LightsLEDATR.geometry} material={nodes.LightsLEDATR.material} position={[-0.4325, 1.612, -2.2805]} />
-        <Mesh name="InBSupportL" geometry={nodes.InBSupportL.geometry} material={nodes.InBSupportL.material} position={[-0.251006, 1.33, -2.231]} />
-        <Mesh name="InBSupportR" geometry={nodes.InBSupportR.geometry} material={nodes.InBSupportR.material} position={[-0.251006, 1.33, -1.054]} />
-        <Mesh name="InBTopShelve" geometry={nodes.InBTopShelve.geometry} material={nodes.InBTopShelve.material} position={[-0.221718, 1.706, -1.83]} />
-        <Mesh name="InBTopShelve001" geometry={nodes.InBTopShelve001.geometry} material={nodes.InBTopShelve001.material} position={[-0.251, 2.301, -1.348]} />
-        <Mesh name="InBTopShelve002" geometry={nodes.InBTopShelve002.geometry} material={nodes.InBTopShelve002.material} position={[-0.251, 2.326, -1.642]} />
-        <Mesh name="InBTopShelve003" geometry={nodes.InBTopShelve003.geometry} material={nodes.InBTopShelve003.material} position={[-0.251006, 2.023, -1.6425]} />
-        <Mesh name="InBTopShelve004" geometry={nodes.InBTopShelve004.geometry} material={nodes.InBTopShelve004.material} position={[-0.251, 2.301, -1.93646]} />
-        <Mesh name="InBTopShelve005" geometry={nodes.InBTopShelve005.geometry} material={nodes.InBTopShelve005.material} position={[-0.221718, 1.853001, -2.0305]} />
-        <Mesh name="InBTopShelve006" geometry={nodes.InBTopShelve006.geometry} material={nodes.InBTopShelve006.material} position={[-0.221718, 1.853, -1.642]} />
-        <Mesh name="InBTopShelve007" geometry={nodes.InBTopShelve007.geometry} material={nodes.InBTopShelve007.material} position={[-0.221718, 1.407, -2.0305]} />
-        <Mesh name="InBTopShelve008" geometry={nodes.InBTopShelve008.geometry} material={nodes.InBTopShelve008.material} position={[-0.221718, 1.653, -2.0305]} />
-        <Mesh name="InBTopShelve010" geometry={nodes.InBTopShelve010.geometry} material={nodes.InBTopShelve010.material} position={[-0.221718, 1.653, -1.642]} />
-        <Mesh name="InBTopShelve011" geometry={nodes.InBTopShelve011.geometry} material={nodes.InBTopShelve011.material} position={[-0.221718, 1.853001, -1.254]} />
-        <Mesh name="InBTopShelve012" geometry={nodes.InBTopShelve012.geometry} material={nodes.InBTopShelve012.material} position={[-0.221718, 1.653, -1.254]} />
-        <Mesh name="InBTopShelve013" geometry={nodes.InBTopShelve013.geometry} material={nodes.InBTopShelve013.material} position={[-0.221718, 1.706, -1.454]} />
-        <Mesh name="InBTopShelve014" geometry={nodes.InBTopShelve014.geometry} material={nodes.InBTopShelve014.material} position={[-0.221718, 1.407, -1.2545]} />
-        <Mesh name="InBTopLightsLEDL" geometry={nodes.InBTopLightsLEDL.geometry} material={nodes.InBTopLightsLEDL.material} position={[-0.4325, 1.9255, -2.2215]} />
-        <Mesh name="InBTopLightsLERR" geometry={nodes.InBTopLightsLERR.geometry} material={nodes.InBTopLightsLERR.material} position={[-0.4325, 1.9255, -1.0635]} />
-        <Mesh name="InBBottomSupportR" geometry={nodes.InBBottomSupportR.geometry} material={nodes.InBBottomSupportR.material} position={[-0.2852, 0.4312, -1.072]} />
-        <Mesh name="InBBottomSupportTop" geometry={nodes.InBBottomSupportTop.geometry} material={nodes.InBBottomSupportTop.material} position={[-0.251006, 1.222, -1.6425]} />
-        <Mesh name="InBBottomSupportMid" geometry={nodes.InBBottomSupportMid.geometry} material={nodes.InBBottomSupportMid.material} position={[-0.251, 0.19, -1.603]} />
-        <Mesh name="InBBottomShelveL" geometry={nodes.InBBottomShelveL.geometry} material={nodes.InBBottomShelveL.material} position={[-0.251, 0.349, -1.908]} />
-        <Mesh name="InBBottomSupportMid001" geometry={nodes.InBBottomSupportMid001.geometry} material={nodes.InBBottomSupportMid001.material} position={[-0.251, 0.7855, -1.603]} />
-        <Mesh name="InBBottomSupportR001" geometry={nodes.InBBottomSupportR001.geometry} material={nodes.InBBottomSupportR001.material} position={[-0.264, 0.220857, -2.213]} />
-        <Mesh name="InBBottomDrawersBigBR" geometry={nodes.InBBottomDrawersBigBR.geometry} material={nodes.InBBottomDrawersBigBR.material} position={[-0.3311, 0.150667, -1.3375]} />
-        <Mesh name="InBBottomDrawersMediumR3" geometry={nodes.InBBottomDrawersMediumR3.geometry} material={nodes.InBBottomDrawersMediumR3.material} position={[-0.3311, 0.400667, -1.3375]} />
-        <Mesh name="InBBottomDrawersMediumR3003" geometry={nodes.InBBottomDrawersMediumR3003.geometry} material={nodes.InBBottomDrawersMediumR3003.material} position={[-0.3311, 0.750667, -1.3375]} />
-        <Mesh name="InBBottomDrawersLightsLEDTop" geometry={nodes.InBBottomDrawersLightsLEDTop.geometry} material={nodes.InBBottomDrawersLightsLEDTop.material} position={[-0.431365, 1.212507, -1.3375]} />
-        <Mesh name="InBBottomDrawersMediumR3001" geometry={nodes.InBBottomDrawersMediumR3001.geometry} material={nodes.InBBottomDrawersMediumR3001.material} position={[-0.3311, 1.100667, -1.3375]} />
-        <Mesh name="InBBottomDrawersMediumR3002" geometry={nodes.InBBottomDrawersMediumR3002.geometry} material={nodes.InBBottomDrawersMediumR3002.material} position={[-0.3311, 0.925667, -1.3375]} />
-        <Mesh name="InBBottomDrawersMediumR3004" geometry={nodes.InBBottomDrawersMediumR3004.geometry} material={nodes.InBBottomDrawersMediumR3004.material} position={[-0.3311, 0.575667, -1.3375]} />
-        <Mesh name="InBBottomDrawersBigBR001" geometry={nodes.InBBottomDrawersBigBR001.geometry} material={nodes.InBBottomDrawersBigBR001.material} position={[-0.3311, 0.150667, -1.908]} />
-        <Mesh name="InBBottomDrawersBigBR002" geometry={nodes.InBBottomDrawersBigBR002.geometry} material={nodes.InBBottomDrawersBigBR002.material} position={[-0.3311, 0.150667, -0.8825]} />
-        <Mesh name="InCSvelve" geometry={nodes.InCSvelve.geometry} material={nodes.InCSvelve.material} position={[-0.251, 0.349, -0.874]} />
-        <Mesh name="InCSvelve001" geometry={nodes.InCSvelve001.geometry} material={nodes.InCSvelve001.material} position={[-0.2505, 0.699, -0.874]} />
-        <Mesh name="InCSvelve002" geometry={nodes.InCSvelve002.geometry} material={nodes.InCSvelve002.material} position={[-0.251, 0.999, -0.874]} />
-        <Mesh name="InCSvelve003" geometry={nodes.InCSvelve003.geometry} material={nodes.InCSvelve003.material} position={[-0.251, 1.301, -0.874]} />
-        <Mesh name="InCSupportDrawerR" geometry={nodes.InCSupportDrawerR.geometry} material={nodes.InCSupportDrawerR.material} position={[-0.264, 0.220857, -0.712]} />
-        <Mesh name="InCSupportR" geometry={nodes.InCSupportR.geometry} material={nodes.InCSupportR.material} position={[-0.251, 0.675, -0.694]} />
-        <Mesh name="InCLightsLED" geometry={nodes.InCLightsLED.geometry} material={nodes.InCLightsLED.material} position={[-0.4325, 0.825, -0.7035]} />
-        <Mesh name="InDSvelve" geometry={nodes.InDSvelve.geometry} material={nodes.InDSvelve.material} position={[-0.251006, 2.301, -0.3625]} />
-        <Mesh name="InDSvelve001" geometry={nodes.InDSvelve001.geometry} material={nodes.InDSvelve001.material} position={[-0.251006, 1.749, -0.3625]} />
-        <Mesh name="InDSvelve002" geometry={nodes.InDSvelve002.geometry} material={nodes.InDSvelve002.material} position={[-0.251006, 2.023, -0.3625]} />
-        <Mesh name="InDSvelve003" geometry={nodes.InDSvelve003.geometry} material={nodes.InDSvelve003.material} position={[-0.251006, 2.611, -0.3625]} />
-        <Mesh name="InDSvelve004" geometry={nodes.InDSvelve004.geometry} material={nodes.InDSvelve004.material} position={[-0.251006, 0.049, -0.3625]} />
-        <Mesh name="InDShelveMini" geometry={nodes.InDShelveMini.geometry} material={nodes.InDShelveMini.material} position={[-0.164878, 0.9002, -0.198625]} />
-        <Mesh name="InDLisgtsLEDR" geometry={nodes.InDLisgtsLEDR.geometry} material={nodes.InDLisgtsLEDR.material} position={[-0.4325, 1.33, -0.0405]} />
-        <Mesh name="InDSupportMid001" geometry={nodes.InDSupportMid001.geometry} material={nodes.InDSupportMid001.material} position={[-0.3035, 1.2452, -0.136]} />
-        <Mesh name="InDShelveMini001" geometry={nodes.InDShelveMini001.geometry} material={nodes.InDShelveMini001.material} position={[-0.164878, 1.1302, -0.191875]} />
-        <Mesh name="InDShelveMini002" geometry={nodes.InDShelveMini002.geometry} material={nodes.InDShelveMini002.material} position={[-0.164878, 1.3602, -0.191875]} />
-        <Mesh name="InDShelveMini003" geometry={nodes.InDShelveMini003.geometry} material={nodes.InDShelveMini003.material} position={[-0.164878, 1.5902, -0.198625]} />
-        <Mesh name="InDSvelve005" geometry={nodes.InDSvelve005.geometry} material={nodes.InDSvelve005.material} position={[-0.251006, 0.067, -0.524591]} />
-        <Mesh name="AShelves" geometry={nodes.AShelves.geometry} material={nodes.AShelves.material} position={[-0.270645, 0.895617, -2.478296]} />
-        <Mesh name="AShelves002" geometry={nodes.AShelves002.geometry} material={nodes.AShelves002.material} position={[-0.285, 1.021537, -2.456775]} />
-        <Mesh name="AShelves003" geometry={nodes.AShelves003.geometry} material={nodes.AShelves003.material} position={[-0.285, 1.421537, -2.456775]} />
-        <Mesh name="AShelves004" geometry={nodes.AShelves004.geometry} material={nodes.AShelves004.material} position={[-0.285, 1.821537, -2.456775]} />
-        <Mesh name="AShelves005" geometry={nodes.AShelves005.geometry} material={nodes.AShelves005.material} position={[-0.285, 2.221537, -2.456775]} />
+      {FRAME_PIECES.map(name => (
+        <Mesh key={name} name={name} geometry={frame.nodes[name].geometry} position={frame.nodes[name].position} rotation={frame.nodes[name].rotation} />
+      ))}
+      {scene.children.map(part)}
     </Measurable>
   );
 }

@@ -7,9 +7,9 @@ import styles from './PlanSection.module.scss';
 export type PlanRow = { view: PlanView; name: string; value: string; text: string; href?: string };
 
 const ROWS: PlanRow[] = [
-  { view: 'front', name: 'Widok z przodu', value: '2688 × 2665 mm', text: 'Bez frontów. Podział na regał A, szafę B, wnękę C i szafę D. Paski LED w kolorze.' },
-  { view: 'side', name: 'Widok z boku', value: '561 × 2665 mm', text: 'Głębokość ramy 530 mm, razem z uchwytami 561 mm.' },
-  { view: 'top', name: 'Widok z góry', value: '2688 × 561 mm', text: 'Wieńce, regał A i linia frontów z uchwytami.' },
+  { view: 'front', name: 'Widok z przodu', value: '2688 × 2660 mm', text: 'Bez frontów. Podział na regał A, szafę B, wnękę C i szafę D. Paski LED w kolorze.' },
+  { view: 'side', name: 'Widok z boku', value: '560 × 2660 mm', text: 'Głębokość ramy 530 mm, razem z uchwytami 560 mm.' },
+  { view: 'top', name: 'Widok z góry', value: '2688 × 560 mm', text: 'Wieńce, regał A i linia frontów z uchwytami.' },
   { view: 'A', name: 'Regał A', value: '408 mm', text: 'Otwarte półki i zamykana szafka na dole.' },
   { view: 'B', name: 'Szafa B', value: '1226 mm', text: 'Półki górne, sześć szuflad i trzy duże kosze.' },
   { view: 'C', name: 'Wnęka C', value: '360 mm', text: 'Cztery półki, front cargo i LED nad wnęką.' },

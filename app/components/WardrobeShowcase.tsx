@@ -4,24 +4,10 @@ import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { useAnimations, useGLTF, useTexture } from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import { ATLAS, FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
-import { toggleAction } from './Wardrobe';
+import { DOORS, type Kind, kindOf, toggleAction } from './Wardrobe';
 import { damp, easeInOut, fitDistance, moveCamera, poseAt, schematicMaterial, schematicMix, type ShowcaseProgress, smoothstep } from './schematic';
 
 type Result = GLTF & { nodes: Record<string, THREE.Object3D> };
-type Kind = 'front' | 'handle' | 'led' | 'drawer' | 'support' | 'shelf' | 'aShelf' | 'aSide' | 'back' | 'frame';
-
-const kindOf = (name: string): Kind => {
-  if (/LED|Lisgts|LERR/.test(name) || name.startsWith('Lights')) return 'led';
-  if (name.startsWith('FrontsHandles')) return 'handle';
-  if (name.startsWith('Fronts') || name === 'AFront') return 'front';
-  if (name.includes('Drawers')) return 'drawer';
-  if (name.includes('Support')) return 'support';
-  if (name === 'AShelves') return 'aSide';
-  if (name.startsWith('AShelves')) return 'aShelf';
-  if (name === 'BackCap') return 'back';
-  if (name.startsWith('Frame')) return 'frame';
-  return 'shelf';
-};
 
 const FLAT: Record<Kind, string> = {
   front: '#d6d8d6',
@@ -32,7 +18,6 @@ const FLAT: Record<Kind, string> = {
   shelf: '#e0cfae',
   aShelf: '#e0cfae',
   aSide: '#d4bf9a',
-  back: '#2e2a26',
   frame: '#c8a473',
 };
 
@@ -45,20 +30,8 @@ const ALPHA: Record<Kind, number[]> = {
   support: [1, 1, 1, 0, 0, 1],
   aShelf: [1, 1, 1, 0, 0, 1],
   aSide: [1, 1, 1, 0, 0, 1],
-  back: [1, 1, 1, 0, 0, 1],
   led: [1, 1, 1, 1, 0, 1],
   frame: [1, 1, 1, 1, 1, 1],
-};
-
-const DOORS: Record<string, string> = {
-  AFront: 'OpenBShelve',
-  FrontsBBL: 'OpenBL',
-  FrontsBBR: 'OpenBM',
-  FrontsBTL: 'OpenTL',
-  FrontsBTR: 'OpenTM',
-  FrontsCB: 'Fronts CargoAction',
-  FrontsDB: 'OpenBR',
-  FrontsDT: 'OpenTR',
 };
 
 // Model space: front faces -X, section A sits at -Z, up is +Y
@@ -86,8 +59,6 @@ function keyframes(kind: Kind, c: THREE.Vector3): THREE.Vector3[] {
       return out(v(-0.22, 0, -0.18), 2);
     case 'aSide':
       return out(v(0, 0, -0.4), 2);
-    case 'back':
-      return out(v(0.35), 2);
     case 'led':
       return [zero, zero, v(-0.06), zero, zero, zero];
     case 'frame': {
@@ -115,8 +86,11 @@ type Part = {
   kind: Kind;
   geometry: THREE.BufferGeometry;
   base: THREE.Vector3;
+  quat: THREE.Quaternion;
+  z: number;
   keys: THREE.Vector3[];
   delay: number;
+  pivot?: { name: string; position: THREE.Vector3 };
   handles: { name: string; geometry: THREE.BufferGeometry; position: THREE.Vector3 }[];
 };
 
@@ -137,15 +111,21 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
     const add = (node: THREE.Object3D) => {
       const mesh = node as THREE.Mesh;
       const kind = kindOf(mesh.name);
+      mesh.updateWorldMatrix(true, false);
       mesh.geometry.computeBoundingBox();
-      const c = mesh.geometry.boundingBox!.getCenter(v()).add(mesh.position);
+      const c = mesh.geometry.boundingBox!.getCenter(v()).applyMatrix4(mesh.matrixWorld);
+      // Hinged doors sit in their F0x_Pivot, which the door clips rotate
+      const parent = mesh.parent!;
       list.push({
         name: mesh.name,
         kind,
         geometry: mesh.geometry,
         base: mesh.position.clone(),
+        quat: mesh.quaternion.clone(),
+        z: mesh.getWorldPosition(v()).z,
         keys: keyframes(kind, c),
         delay: 0,
+        pivot: parent.name.endsWith('_Pivot') ? { name: parent.name, position: parent.position.clone() } : undefined,
         handles: mesh.children
           .filter(ch => (ch as THREE.Mesh).isMesh)
           .map(ch => ({ name: ch.name, geometry: (ch as THREE.Mesh).geometry, position: ch.position.clone() })),
@@ -153,14 +133,14 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
     };
 
     Object.values(wardrobe.nodes).forEach(node => {
-      if ((node as THREE.Mesh).isMesh && node.name !== 'Frame' && node.parent?.type !== 'Mesh') add(node);
+      if ((node as THREE.Mesh).isMesh && node.parent?.type !== 'Mesh') add(node);
     });
     FRAME_PIECES.forEach(name => add(frame.nodes[name]));
 
     // Stagger inside a kind from section A towards D
     const byKind = Object.groupBy(list, p => p.kind);
     Object.values(byKind).forEach(group => {
-      group!.sort((a, b) => a.base.z - b.base.z).forEach((p, i, all) => (p.delay = all.length > 1 ? (i / (all.length - 1)) * 0.3 : 0));
+      group!.sort((a, b) => a.z - b.z).forEach((p, i, all) => (p.delay = all.length > 1 ? (i / (all.length - 1)) * 0.3 : 0));
     });
     return list;
   }, [wardrobe, frame]);
@@ -280,24 +260,34 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
       <group ref={yawGroup} position={[CENTER.x, 0, CENTER.z]}>
         <group position={pivot}>
           <group ref={root}>
-            {parts.map(p => (
-              <mesh
-                key={p.name}
-                name={p.name}
-                ref={m => void (m && (meshes.current[p.name] = m))}
-                geometry={p.geometry}
-                material={materials[p.kind].surface}
-                position={p.base}
-                onClick={DOORS[p.name] ? onClick : undefined}
-              >
-                <lineSegments geometry={edges.get(p.geometry)} material={materials[p.kind].edges} raycast={() => null} />
-                {p.handles.map(h => (
-                  <mesh key={h.name} name={h.name} geometry={h.geometry} material={materials.handle.surface} position={h.position}>
-                    <lineSegments geometry={edges.get(h.geometry)} material={materials.handle.edges} raycast={() => null} />
-                  </mesh>
-                ))}
-              </mesh>
-            ))}
+            {parts.map(p => {
+              const mesh = (
+                <mesh
+                  key={p.name}
+                  name={p.name}
+                  ref={m => void (m && (meshes.current[p.name] = m))}
+                  geometry={p.geometry}
+                  material={materials[p.kind].surface}
+                  position={p.base}
+                  quaternion={p.quat}
+                  onClick={DOORS[p.name] ? onClick : undefined}
+                >
+                  <lineSegments geometry={edges.get(p.geometry)} material={materials[p.kind].edges} raycast={() => null} />
+                  {p.handles.map(h => (
+                    <mesh key={h.name} name={h.name} geometry={h.geometry} material={materials.handle.surface} position={h.position}>
+                      <lineSegments geometry={edges.get(h.geometry)} material={materials.handle.edges} raycast={() => null} />
+                    </mesh>
+                  ))}
+                </mesh>
+              );
+              return p.pivot ? (
+                <group key={p.name} name={p.pivot.name} position={p.pivot.position}>
+                  {mesh}
+                </group>
+              ) : (
+                mesh
+              );
+            })}
           </group>
         </group>
       </group>

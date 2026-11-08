@@ -65,13 +65,12 @@ export function Measurable({ ref, children, ...props }: Props) {
     lineRef.current.rotation.copy(meshRef.current.rotation);
     lineRef.current.geometry.setPositions(points.map(p => [p.x, p.y, p.z]).flat());
 
-    if (meshRef.current.parent?.type === 'Mesh') {
-      lineGroup.current.position.copy(meshRef.current.parent.position);
-      lineGroup.current.rotation.copy(meshRef.current.parent.rotation);
-    } else {
-      lineGroup.current.position.set(0, 0, 0);
-      lineGroup.current.rotation.set(0, 0, 0);
-    }
+    // The mesh's parent (a door's pivot, a handle's door) relative to the scene group places the line
+    new THREE.Matrix4()
+      .copy(sceneGroup.current.matrixWorld)
+      .invert()
+      .multiply(meshRef.current.parent!.matrixWorld)
+      .decompose(lineGroup.current.position, lineGroup.current.quaternion, lineGroup.current.scale);
     lineRef.current.visible = true;
   };
 
