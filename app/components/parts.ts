@@ -30,9 +30,10 @@ export const DOORS: Record<string, string> = {
   'F09_A_Door': 'OpenBShelve',
 };
 
-// Damping ratio ~0.6 lets a door swing a little past open and settle back; drawers are critically damped
-const DOOR = { stiffness: 36, damping: 7.2 };
-const DRAWER = { stiffness: 40, damping: 12.6 };
+// Damping ratio ~0.6 lets a door swing a little past open and settle back; drawers are critically damped.
+// Speed scales with sqrt(stiffness): twice as fast is 4x stiffness and 2x damping, same damping ratio.
+const DOOR = { stiffness: 144, damping: 14.4 };
+const DRAWER = { stiffness: 160, damping: 25.2 };
 const OPEN = 0.95; // a door counts as open for its drawers from here
 
 // Group around a drawer that slides it out
@@ -70,7 +71,7 @@ export function useParts(root: RefObject<THREE.Object3D | null>, scene: THREE.Ob
       const slide = kindOf(node.name) === 'drawer' && (node as THREE.Mesh).isMesh && live.getObjectByName(slideName(node.name));
       if (!slide) return;
       const box = new THREE.Box3().setFromObject(node);
-      const out = (box.max.x - box.min.x) * 0.7;
+      const out = (box.max.x - box.min.x) * 0.7; // scripts/bake.py bakes each drawer slid out this far (SLIDE)
       springs.set(node.name, { t: 0, v: 0, target: 0, ...DRAWER, apply: t => slide.position.setX(-out * t) });
       const e = 0.01;
       covers.set(
