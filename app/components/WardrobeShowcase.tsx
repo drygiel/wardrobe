@@ -18,6 +18,7 @@ const FLAT: Record<Kind, string> = {
   shelf: '#e0cfae',
   aShelf: '#e0cfae',
   aSide: '#d4bf9a',
+  back: '#2e2a26',
   frame: '#c8a473',
 };
 
@@ -30,6 +31,7 @@ const ALPHA: Record<Kind, number[]> = {
   support: [1, 1, 1, 0, 0, 1],
   aShelf: [1, 1, 1, 0, 0, 1],
   aSide: [1, 1, 1, 0, 0, 1],
+  back: [1, 1, 1, 0, 0, 1],
   led: [1, 1, 1, 1, 0, 1],
   frame: [1, 1, 1, 1, 1, 1],
 };
@@ -59,6 +61,8 @@ function keyframes(kind: Kind, c: THREE.Vector3): THREE.Vector3[] {
       return out(v(-0.22, 0, -0.18), 2);
     case 'aSide':
       return out(v(0, 0, -0.4), 2);
+    case 'back':
+      return out(v(0.35), 2);
     case 'led':
       return [zero, zero, v(-0.06), zero, zero, zero];
     case 'frame': {

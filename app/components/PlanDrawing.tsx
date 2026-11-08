@@ -37,7 +37,7 @@ export function PlanDrawing({ view }: { view: PlanView }) {
   const frame = useGLTF(FRAME_GLB);
 
   const data = useMemo(() => {
-    const parts = [...boxes(wardrobe.scene), ...boxes(frame.scene, FRAME_PIECES)];
+    const parts = [...boxes(wardrobe.scene).filter(b => kindOf(b.name) !== 'back'), ...boxes(frame.scene, FRAME_PIECES)];
     // Boards first so the pieces are drawn on top of them
     const plan = boxes(frame.scene, [...FRAME_BOARDS, ...FRAME_PIECES.map(flatPiece)]).sort(
       (a, b) => Number(isBoard(b.name)) - Number(isBoard(a.name)),

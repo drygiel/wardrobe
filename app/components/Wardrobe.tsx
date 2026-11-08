@@ -8,10 +8,11 @@ import { Measurable } from './Measurable';
 import { useApp } from '@/contexts/AppContext';
 import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
 
-export type Kind = 'front' | 'handle' | 'led' | 'drawer' | 'support' | 'shelf' | 'aShelf' | 'aSide' | 'frame';
+export type Kind = 'front' | 'handle' | 'led' | 'drawer' | 'support' | 'shelf' | 'aShelf' | 'aSide' | 'back' | 'frame';
 
 // Part kind from its Szafa4.blend object name
 export const kindOf = (name: string): Kind => {
+  if (name.endsWith('BackPanel')) return 'back';
   if (name.startsWith('LED_')) return 'led';
   if (name.endsWith('_Handle')) return 'handle';
   if (/^F\d\d_/.test(name)) return 'front';
