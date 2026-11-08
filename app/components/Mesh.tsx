@@ -23,6 +23,7 @@ export function Mesh(props: ThreeElements['mesh']) {
   const materials = useMemo(() => {
     texture.flipY = false;
     texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 16; // three clamps it to the GPU limit; keeps shelves seen at an angle sharp
     return {
       // ['Shelve', 'Svelve', 'Support', 'Frame', 'Drawer']
       // MeshLambertMaterial

@@ -27,6 +27,7 @@
   },
   "include": [
     "app",
+    "scripts",
     "*.ts"
   ]
 }

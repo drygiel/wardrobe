@@ -152,6 +152,7 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
   const materials = useMemo(() => {
     texture.flipY = false;
     texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 16;
     const kinds = Object.keys(FLAT) as Kind[];
     return Object.fromEntries(
       kinds.map(kind => [

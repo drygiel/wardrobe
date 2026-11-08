@@ -12,7 +12,7 @@ export type Kind = 'front' | 'handle' | 'led' | 'drawer' | 'support' | 'shelf' |
 
 // Part kind from its Szafa4.blend object name
 export const kindOf = (name: string): Kind => {
-  if (name.endsWith('BackPanel')) return 'back';
+  if (/(Back|Side)Panel$/.test(name)) return 'back';
   if (name.startsWith('LED_')) return 'led';
   if (name.endsWith('_Handle')) return 'handle';
   if (/^F\d\d_/.test(name)) return 'front';

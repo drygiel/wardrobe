@@ -8,7 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "transform": "tsx transform.ts"
+    "transform": "tsx scripts/transform.ts",
+    "atlas": "tsx scripts/atlas.ts",
+    "bake": "E:/Steam/steamapps/common/Blender/blender.exe -b ../Szafa4.blend --python-exit-code 1 -P scripts/bake.py && yarn atlas",
+    "export": "E:/Steam/steamapps/common/Blender/blender.exe -b ../Szafa4.blend --python-exit-code 1 -P scripts/export.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",
@@ -35,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "prettier": "^3.5.3",
     "sass": "^1.87.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.72.1",
