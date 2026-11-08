@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece, WARDROBE_GLB } from '@/assets';
-import { kindOf } from './Wardrobe';
+import { kindOf } from './parts';
 
 export type PlanView = 'front' | 'side' | 'top' | 'A' | 'B' | 'C' | 'D' | 'cut';
 

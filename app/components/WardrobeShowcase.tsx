@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 import { type RefObject, useMemo, useRef } from 'react';
 import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
-import { useAnimations, useGLTF, useTexture } from '@react-three/drei';
+import { useGLTF, useTexture } from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import { ATLAS, FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
-import { DOORS, type Kind, kindOf, toggleAction } from './Wardrobe';
+import { DOORS, type Kind, kindOf, slideName, useParts } from './parts';
 import { damp, easeInOut, fitDistance, moveCamera, poseAt, schematicMaterial, schematicMix, type ShowcaseProgress, smoothstep } from './schematic';
 
 type Result = GLTF & { nodes: Record<string, THREE.Object3D> };
@@ -106,7 +106,7 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
   const yawGroup = useRef<THREE.Group>(null!);
   const meshes = useRef<Record<string, THREE.Mesh>>({});
   const lights = useRef<{ ambient?: THREE.AmbientLight; point?: THREE.PointLight; sun?: THREE.DirectionalLight }>({});
-  const { actions } = useAnimations(wardrobe.animations, root);
+  const motion = useParts(root, wardrobe.scene, wardrobe.animations);
   const invalidate = useThree(s => s.invalidate);
   const look = useRef(CENTER.clone());
 
@@ -177,11 +177,8 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
 
   const onClick = (event: ThreeEvent<MouseEvent>) => {
     const target = event.nativeEvent.target as HTMLElement;
-    const clip = DOORS[event.eventObject.name];
-    if (!clip || progress.current.T > 0.3 || event.delta > 6 || target.closest('a, button')) return;
-    event.stopPropagation();
-    toggleAction(actions[clip]!, event.eventObject.userData);
-    invalidate();
+    if (progress.current.T > 0.3 || event.delta > 6 || target.closest('a, button')) return;
+    if (motion.toggle(event.eventObject.name)) event.stopPropagation();
   };
 
   const target = new THREE.Vector3();
@@ -196,14 +193,8 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
       return from + (to - from) * damp(lambda, dt);
     };
 
-    // Doors close once the page leaves the hero
-    if (T > 0.6) {
-      Object.entries(DOORS).forEach(([name, clip]) => {
-        const data = meshes.current[name]?.userData;
-        if (data?.open) toggleAction(actions[clip]!, data);
-      });
-    }
-    if (Object.values(actions).some(a => a?.isRunning())) moving = true;
+    // Doors and drawers close once the page leaves the hero
+    if (T > 0.6) motion.closeAll();
 
     schematicMix.value = settle(schematicMix.value, smoothstep(0.1, 0.85, T));
     const mix = schematicMix.value;
@@ -275,7 +266,7 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
                   material={materials[p.kind].surface}
                   position={p.base}
                   quaternion={p.quat}
-                  onClick={DOORS[p.name] ? onClick : undefined}
+                  onClick={DOORS[p.name] || p.kind === 'drawer' ? onClick : undefined}
                 >
                   <lineSegments geometry={edges.get(p.geometry)} material={materials[p.kind].edges} raycast={() => null} />
                   {p.handles.map(h => (
@@ -285,8 +276,15 @@ export function WardrobeShowcase({ progress }: { progress: RefObject<ShowcasePro
                   ))}
                 </mesh>
               );
-              return p.pivot ? (
-                <group key={p.name} name={p.pivot.name} position={p.pivot.position}>
+              if (p.pivot) {
+                return (
+                  <group key={p.name} name={p.pivot.name} position={p.pivot.position}>
+                    {mesh}
+                  </group>
+                );
+              }
+              return p.kind === 'drawer' ? (
+                <group key={p.name} name={slideName(p.name)}>
                   {mesh}
                 </group>
               ) : (
