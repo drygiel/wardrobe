@@ -1,4 +1,4 @@
-import { type ReactNode, Suspense, useEffect, useLayoutEffect, useMemo, useRef, type ComponentRef } from 'react';
+import { type ReactNode, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
 import * as THREE from 'three';
 import * as TWEEN from '@tweenjs/tween.js';
 import {
@@ -45,6 +45,10 @@ const Views: Record<SceneView, ViewState> = {
 export default function Scene({ children, editorCamera = false }: { children: ReactNode; editorCamera?: boolean }) {
   const app = useApp();
   const size = useThree(s => s.size);
+  // The editor flies to an orthographic preset in perspective; app.orthographic is what was asked for, ortho what is on screen
+  const [arrived, setArrived] = useState(app.orthographic);
+  if (!app.orthographic && arrived) setArrived(false);
+  const ortho = app.orthographic && (arrived || !editorCamera);
   // The orthographic presets already aim at the middle of the wardrobe
   const goalOf = (view: SceneView): ViewState => (editorCamera && view === 'initial' ? { ...Views[view], target: Views.front.target } : Views[view]);
 
@@ -105,9 +109,17 @@ export default function Scene({ children, editorCamera = false }: { children: Re
   useEffect(() => {
     if (!controls || isPresenting || app.viewTick === servedTick.current) return;
     // A preset that changes the projection waits for the controls on the new camera
-    if (Boolean((controls.object as THREE.OrthographicCamera).isOrthographicCamera) !== app.orthographic) return;
+    if (Boolean((controls.object as THREE.OrthographicCamera).isOrthographicCamera) !== ortho) return;
     servedTick.current = app.viewTick;
     const goal = goalOf(app.view);
+    const flying = editorCamera && !ortho;
+    const enteringOrtho = flying && app.orthographic;
+
+    // A flight redirected midway has already left the view to come back to
+    if (enteringOrtho && !tweens.current.getAll().some(tween => tween.isPlaying())) {
+      Views['last-3d'].position.copy(controls.object.position);
+      Views['last-3d'].target.copy(controls.target);
+    }
 
     tweens.current.removeAll();
     tweens.current.add(
@@ -115,6 +127,9 @@ export default function Scene({ children, editorCamera = false }: { children: Re
         .to(goal.position, 500)
         .easing(TWEEN.Easing.Quadratic.InOut)
         .interpolation(TWEEN.Interpolation.Bezier)
+        .onComplete(() => {
+          if (enteringOrtho) setArrived(true);
+        })
         .start(),
       new TWEEN.Tween(controls.target)
         .to(goal.target, 500)
@@ -122,8 +137,10 @@ export default function Scene({ children, editorCamera = false }: { children: Re
         .interpolation(TWEEN.Interpolation.Bezier)
         .start(),
     );
-    if (goal.fit && app.orthographic) {
-      const zoom = orthoHalfHeight.current / Math.max(goal.fit[1], goal.fit[0] / (size.width / size.height));
+    // Perspective ends on the preset's framing, so the projection changes without a jump
+    const halfHeight = flying ? frustumHeightAtDistance(perCamRef.current, goal.position.distanceTo(goal.target)) / 2 : orthoHalfHeight.current;
+    const zoom = goal.fit && app.orthographic ? halfHeight / Math.max(goal.fit[1], goal.fit[0] / (size.width / size.height)) : flying ? camState.zoom : null;
+    if (zoom !== null) {
       tweens.current.add(
         new TWEEN.Tween(controls.object)
           .to({ zoom }, 500)
@@ -139,9 +156,12 @@ export default function Scene({ children, editorCamera = false }: { children: Re
     if (!controls || isPresenting) return;
     target.current.copy(controls.target);
 
-    if (!app.orthographic) {
+    if (!ortho) {
       perCamRef.current.position.copy(orthoCamRef.current.position);
       if (editorCamera) {
+        // The flight in left its zoom here; orbiting out of ortho starts no tween that would restore it
+        perCamRef.current.zoom = camState.zoom;
+        perCamRef.current.updateProjectionMatrix();
         // Back off to the distance where the target plane keeps the size it had in ortho
         const halfHeight = orthoHalfHeight.current / orthoCamRef.current.zoom;
         const distance = (halfHeight * perCamRef.current.zoom) / Math.tan((perCamRef.current.fov * Math.PI) / 360);
@@ -153,11 +173,6 @@ export default function Scene({ children, editorCamera = false }: { children: Re
       return;
     }
 
-    if (editorCamera) {
-      Views['last-3d'].position.copy(perCamRef.current.position);
-      Views['last-3d'].target.copy(controls.target);
-    }
-
     orthoCamRef.current.position.copy(perCamRef.current.position);
     const distance = perCamRef.current.position.distanceTo(controls.target);
     const halfWidth = frustumWidthAtDistance(perCamRef.current, distance) / 2;
@@ -166,22 +181,22 @@ export default function Scene({ children, editorCamera = false }: { children: Re
     orthoCamRef.current.bottom = -halfHeight;
     orthoCamRef.current.left = -halfWidth;
     orthoCamRef.current.right = halfWidth;
-    orthoCamRef.current.zoom = Math.min(Math.max(1, perCamRef.current.zoom), 3);
+    orthoCamRef.current.zoom = editorCamera ? perCamRef.current.zoom : Math.min(Math.max(1, perCamRef.current.zoom), 3);
     orthoHalfHeight.current = halfHeight;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [app.orthographic, isPresenting]);
+  }, [ortho, isPresenting]);
 
   // drei puts the orthographic frustum back in pixels whenever the canvas resizes
   useEffect(() => {
-    const ortho = orthoCamRef.current;
-    if (!app.orthographic || !ortho) return;
+    const camera = orthoCamRef.current;
+    if (!ortho || !camera) return;
     const half = orthoHalfHeight.current;
-    ortho.top = half;
-    ortho.bottom = -half;
-    ortho.left = -half * (size.width / size.height);
-    ortho.right = half * (size.width / size.height);
-    ortho.updateProjectionMatrix();
-  }, [size, app.orthographic]);
+    camera.top = half;
+    camera.bottom = -half;
+    camera.left = -half * (size.width / size.height);
+    camera.right = half * (size.width / size.height);
+    camera.updateProjectionMatrix();
+  }, [size, ortho]);
 
   useFrame(() => {
     tweens.current?.update();
@@ -224,7 +239,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
       />
 
       <PerspectiveCamera
-        makeDefault={!app.orthographic || isPresenting}
+        makeDefault={!ortho || isPresenting}
         ref={perCamRef}
         position={camState.position}
         zoom={camState.zoom}
@@ -235,7 +250,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
 
       {!isPresenting && (
         <OrthographicCamera
-          makeDefault={app.orthographic}
+          makeDefault={ortho}
           ref={orthoCamRef}
           position={camState.position}
           zoom={camState.zoom}
