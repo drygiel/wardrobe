@@ -8,8 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "transform": "tsx transform.ts",
-    "deploy": "tsx deploy.ts"
+    "transform": "tsx transform.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",
@@ -30,7 +29,6 @@
     "@types/react-dom": "^19.1.2",
     "@types/react-image-gallery": "^1.2.4",
     "@vitejs/plugin-react": "^6.2.1",
-    "basic-ftp": "^5.0.5",
     "colors": "^1.4.0",
     "dotenv": "^16.5.0",
     "eslint": "^9.25.1",
