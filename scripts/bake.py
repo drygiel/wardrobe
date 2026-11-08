@@ -1,9 +1,10 @@
 # Bakes the shared "Baked" atlas of ../Szafa4.blend into public/models/Wardrobe.jpg. Run headless with `yarn bake`;
 # it reads the saved .blend, so save it first.
 # 1. Everything except the fronts, with the fronts and the hinge parts they carry hidden: the interior as if the doors were open.
-# 2. Outer faces of the fronts and the handles, doors closed.
-# 3. Edges and inner faces of the fronts, doors open at the end of their clips.
-# Each step bakes one temporary joined copy: Blender bakes selected objects one by one and walks the whole
+# 2. Each drawer alone, slid out as far as on the site, fronts still hidden, so its inside is not lit through a closed slot.
+# 3. Outer faces of the fronts and the handles, doors closed.
+# 4. Edges and inner faces of the fronts, doors open at the end of their clips.
+# Each bake is one temporary joined copy: Blender bakes selected objects one by one and walks the whole
 # 8K image for each (~15 s apiece), while a joined copy takes the whole atlas in about a minute.
 import bpy
 import bmesh
@@ -13,8 +14,9 @@ if not bpy.app.background:
 
 OPEN_FRAME = 40  # the door clips end fully open
 MARGIN = 16
-# Fronts must not bleed into other islands: the closest gap front <-> other island is ~12 px at 8096x4096.
-FRONT_MARGIN = 6
+# Parts baked over step 1 must not bleed into other islands: the closest gap between islands is ~12 px at 8096x4096.
+OVER_MARGIN = 6
+SLIDE = 0.7  # drawers slide out by this share of their depth, as in app/components/parts.ts
 
 scene = bpy.context.scene
 view_layer = bpy.context.view_layer
@@ -37,6 +39,7 @@ for o in baked:
     o.hide_render = False  # Unused_BackPanel and Unused_SidePanel are hidden in renders but are part of the atlas and of the light
 panels = [o for o in baked if o in fronts and not o.name.endswith('_Handle')]
 handles = [o for o in baked if o.name.endswith('_Handle')]
+drawers = [o for o in baked if o.name.startswith('DR_')]
 
 
 def carried_by_front(o):
@@ -61,8 +64,8 @@ for o in panels:
     bpy.data.meshes.remove(mesh)
 
 
-def bake(objs, use_clear, margin, keep=None):
-    """Bakes one joined copy of objs; keep(o, face_index) limits which faces of o get baked."""
+def bake(objs, use_clear, margin, keep=None, slide=0.0):
+    """Bakes one joined copy of objs; keep(o, face_index) limits which faces of o get baked, slide moves them to the front (-X)."""
     copies = []
     for o in objs:
         mesh = evaluated_mesh(o)
@@ -74,6 +77,7 @@ def bake(objs, use_clear, margin, keep=None):
             bm.free()
         copy = bpy.data.objects.new(o.name + '_bake', mesh)
         copy.matrix_world = o.matrix_world
+        copy.location.x -= slide
         scene.collection.objects.link(copy)
         copies.append(copy)
         o.hide_render = True  # the copy stands in for it
@@ -102,13 +106,15 @@ hidden_in_step1 = fronts | {o for o in wardrobe if carried_by_front(o)}
 for o in hidden_in_step1:
     o.hide_render = True
 bake([o for o in baked if o not in fronts], use_clear=True, margin=MARGIN)
+for drawer in drawers:
+    bake([drawer], use_clear=False, margin=OVER_MARGIN, slide=drawer.dimensions.x * SLIDE)
 for o in hidden_in_step1:
     o.hide_render = False
 
-bake(panels + handles, use_clear=False, margin=FRONT_MARGIN, keep=closed_side)
+bake(panels + handles, use_clear=False, margin=OVER_MARGIN, keep=closed_side)
 
 scene.frame_set(OPEN_FRAME)
-bake(panels, use_clear=False, margin=FRONT_MARGIN, keep=open_side)
+bake(panels, use_clear=False, margin=OVER_MARGIN, keep=open_side)
 
 atlas = bpy.data.images['Baked']
 atlas.file_format = 'JPEG'
