@@ -40,3 +40,4 @@ yarn-error.log*
 /.idea
 # Design tooling
 /.taste-skill
+/design
