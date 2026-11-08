@@ -1,10 +1,12 @@
 import * as THREE from 'three';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, Suspense, useEffect, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { type ThreeElements, type ThreeEvent } from '@react-three/fiber';
 import { GLTF } from 'three-stdlib';
 import { Mesh } from './Mesh';
 import { Measurable } from './Measurable';
+import { Electric } from './Electric';
+import { Hardware } from './Hardware';
 import { DOORS, kindOf, slideName, useParts } from './parts';
 import { useApp } from '@/contexts/AppContext';
 import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
@@ -15,8 +17,12 @@ export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
   const sceneGroup = useRef<THREE.Group>(null!);
   const { scene, animations } = useGLTF(WARDROBE_GLB) as unknown as GLTF;
   const frame = useGLTF(FRAME_GLB) as unknown as FrameResult;
-  const { hideFronts } = useApp();
+  const { hideFronts, electric, hidden, shown, parts: partsApi } = useApp();
   const parts = useParts(sceneGroup, scene, animations, hideFronts);
+
+  useEffect(() => {
+    partsApi.current = parts;
+  });
 
   const onPartClick = (event: ThreeEvent<MouseEvent>) => {
     if (parts.toggle(event.eventObject.name)) event.stopPropagation();
@@ -41,7 +47,7 @@ export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
         geometry={(node as THREE.Mesh).geometry}
         position={node.position}
         rotation={node.rotation}
-        visible={door || kindOf(node.name) === 'handle' ? !hideFronts : undefined}
+        visible={shown(node)}
         onClick={door || drawer ? onPartClick : undefined}
       >
         {children}
@@ -59,9 +65,19 @@ export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
   return (
     <Measurable ref={sceneGroup} {...props}>
       {FRAME_PIECES.map(name => (
-        <Mesh key={name} name={name} geometry={frame.nodes[name].geometry} position={frame.nodes[name].position} rotation={frame.nodes[name].rotation} />
+        <Mesh key={name} name={name} geometry={frame.nodes[name].geometry} position={frame.nodes[name].position} rotation={frame.nodes[name].rotation} visible={shown(frame.nodes[name])} />
       ))}
       {scene.children.map(part)}
+      {electric && (
+        <Suspense fallback={null}>
+          <Electric root={sceneGroup} shown={shown} />
+        </Suspense>
+      )}
+      {!(hidden.has('dowels') && hidden.has('hinges') && hidden.has('blocks')) && (
+        <Suspense fallback={null}>
+          <Hardware root={sceneGroup} shown={shown} />
+        </Suspense>
+      )}
     </Measurable>
   );
 }

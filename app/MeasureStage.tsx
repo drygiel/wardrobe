@@ -9,17 +9,18 @@ import styles from './MeasureStage.module.scss';
 
 type Props = {
   children: ReactNode;
-  // Embedded in a scrolling page: a card instead of the bar, camera controls on click
-  embedded?: { id: string; title: string; text: string };
+  // Embedded in a scrolling page: a card over the scene, camera controls on click
+  embedded: { id: string; title: string; text: string };
+  // The model on this stage can show its wiring
+  electric?: boolean;
 };
 
-export default function MeasureStage({ children, embedded }: Props) {
+export default function MeasureStage({ children, embedded, electric }: Props) {
   const app = useApp();
   const stageRef = useRef<HTMLElement>(null!);
-  const [visible, setVisible] = useState(!embedded);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!embedded) return;
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && app.setActive(false);
     const io = new IntersectionObserver(([entry]) => {
       setVisible(entry.isIntersecting);
@@ -58,9 +59,15 @@ export default function MeasureStage({ children, embedded }: Props) {
         Siatka
       </label>
       <label>
-        <input type="checkbox" checked={app.hideFronts} onChange={() => app.setHideFronts(h => !h)} />
+        <input type="checkbox" checked={app.hideFronts} onChange={() => app.toggleGroup('fronts')} />
         Bez frontów
       </label>
+      {electric && (
+        <label>
+          <input type="checkbox" checked={app.electric} onChange={() => app.toggleGroup('electric')} />
+          Elektryka
+        </label>
+      )}
       <label>
         Warstwa
         <input
@@ -94,16 +101,16 @@ export default function MeasureStage({ children, embedded }: Props) {
 
   return (
     <section
-      id={embedded?.id}
+      id={embedded.id}
       ref={stageRef}
-      className={cn(styles.stage, embedded ? styles.embedded : styles.full)}
-      aria-labelledby={embedded && `${embedded.id}-h`}
+      className={cn(styles.stage, styles.embedded)}
+      aria-labelledby={`${embedded.id}-h`}
     >
       <Canvas
         className={styles.canvas}
         dpr={[1, 1.75]}
         frameloop={visible ? 'always' : 'never'}
-        onPointerDown={() => embedded && !app.active && app.setActive(true)}
+        onPointerDown={() => !app.active && app.setActive(true)}
       >
         <XR store={app.xr}>
           <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
@@ -112,41 +119,29 @@ export default function MeasureStage({ children, embedded }: Props) {
         {import.meta.env.DEV && <Stats className={styles.stats} />}
       </Canvas>
 
-      {embedded ? (
-        <>
-          <aside className={styles.card}>
-            <h2 id={`${embedded.id}-h`}>{embedded.title}</h2>
-            <p>{embedded.text}</p>
-            <p className={styles.touchHint}>Stuknij scenę, aby nią obracać. Esc lub przewinięcie kończy.</p>
-            <p className={styles.readout} aria-live="polite">
-              <span ref={app.readout}>–</span>
-            </p>
-            <dl className={styles.keys}>
-              <dt>Obrót</dt>
-              <dd>lewy przycisk myszy</dd>
-              <dt>Przesuwanie</dt>
-              <dd>prawy przycisk lub Shift</dd>
-              <dt>Przybliżenie</dt>
-              <dd>kółko, do kursora</dd>
-              <dt>Telefon</dt>
-              <dd>1 palec obraca, 2 przybliżają</dd>
-            </dl>
-            {toggles}
-            {actions}
-          </aside>
-          <p className={styles.hint}>
-            {app.active ? 'Esc kończy sterowanie kamerą.' : 'Kliknij scenę, aby obracać i przybliżać.'}
-          </p>
-        </>
-      ) : (
-        <div className={styles.bar}>
-          <a className={styles.home} href={import.meta.env.BASE_URL}>
-            Szafa 2025
-          </a>
-          {toggles}
-          {actions}
-        </div>
-      )}
+      <aside className={styles.card}>
+        <h2 id={`${embedded.id}-h`}>{embedded.title}</h2>
+        <p>{embedded.text}</p>
+        <p className={styles.touchHint}>Stuknij scenę, aby nią obracać. Esc lub przewinięcie kończy.</p>
+        <p className={styles.readout} aria-live="polite">
+          <span ref={app.readout}>–</span>
+        </p>
+        <dl className={styles.keys}>
+          <dt>Obrót</dt>
+          <dd>lewy przycisk myszy</dd>
+          <dt>Przesuwanie</dt>
+          <dd>prawy przycisk lub Shift</dd>
+          <dt>Przybliżenie</dt>
+          <dd>kółko, do kursora</dd>
+          <dt>Telefon</dt>
+          <dd>1 palec obraca, 2 przybliżają</dd>
+        </dl>
+        {toggles}
+        {actions}
+      </aside>
+      <p className={styles.hint}>
+        {app.active ? 'Esc kończy sterowanie kamerą.' : 'Kliknij scenę, aby obracać i przybliżać.'}
+      </p>
     </section>
   );
 }

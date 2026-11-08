@@ -35,6 +35,10 @@ scene.cycles.caustics_reflective = scene.cycles.caustics_refractive = False
 wardrobe = bpy.data.collections['Wardrobe'].all_objects
 fronts = set(bpy.data.collections['2_Fronts'].all_objects)
 baked = [o for o in wardrobe if o.type == 'MESH' and 'Baked' in o.data.uv_layers]
+electric = set(bpy.data.collections['Electric'].objects)
+for o in electric:
+    o.hide_render = True  # the wiring is a separate overlay on the site, it must not shade the atlas
+bpy.data.objects['Room'].hide_render = True  # the site has no room: its walls darken the atlas and black out the D side panel
 for o in baked:
     o.hide_render = False  # Unused_BackPanel and Unused_SidePanel are hidden in renders but are part of the atlas and of the light
 panels = [o for o in baked if o in fronts and not o.name.endswith('_Handle')]
@@ -102,7 +106,7 @@ def open_side(o, i):
     return i not in outer[o]
 
 
-hidden_in_step1 = fronts | {o for o in wardrobe if carried_by_front(o)}
+hidden_in_step1 = (fronts | {o for o in wardrobe if carried_by_front(o)}) - electric
 for o in hidden_in_step1:
     o.hide_render = True
 bake([o for o in baked if o not in fronts], use_clear=True, margin=MARGIN)

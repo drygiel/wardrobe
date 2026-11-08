@@ -17,6 +17,9 @@ export default function Footer() {
             <a href={`${base}rama.html`}>Rama</a>
           </li>
           <li>
+            <a href={`${base}elektryka.html`}>Elektryka</a>
+          </li>
+          <li>
             <a href={`${base}editor.html`}>Edytor pomiarów</a>
           </li>
         </ul>

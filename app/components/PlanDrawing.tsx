@@ -2,20 +2,19 @@ import * as THREE from 'three';
 import { useMemo } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece, WARDROBE_GLB } from '@/assets';
-import { kindOf } from './parts';
+import { COLUMNS, kindOf } from './parts';
 
 export type PlanView = 'front' | 'side' | 'top' | 'A' | 'B' | 'C' | 'D' | 'cut';
 
 type Box = { name: string; min: THREE.Vector3; max: THREE.Vector3 };
 
-// Sections along model z (front view left to right); dividers taken at their centres
-const SECTIONS = { A: [-2.688, -2.28], B: [-2.28, -1.054], C: [-1.054, -0.694], D: [-0.694, 0] } as const;
+const SECTIONS = COLUMNS;
 const isLed = (n: string) => kindOf(n) === 'led';
 const isFront = (n: string) => kindOf(n) === 'front' || kindOf(n) === 'handle';
 const isBoard = (n: string) => (FRAME_BOARDS as readonly string[]).includes(n);
 const mm = (m: number) => Math.round(m * 1000);
 
-function boxes(scene: THREE.Object3D, names?: readonly string[]) {
+export function boxes(scene: THREE.Object3D, names?: readonly string[]) {
   scene.updateMatrixWorld(true);
   const list: Box[] = [];
   scene.traverse(o => {

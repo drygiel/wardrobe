@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
           index: resolve(import.meta.dirname, 'index.html'),
           editor: resolve(import.meta.dirname, 'editor.html'),
           rama: resolve(import.meta.dirname, 'rama.html'),
+          elektryka: resolve(import.meta.dirname, 'elektryka.html'),
         },
       },
     },

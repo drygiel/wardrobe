@@ -4,11 +4,6 @@
     overflow: hidden;
 }
 
-.full {
-    width: 100vw;
-    height: 100svh;
-}
-
 .embedded {
     z-index: 1;
     height: 100svh;
@@ -60,30 +55,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px 20px;
-}
-
-// Editor: a plain bar over the scene
-.bar {
-    position: absolute;
-    inset: 0 0 auto;
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px 32px;
-    padding: 14px var(--m);
-    background: var(--surface);
-    font-size: var(--step-small);
-
-    .actions {
-        margin-left: auto;
-    }
-}
-
-.home {
-    font-family: var(--font-display);
-    font-size: var(--step-lead);
-    text-decoration: none;
 }
 
 // Embedded: one column card over the full-bleed scene
@@ -163,10 +134,5 @@
 
     .touchHint {
         display: block;
-    }
-
-    .bar {
-        gap: 10px 20px;
-        padding: 10px 16px;
     }
 }

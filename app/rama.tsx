@@ -21,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
         { href: '#formatki', label: 'Formatki' },
         { href: '#pomiar', label: 'Pomiar' },
         { href: 'rama.html', label: 'Rama', current: true },
+        { href: 'elektryka.html', label: 'Elektryka' },
       ]}
       heading="Rama szafy: 14 formatek z trzech płyt dębowych."
       facts="Płyty 3000 × 620 × 40 mm. Frezy pod LED i ścięcia 45°."

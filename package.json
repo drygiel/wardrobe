@@ -11,7 +11,7 @@
     "transform": "tsx scripts/transform.ts",
     "atlas": "tsx scripts/atlas.ts",
     "bake": "tsx scripts/blender.ts scripts/bake.py && yarn atlas",
-    "export": "tsx scripts/blender.ts scripts/export.py"
+    "export:model": "tsx scripts/blender.ts scripts/export.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",

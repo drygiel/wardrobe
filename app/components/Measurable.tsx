@@ -9,13 +9,16 @@ import { LineHint } from '@/components/LineHint';
 
 type Props = Omit<ThreeElements['group'], 'ref'> & { ref?: Ref<THREE.Group>; children: ReactNode };
 
+// The raycaster does not skip invisible objects
+const isShown = (object: THREE.Object3D | null): boolean => !object || (object.visible && isShown(object.parent));
+
 // Hover measuring shared by every model: raycasts edge lines on layer 1 and shows the red line with its length
 export function Measurable({ ref, children, ...props }: Props) {
   const lineRef = useRef<ComponentRef<typeof Line>>(null!);
   const sceneGroup = useRef<THREE.Group>(null!);
   const lineGroup = useRef<THREE.Group>(null!);
   const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());
-  const { wireframe, line } = useApp();
+  const { wireframe, line, inspect } = useApp();
 
   const isLMBPressed = useRef(false);
 
@@ -32,6 +35,7 @@ export function Measurable({ ref, children, ...props }: Props) {
 
     if (!wireframe) {
       line.current = null;
+      inspect.current?.(null);
       return;
     }
 
@@ -43,6 +47,15 @@ export function Measurable({ ref, children, ...props }: Props) {
 
     const hit = intersects.find(i => i.object.name.startsWith('line'));
     const lineData = hit && (hit.object.userData.lines as LineData[])[hit.faceIndex!];
+
+    if (inspect.current) {
+      const faces = raycaster.intersectObject(sceneGroup.current, true).filter(i => (i.object as THREE.Mesh).isMesh && isShown(i.object));
+      // Overlays are drawn over everything, so they win; otherwise an edge counts only when no surface covers it
+      const face = faces.find(i => i.object.userData.overlay) ?? faces[0];
+      const edgeOnTop = lineData && (!face || (!face.object.userData.overlay && hit.distance <= face.distance + 0.01));
+      const picked = edgeOnTop ? lineData.meshRef.current : ((face?.object as THREE.Mesh) ?? null);
+      inspect.current(picked, lineData ?? null);
+    }
 
     if (!lineData) {
       const onBlur = line.current?.onBlur;
@@ -57,7 +70,7 @@ export function Measurable({ ref, children, ...props }: Props) {
     line.current?.onBlur();
     line.current = lineData;
     showRedLine(lineData);
-    line.current.onHover();
+    if (!inspect.current) line.current.onHover(); // the inspector brightens the whole part itself, this would darken it
   });
 
   const showRedLine = ({ meshRef, points }: LineData) => {

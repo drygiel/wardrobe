@@ -18,6 +18,67 @@ export const kindOf = (name: string): Kind => {
   return 'shelf';
 };
 
+// How much of the rest of the wardrobe stays visible around a selected part
+export const DIMMED_OPACITY = 0.18;
+export const HOVERED_OPACITY = 0.55; // a dimmed part under the cursor
+
+export const GROUPS = [
+  { id: 'frame', label: 'Rama' },
+  { id: 'interior', label: 'Półki i przegrody' },
+  { id: 'drawers', label: 'Szuflady' },
+  { id: 'fronts', label: 'Fronty' },
+  { id: 'back', label: 'Plecy i panel boczny' },
+  { id: 'led', label: 'Taśmy LED' },
+  { id: 'dowels', label: 'Kołki' },
+  { id: 'hinges', label: 'Zawiasy' },
+  { id: 'blocks', label: 'Klocki montażowe' },
+  { id: 'electric', label: 'Elektryka' },
+] as const;
+export type GroupId = (typeof GROUPS)[number]['id'];
+
+// Off until switched on, on every page
+export const HIDDEN_GROUPS: GroupId[] = ['dowels', 'hinges', 'blocks', 'electric'];
+
+export const groupOf = (name: string): GroupId => {
+  // Before kindOf: the cables are named LED_Wire*
+  if (/^(LED_Wire|Dimmer|Bus_|PSU|Plug|Switch|Mains|Feed|Door_|Socket$|Wire$)/.test(name)) return 'electric';
+  if (/^J\d\d_/.test(name)) return 'dowels';
+  if (/^H\d\d_/.test(name)) return 'hinges';
+  if (/^MB\d_/.test(name)) return 'blocks';
+  const kind = kindOf(name);
+  if (kind === 'front' || kind === 'handle') return 'fronts';
+  if (kind === 'drawer') return 'drawers';
+  if (kind === 'led' || kind === 'back' || kind === 'frame') return kind;
+  return 'interior';
+};
+
+// Columns ("słupki") along model z, front view left to right; dividers taken at their centres
+export const COLUMNS = { A: [-2.688, -2.28], B: [-2.28, -1.054], C: [-1.054, -0.694], D: [-0.694, 0] } as const;
+export type Column = keyof typeof COLUMNS;
+const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
+const DOOR_COLUMN: Record<string, Column> = { F01: 'B', F02: 'B', F03: 'B', F04: 'B', F05: 'C', F06: 'D', F07: 'D' };
+
+const columnCache = new WeakMap<THREE.Object3D, Column[]>();
+
+// The object name decides when it says; otherwise the columns its closed glTF pose overlaps
+export function columnsOf(node: THREE.Object3D): Column[] {
+  const cached = columnCache.get(node);
+  if (cached) return cached;
+  const tag = /^(?:[PF]\d\d|IN|DR|LED|MB\d)_([ABCD])_/.exec(node.name)?.[1] ?? (node.name.startsWith('A_') ? 'A' : undefined);
+  const door = DOOR_COLUMN[/F\d\d/.exec(node.name)?.[0] ?? ''];
+  let columns: Column[];
+  if (tag) columns = [tag as Column];
+  else if (door) columns = [door];
+  else {
+    node.updateWorldMatrix(true, false);
+    const box = new THREE.Box3().setFromObject(node);
+    const need = Math.min(0.005, (box.max.z - box.min.z) / 2);
+    columns = COLUMN_NAMES.filter(c => Math.min(COLUMNS[c][1], box.max.z) - Math.max(COLUMNS[c][0], box.min.z) >= need);
+  }
+  columnCache.set(node, columns);
+  return columns;
+}
+
 // Door mesh to its clip: hinged doors swing on their F0x_Pivot, the section A door rotates itself
 export const DOORS: Record<string, string> = {
   'F01_B_Door-Bottom-L': 'Hinge.Pivot.B.BLAction',
@@ -141,5 +202,10 @@ export function useParts(root: RefObject<THREE.Object3D | null>, scene: THREE.Ob
     if (changed) invalidate();
   };
 
-  return { toggle, closeAll };
+  const openAll = () => {
+    get()?.springs.forEach(sp => (sp.target = 1));
+    invalidate();
+  };
+
+  return { toggle, closeAll, openAll };
 }

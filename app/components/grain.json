@@ -1,0 +1,326 @@
+{
+"A_Carcass": {
+"x": "y",
+"z": "y"
+},
+"A_Shelf-01": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"A_Shelf-02": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"A_Shelf-03": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"A_Shelf-04": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"A_Shelf-Bottom": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"DR_B_Drawer-01-L": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-01-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-02-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-03-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-04-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-05-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_B_Drawer-06-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"DR_C_Drawer-01": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"F05_C_Door-Bottom": {
+"x": "y",
+"z": "y"
+},
+"F09_A_Door": {
+"x": "y",
+"y": "z",
+"z": "y"
+},
+"IN_B_Divider-01": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_B_Divider-02": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_B_Divider-03": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_B_Divider-04": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_B_Divider-05": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_B_Shelf-01": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-02": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-03": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-04": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-05": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-06": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-07": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-08": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-09": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-10": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-11": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Shelf-12": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_B_Side-L": {
+"x": "y",
+"z": "y"
+},
+"IN_B_Side-L-Lower": {
+"x": "y",
+"y": "?",
+"z": "y"
+},
+"IN_B_Side-R": {
+"x": "y",
+"z": "y"
+},
+"IN_B_Side-R-Lower": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_C_Shelf-01": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_C_Shelf-02": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_C_Shelf-03": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_C_Shelf-04": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_C_Side-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"IN_C_Side-R-Lower": {
+"x": "y",
+"y": "x",
+"z": "?"
+},
+"IN_D_Divider-01": {
+"x": "?",
+"y": "x",
+"z": "?"
+},
+"IN_D_Shelf-01": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-02": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-03": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-04": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-05": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-06": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-07": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-08": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Shelf-09": {
+"x": "z",
+"y": "z",
+"z": "x"
+},
+"IN_D_Strip-01": {
+"y": "x",
+"z": "x"
+},
+"P01_D_Post-Rear-R": {
+"x": "y",
+"z": "y"
+},
+"P02_B_Rail-Bottom-Rear": {
+"x": "z",
+"y": "z"
+},
+"P03_C_Side-L": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"P04_C_Bottom": {
+"x": "?",
+"y": "z",
+"z": "z"
+},
+"P05_C_Side-R": {
+"x": "y",
+"y": "x",
+"z": "y"
+},
+"P06_C_Top": {
+"x": "z",
+"y": "?"
+},
+"P07_B_Rail-Top-Front": {
+"x": "z",
+"y": "z"
+},
+"P08_B_Rail-Bottom-Front": {
+"x": "z",
+"y": "z"
+},
+"P09_D_Post-Front-R": {
+"x": "y",
+"z": "y"
+},
+"P10_D_Rail-Top-Rear": {
+"x": "z",
+"y": "z"
+},
+"P11_D_Crossbar-Bottom-R": {
+"x": "z",
+"y": "z"
+},
+"P12_D_Crossbar-Top-R": {
+"x": "z",
+"y": "z"
+},
+"P13_B_Rail-Top-Rear": {
+"x": "z",
+"y": "z"
+},
+"P14_B_Side-L": {
+"x": "y",
+"z": "y"
+}
+}

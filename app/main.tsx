@@ -20,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
         { href: '#plan', label: 'Plan' },
         { href: '#galeria', label: 'Galeria' },
         { href: 'rama.html', label: 'Rama' },
+        { href: 'elektryka.html', label: 'Elektryka' },
       ]}
       heading="Szafa z litego dębu, od podłogi do sufitu."
       facts="268,8 × 266 × 53 cm. Cztery części, 86 elementów."
@@ -55,6 +56,7 @@ createRoot(document.getElementById('root')!).render(
     <main>
       <AppProvider initial={{ wireframe: true, grid: true, gizmo: true, active: false, view: 'left-side' }}>
         <MeasureStage
+          electric
           embedded={{
             id: 'pomiar',
             title: 'Zmierz sam',

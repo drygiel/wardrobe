@@ -1,0 +1,617 @@
+// The editor: a dark drafting room around the model, the part drawing is the one sheet of paper in it
+.shell {
+    --panel: #1c1a17;
+    --line: #38332c;
+    --control: #2a2622;
+
+    display: grid;
+    grid-template: 'side view insp' 100svh / 280px minmax(0, 1fr) 360px;
+    background: var(--bg);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+
+    button {
+        cursor: pointer;
+    }
+
+    :is(button, input):disabled {
+        cursor: default;
+    }
+
+    small {
+        font-size: 0.75rem;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    h2 {
+        font-family: var(--font-text);
+        font-size: 0.8125rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        line-height: 1.4;
+    }
+}
+
+.side,
+.insp {
+    background: var(--panel);
+    overflow-y: auto;
+    scrollbar-color: var(--line) transparent;
+    scrollbar-width: thin;
+}
+
+.side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--line);
+}
+
+.insp {
+    grid-area: insp;
+    border-left: 1px solid var(--line);
+}
+
+.view {
+    grid-area: view;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.canvas {
+    position: absolute !important;
+    inset: 0;
+}
+
+.brand {
+    padding: 14px 16px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+
+    &:hover {
+        color: #fff;
+    }
+}
+
+.note {
+    padding: 0;
+    color: var(--muted);
+    max-width: 44ch;
+}
+
+.block,
+.listBlock {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+}
+
+.listBlock {
+    flex: 1 0 280px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-bottom: 0;
+}
+
+.blockHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+.textButton {
+    border: 0;
+    background: none;
+    padding: 2px 0 2px 12px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: color 160ms;
+
+    &:hover:not(:disabled) {
+        color: var(--ink);
+    }
+
+    &:disabled {
+        opacity: 0.45;
+    }
+}
+
+.tree {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    margin: 0 -8px;
+    scrollbar-color: var(--line) transparent;
+    scrollbar-width: thin;
+
+    &,
+    ul {
+        list-style: none;
+    }
+}
+
+.row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding-right: 8px;
+    transition: background-color 120ms;
+
+    &:hover {
+        background: var(--control);
+    }
+
+    &:has(.rowLabel[aria-pressed='true']) {
+        background: var(--ink);
+        color: var(--bg);
+
+        small {
+            color: inherit;
+        }
+    }
+
+    // Quiet outline, the mark takes the row's text colour so it also works on a pinned row
+    input {
+        appearance: none;
+        flex: none;
+        display: grid;
+        place-content: center;
+        width: 13px;
+        height: 13px;
+        border: 1px solid #6b645a;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        transition: border-color 120ms;
+
+        &:hover {
+            border-color: var(--muted);
+        }
+
+        &::before {
+            content: '';
+            width: 9px;
+            height: 9px;
+            background: currentColor;
+            opacity: 0;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.8 5.3 4.1 7.6 8.2 2.8' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+        }
+
+        &:checked::before,
+        &:indeterminate::before {
+            opacity: 0.7;
+        }
+
+        &:indeterminate::before {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 5H7.5' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
+        }
+    }
+
+    i {
+        flex: none;
+        width: 8px;
+        height: 8px;
+    }
+
+    &:hover .count,
+    &:focus-within .count {
+        visibility: hidden;
+    }
+}
+
+.chevron {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 24px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+
+    svg {
+        transition: transform 120ms;
+    }
+
+    &[aria-expanded='true'] svg {
+        transform: rotate(90deg);
+    }
+}
+
+.rowLabel {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    text-align: left;
+
+    span {
+        flex: none;
+        max-width: 70%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .row:hover & small {
+        visibility: hidden;
+    }
+}
+
+.solo {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    color: inherit;
+    font-size: 0.75rem;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    opacity: 0;
+
+    .row:hover &,
+    &:focus-visible {
+        opacity: 1;
+    }
+}
+
+.columns {
+    display: flex;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+
+    button {
+        flex: 1 1 0;
+        min-width: 0;
+        height: 32px;
+        border: 0;
+        background: var(--bg);
+        font-weight: 500;
+        transition: background-color 120ms, color 120ms;
+
+        &:hover {
+            background: var(--control);
+        }
+
+        &[aria-pressed='true'] {
+            background: var(--ink);
+            color: var(--bg);
+        }
+    }
+}
+
+.search {
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    margin-bottom: 8px;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+
+    &::placeholder {
+        color: var(--muted);
+    }
+}
+
+// Viewport controls float over the scene; the gaps between them still reach the canvas
+.toolbar {
+    position: absolute;
+    inset: 12px 12px auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+}
+
+// Stacked in the corner; the groups share one width so their edges line up
+.toolsEnd {
+    flex: none;
+    display: grid;
+    gap: 10px;
+
+    .seg {
+        grid-auto-flow: row;
+
+        button {
+            justify-content: flex-start;
+        }
+    }
+
+    // The first option takes a whole row, the rest share the next one
+    .pair {
+        grid-template-columns: 1fr 1fr;
+
+        button:first-child {
+            grid-column: 1 / -1;
+        }
+    }
+}
+
+.seg {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr; // every option in a group gets the width of the longest one
+    gap: 1px;
+    border: 1px solid var(--line);
+    background: var(--line);
+    pointer-events: auto;
+
+    button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        height: 32px;
+        padding: 0 11px;
+        border: 0;
+        background: var(--panel);
+        white-space: nowrap;
+        transition: background-color 120ms, color 120ms;
+
+        svg {
+            flex: none;
+        }
+
+        // Sits over the model, so it needs more contrast than the panel controls
+        &:hover {
+            background: #4a4439;
+            color: #fff;
+        }
+
+        &:active {
+            background: var(--line);
+        }
+
+        &[aria-pressed='true'] {
+            background: var(--ink);
+            color: var(--bg);
+        }
+    }
+}
+
+.status {
+    position: absolute;
+    left: 16px;
+    right: 180px;
+    bottom: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    color: var(--muted);
+    pointer-events: none;
+
+    b {
+        color: var(--ink);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.inspector {
+    display: grid;
+    gap: 14px;
+    padding: 18px 16px;
+}
+
+.partName {
+    font-family: var(--font-display) !important;
+    font-size: 1.875rem !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.05 !important;
+    text-wrap: balance;
+}
+
+.partMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 14px;
+    align-items: baseline;
+    margin-top: -6px;
+
+    span {
+        font-weight: 600;
+    }
+
+    code {
+        font-family: var(--font-text);
+        color: var(--muted);
+        overflow-wrap: anywhere;
+    }
+}
+
+.sizes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-block: 1px solid var(--line);
+    padding-block: 10px;
+
+    dt {
+        color: var(--muted);
+        font-size: 0.75rem;
+    }
+
+    dd {
+        font-size: 1.5rem;
+        font-weight: 500;
+        line-height: 1.15;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.sheet svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 16px;
+
+    dt {
+        color: var(--muted);
+    }
+
+    dd {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.inspectorActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tool {
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--line);
+    background: var(--control);
+    transition: border-color 120ms;
+
+    &:hover {
+        border-color: var(--muted);
+    }
+
+    &:active {
+        background: var(--line);
+    }
+}
+
+// The model and the inspector stay side by side; the lists move under the model
+@media (max-width: 1179px) {
+    .shell {
+        grid-template:
+            'view insp' 76svh
+            'side insp' auto / minmax(0, 1fr) 340px;
+    }
+
+    .insp {
+        position: sticky;
+        top: 0;
+        align-self: start;
+        max-height: 100svh;
+    }
+
+    .side {
+        border-top: 1px solid var(--line);
+        border-right: 0;
+    }
+
+    .listBlock {
+        flex: none;
+    }
+
+    .tree {
+        max-height: 420px;
+        flex: none;
+    }
+}
+
+@media (max-width: 759px) {
+    .shell {
+        grid-template:
+            'view' 58svh
+            'insp' auto
+            'side' auto / minmax(0, 1fr);
+    }
+
+    .insp {
+        position: static;
+        max-height: none;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+    }
+
+    .toolbar {
+        inset: 8px 8px auto;
+        gap: 6px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        pointer-events: auto;
+    }
+
+    // One scrolling row, so the corner stack must not cover the small model
+    .tools,
+    .toolsEnd {
+        display: contents;
+    }
+
+    .seg,
+    .toolsEnd .seg {
+        flex: none;
+        grid-auto-flow: column;
+    }
+
+    .toolsEnd .pair {
+        grid-template-columns: none;
+
+        button:first-child {
+            grid-column: auto;
+        }
+    }
+
+    .keys {
+        display: none;
+    }
+
+    .status {
+        left: 12px;
+        bottom: 10px;
+    }
+}
+
+@media (hover: none) {
+    .solo {
+        opacity: 1;
+    }
+
+    .count,
+    .rowLabel small {
+        visibility: hidden;
+    }
+
+    .seg button,
+    .columns button,
+    .tool,
+    .row {
+        min-height: 44px;
+    }
+}
