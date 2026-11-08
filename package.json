@@ -10,8 +10,8 @@
     "lint": "eslint .",
     "transform": "tsx scripts/transform.ts",
     "atlas": "tsx scripts/atlas.ts",
-    "bake": "E:/Steam/steamapps/common/Blender/blender.exe -b ../Szafa4.blend --python-exit-code 1 -P scripts/bake.py && yarn atlas",
-    "export": "E:/Steam/steamapps/common/Blender/blender.exe -b ../Szafa4.blend --python-exit-code 1 -P scripts/export.py"
+    "bake": "tsx scripts/blender.ts scripts/bake.py && yarn atlas",
+    "export": "tsx scripts/blender.ts scripts/export.py"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.7",

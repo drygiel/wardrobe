@@ -114,6 +114,8 @@ yarn deploy        # Deploy to production
 ### Environment Variables
 ```env
 BASE_PATH=/your-base-path/  # Optional base path (Vite `base`)
+BLENDER=path/to/blender.exe  # `yarn bake` / `yarn export` (see .env.sample)
+BLEND_FILE=../Szafa4.blend   # Scene the Blender scripts run on
 ```
 
 ## 🎨 Customization
