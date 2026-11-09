@@ -48,6 +48,9 @@ export const selection = {
   hover(mesh: THREE.Mesh | null, edge: LineData | null = null) {
     if (state.hover !== mesh || state.edge !== edge) update({ hover: mesh, edge });
   },
+  setEdge(edge: LineData | null) {
+    if (state.edge !== edge) update({ edge });
+  },
   // A click: pins what is under the cursor; on empty space or the pinned part again it unpins
   pin(mesh = state.hover) {
     update({ pinned: mesh === state.pinned ? null : mesh });

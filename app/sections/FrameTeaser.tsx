@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { picture } from '@/assets';
 import { useReveal } from '@/hooks/useReveal';
 import styles from './FrameTeaser.module.scss';
@@ -35,9 +36,9 @@ export default function FrameTeaser() {
           <b>Wszystko z trzech płyt.</b> Rozkrój na płyty 3000 × 620 mm z jak najmniejszym odpadem. Siedem formatek ma
           ścięcia 45°.
         </span>
-        <a className="link" href="rama.html">
+        <Link className="link" to="/rama">
           Zobacz ramę
-        </a>
+        </Link>
       </p>
     </section>
   );

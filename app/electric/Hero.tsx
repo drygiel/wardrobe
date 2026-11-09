@@ -1,5 +1,6 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
+import { Link } from 'react-router';
 import cn from 'classnames';
 import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
 import { boxes } from '@/components/PlanDrawing';
@@ -7,8 +8,6 @@ import { kindOf } from '@/components/parts';
 import { useCircuit } from './circuit';
 import { CABLE_METRES, CONTACTS, contact, DOOR_IDS, DRILLS, FULL_WATT, LED_METRES, LEDS, num, ROUTES, type Route } from './data';
 import styles from './Elektryka.module.scss';
-
-const base = import.meta.env.BASE_URL;
 
 const WIDE = 2688;
 const HIGH = 2655;
@@ -275,21 +274,21 @@ export function Hero() {
   return (
     <header ref={heroRef} className={styles.hero} style={{ ['--room' as string]: glow }}>
       <nav className={styles.topnav} aria-label="Nawigacja">
-        <a className={styles.wordmark} href={base}>
+        <Link className={styles.wordmark} to="/">
           Szafa 2025
-        </a>
+        </Link>
         <ul>
           <li>
-            <a href={base}>Szafa</a>
+            <Link to="/">Szafa</Link>
           </li>
           <li>
-            <a href={`${base}rama.html`}>Rama</a>
+            <Link to="/rama">Rama</Link>
           </li>
           <li>
-            <a href="#wiercenie">Wiercenie</a>
+            <Link to="#wiercenie">Wiercenie</Link>
           </li>
           <li>
-            <a href="#montaz">Montaż</a>
+            <Link to="#montaz">Montaż</Link>
           </li>
         </ul>
       </nav>

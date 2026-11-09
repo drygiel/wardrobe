@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import type { LineData } from '@/components/Mesh';
 import { GROUPS } from '@/components/parts';
 import { grainAxis, sizeOf } from '@/components/grain';
 import { useCatalog } from './catalog';
@@ -19,6 +20,22 @@ export function Inspector() {
   const part = mesh && catalog.byName.get(mesh.name);
   const svg = useRef<SVGSVGElement>(null);
   const [copied, setCopied] = useState(false);
+  const edgeFromDrawing = useRef(false);
+
+  const showEdge = (line: LineData | null) => {
+    edgeFromDrawing.current = !!line;
+    selection.setEdge(line);
+    app.showEdge.current?.(line);
+  };
+
+  // Esc can take the drawing away with the cursor still on an edge, and then no leave event comes
+  useEffect(
+    () => () => {
+      if (edgeFromDrawing.current) showEdge(null);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pinned],
+  );
 
   if (!mesh || !part) {
     const { x, y, z } = catalog.overall;
@@ -54,7 +71,9 @@ export function Inspector() {
   };
 
   const download = () => {
-    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg.current!)], { type: 'image/svg+xml' }));
+    const sheet = svg.current!.cloneNode(true) as SVGSVGElement;
+    sheet.querySelector('[data-pick]')?.remove();
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(sheet)], { type: 'image/svg+xml' }));
     const link = document.createElement('a');
     link.href = url;
     link.download = `${part.name}.svg`;
@@ -80,7 +99,7 @@ export function Inspector() {
       </dl>
 
       <div className={styles.sheet}>
-        <PartDrawing ref={svg} geometry={mesh.geometry} code={part.name} edge={edge?.meshRef.current === mesh ? edge.points : null} grain={app.grain && typeof grain === 'number' ? grain : undefined} />
+        <PartDrawing ref={svg} geometry={mesh.geometry} code={part.name} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} grain={app.grain && typeof grain === 'number' ? grain : undefined} />
       </div>
 
       <dl className={styles.facts}>

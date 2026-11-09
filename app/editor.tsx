@@ -1,10 +1,12 @@
-import { createRoot } from 'react-dom/client';
 import { AppProvider } from '@/contexts/AppContext';
 import Editor from '@/editor/Editor';
-import './global.scss';
 
-createRoot(document.getElementById('root')!).render(
-  <AppProvider initial={{ grid: true, gizmo: true, view: 'initial', hideFronts: true, wireframe: true }}>
-    <Editor />
-  </AppProvider>,
-);
+export default function EditorPage() {
+  return (
+    <AppProvider initial={{ grid: true, gizmo: true, view: 'initial', hideFronts: true, wireframe: true }}>
+      <title>Szafa 2025 – edytor pomiarów</title>
+      <meta name="theme-color" content="#161412" />
+      <Editor />
+    </AppProvider>
+  );
+}

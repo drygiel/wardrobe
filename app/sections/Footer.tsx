@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { WARDROBE_GLB } from '@/assets';
 import styles from './Footer.module.scss';
 
@@ -11,16 +12,16 @@ export default function Footer() {
         <ul>
           <li>Strony</li>
           <li>
-            <a href={base}>Szafa</a>
+            <Link to="/">Szafa</Link>
           </li>
           <li>
-            <a href={`${base}rama.html`}>Rama</a>
+            <Link to="/rama">Rama</Link>
           </li>
           <li>
-            <a href={`${base}elektryka.html`}>Elektryka</a>
+            <Link to="/elektryka">Elektryka</Link>
           </li>
           <li>
-            <a href={`${base}editor.html`}>Edytor pomiarów</a>
+            <Link to="/editor">Edytor pomiarów</Link>
           </li>
         </ul>
         <ul>

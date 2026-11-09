@@ -20,7 +20,7 @@ export const kindOf = (name: string): Kind => {
 
 // How much of the rest of the wardrobe stays visible around a selected part
 export const DIMMED_OPACITY = 0.18;
-export const HOVERED_OPACITY = 0.55; // a dimmed part under the cursor
+export const HOVERED_OPACITY = 0.35; // a dimmed part under the cursor
 
 export const GROUPS = [
   { id: 'frame', label: 'Rama' },

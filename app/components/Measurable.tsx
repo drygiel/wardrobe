@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { type ComponentRef, type ReactNode, type Ref, useRef } from 'react';
+import { type ComponentRef, type ReactNode, type Ref, useEffect, useRef } from 'react';
 import { Line } from '@react-three/drei';
 import { type ThreeElements, useFrame, useThree } from '@react-three/fiber';
 import type { LineData } from './Mesh';
@@ -18,9 +18,22 @@ export function Measurable({ ref, children, ...props }: Props) {
   const sceneGroup = useRef<THREE.Group>(null!);
   const lineGroup = useRef<THREE.Group>(null!);
   const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());
-  const { wireframe, line, inspect } = useApp();
+  const { wireframe, line, inspect, showEdge } = useApp();
 
   const isLMBPressed = useRef(false);
+
+  // An edge chosen outside the canvas; the hover loop below sleeps while the pointer is away
+  useEffect(() => {
+    showEdge.current = edge => {
+      line.current = edge;
+      if (edge) showRedLine(edge);
+      else lineRef.current.visible = false;
+    };
+    return () => {
+      showEdge.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEventListener('pointerdown', () => (isLMBPressed.current = true));
   useEventListener('pointerup', () => (isLMBPressed.current = false));
@@ -98,6 +111,10 @@ export function Measurable({ ref, children, ...props }: Props) {
           lineWidth={2.5}
           color="red"
           renderOrder={1000}
+          // renderOrder sorts only within a queue, and three draws all opaque objects before transparent ones:
+          // without this the outlines and faces of transparent parts land on top of the red line
+          transparent
+          depthTest={false}
         />
       </group>
 

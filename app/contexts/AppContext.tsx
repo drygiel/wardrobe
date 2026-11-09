@@ -30,6 +30,8 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
   const readout = useRef<HTMLElement>(null);
   // Set by the editor; a ref so hovering does not re-render the scene
   const inspect = useRef<((mesh: THREE.Mesh | null, edge?: LineData | null) => void) | null>(null);
+  // Set by the model: shows or clears the red measuring line from outside the canvas
+  const showEdge = useRef<((edge: LineData | null) => void) | null>(null);
   const parts = useRef<ReturnType<typeof useParts> | null>(null);
 
   const setView = (next: SceneView) => {
@@ -81,6 +83,7 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     line,
     readout,
     inspect,
+    showEdge,
     parts,
     gizmo,
     setGizmo,

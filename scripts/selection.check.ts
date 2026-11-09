@@ -38,6 +38,10 @@ assert.deepEqual(take(), ['a selected', 'b dim', 'b unlit']);
 
 selection.hover(null);
 assert.deepEqual(take(), ['a selected']);
+// An edge picked on the drawing leaves highlight and focus alone
+selection.setEdge(edge);
+selection.setEdge(null);
+assert.deepEqual(take(), []);
 selection.unpin();
 assert.deepEqual(take(), ['a none', 'b none']);
 console.log('selection ok');

@@ -25,7 +25,8 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 
 ### Frontend
 - **React 19** - Modern React with latest features
-- **Vite 8** - Dev server and bundler (multi-page: `index.html`, `editor.html`)
+- **Vite 8** - Dev server and bundler
+- **React Router 7** - Client-side routes: `/`, `/rama`, `/elektryka`, `/editor`
 - **TypeScript** - Type-safe development
 - **Sass** - CSS preprocessing with modules
 
@@ -60,8 +61,8 @@ app/
 │   └── useNonInitialEffect.ts
 ├── Intro.tsx              # Landing page with project info
 ├── App.tsx                # Main application component
-├── main.tsx               # Entry for index.html
-├── editor.tsx             # Entry for editor.html
+├── main.tsx               # Entry and route table
+├── szafa.tsx, rama.tsx, elektryka.tsx, editor.tsx  # Route pages
 └── *.module.scss          # Component-specific styles
 ```
 

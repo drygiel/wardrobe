@@ -1,5 +1,6 @@
 import { type ReactNode, type RefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { Link } from 'react-router';
 import cn from 'classnames';
 import type { ShowcaseProgress } from '@/components/schematic';
 import styles from './Showcase.module.scss';
@@ -117,16 +118,16 @@ export default function Showcase({ nav, heading, facts, hint, actions, id, title
       </div>
 
       <header ref={heroRef} className={styles.hero}>
-        <a className={styles.wordmark} href={import.meta.env.BASE_URL}>
+        <Link className={styles.wordmark} to="/">
           Szafa 2025
-        </a>
+        </Link>
         <nav className={styles.nav} aria-label="Nawigacja">
           <ul>
             {nav.map(item => (
               <li key={item.href}>
-                <a href={item.href} aria-current={item.current ? 'page' : undefined}>
+                <Link to={item.href} aria-current={item.current ? 'page' : undefined}>
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

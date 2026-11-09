@@ -1,6 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { XR, XROrigin } from '@react-three/xr';
+import { Link } from 'react-router';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useEventListener } from '@/hooks/useEventListener';
 import Scene from '@/components/Scene';
@@ -29,6 +30,9 @@ export default function Editor() {
     app.inspect.current = selection.hover;
     return () => {
       app.inspect.current = null;
+      // The store outlives this route; meshes it holds die with the scene
+      selection.hover(null);
+      selection.unpin();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -58,7 +62,7 @@ export default function Editor() {
   return (
     <div ref={shell} className={styles.shell}>
       <aside className={styles.side} aria-label="Grupy i elementy">
-        <a className={styles.brand} href={import.meta.env.BASE_URL}>Szafa 2025</a>
+        <Link className={styles.brand} to="/">Szafa 2025</Link>
         <Suspense fallback={<p className={styles.note}>Wczytywanie modelu…</p>}>
           <Sidebar />
         </Suspense>

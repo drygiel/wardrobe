@@ -1,5 +1,5 @@
-import { createRoot } from 'react-dom/client';
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import cn from 'classnames';
 import { CircuitProvider } from '@/electric/circuit';
 import { BOM, STEPS } from '@/electric/data';
@@ -9,7 +9,16 @@ import { Xray } from '@/electric/Xray';
 import { DrillSheet } from '@/electric/DrillSheet';
 import Footer from '@/sections/Footer';
 import styles from '@/electric/Elektryka.module.scss';
-import './global.scss';
+
+// Solder mask palette for this page; the shared footer and controls read the same tokens
+const PALETTE = `html:root {
+  --bg: #0b3327;
+  --surface: #0f4233;
+  --ink: #f1efe4;
+  --muted: #a9c3b6;
+  --accent: #ffb65c;
+  --accent-ink: #0b3327;
+}`;
 
 const SECTIONS = [
   { id: 'obwod', label: 'Obwód' },
@@ -36,9 +45,9 @@ function Rail() {
       <ul>
         {SECTIONS.map((section, i) => (
           <li key={section.id} className={cn(i <= active && styles.railOn)}>
-            <a href={`#${section.id}`} aria-current={i === active ? 'true' : undefined}>
+            <Link to={`#${section.id}`} aria-current={i === active ? 'true' : undefined}>
               <span>{section.label}</span>
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
@@ -79,16 +88,21 @@ function Assembly() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(
-  <CircuitProvider>
-    <Rail />
-    <Hero />
-    <main>
-      <LiveCircuit />
-      <Xray />
-      <DrillSheet />
-      <Assembly />
-    </main>
-    <Footer />
-  </CircuitProvider>,
-);
+export default function ElektrykaPage() {
+  return (
+    <CircuitProvider>
+      <title>Elektryka – Szafa 2025</title>
+      <meta name="theme-color" content="#0b3327" />
+      <style>{PALETTE}</style>
+      <Rail />
+      <Hero />
+      <main>
+        <LiveCircuit />
+        <Xray />
+        <DrillSheet />
+        <Assembly />
+      </main>
+      <Footer />
+    </CircuitProvider>
+  );
+}

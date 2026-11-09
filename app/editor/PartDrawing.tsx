@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { type Ref, useMemo } from 'react';
 import { markScale } from '@/components/grain';
+import type { LineData } from '@/components/Mesh';
 import { edgeRuns } from './edgeView';
 import { mm } from './labels';
 
@@ -51,12 +52,16 @@ export function PartDrawing({
   code,
   grain,
   edge,
+  lines,
+  onEdge,
   ref,
 }: {
   geometry: THREE.BufferGeometry;
   code: string;
   grain?: number;
   edge?: readonly [THREE.Vector3, THREE.Vector3] | null; // the edge measured in the model, in the part's own axes
+  lines?: LineData[]; // the part's measurable edges; hovering one on the sheet reports it
+  onEdge?: (line: LineData | null) => void;
   ref?: Ref<SVGSVGElement>;
 }) {
   const drawing = useMemo(() => {
@@ -124,6 +129,22 @@ export function PartDrawing({
     return { solid, dashed, dots };
   }, [edge, drawing, geometry]);
 
+  // Invisible wide strokes over each edge, nearest to the viewer last so it wins where edges coincide
+  const pickPaths = useMemo(() => {
+    if (!lines) return [];
+    return drawing.views.flatMap((view, v) =>
+      lines
+        .flatMap((line, i) => {
+          const [p, q] = line.points.map(point => point.toArray());
+          const from = view.at(p);
+          const to = view.at(q);
+          if (Math.hypot(to[0] - from[0], to[1] - from[1]) < 1.5) return [];
+          return [{ key: `${v}-${i}`, line, d: `M${px(from[0])} ${px(from[1])}L${px(to[0])} ${px(to[1])}`, depth: (p[view.axis] + q[view.axis]) * view.sign }];
+        })
+        .sort((m, n) => m.depth - n.depth),
+    );
+  }, [lines, drawing]);
+
   const { d, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize, labels } = drawing;
   const outline = { fill: 'none', stroke: INK, strokeWidth: 1.1 };
 
@@ -156,6 +177,13 @@ export function PartDrawing({
           <path d={measured.dashed} strokeDasharray="5 4" />
           {measured.dots.map(([x, y], i) => (
             <circle key={i} cx={x} cy={y} r={2.6} fill={MEASURED} stroke="none" />
+          ))}
+        </g>
+      )}
+      {pickPaths.length > 0 && (
+        <g data-pick fill="none" stroke="transparent" strokeWidth={8} pointerEvents="stroke" style={{ cursor: 'pointer' }} onPointerLeave={() => onEdge?.(null)}>
+          {pickPaths.map(pick => (
+            <path key={pick.key} d={pick.d} onPointerEnter={() => onEdge?.(pick.line)} />
           ))}
         </g>
       )}
