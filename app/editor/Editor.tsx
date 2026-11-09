@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { XR, XROrigin } from '@react-three/xr';
+import { XR } from '@react-three/xr';
 import { Link } from 'react-router';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useEventListener } from '@/hooks/useEventListener';
@@ -35,12 +35,26 @@ export default function Editor() {
       app.inspect.current = null;
       // The store outlives this route; meshes it holds die with the scene
       selection.hover(null);
+      selection.hoverGroup([]);
       selection.unpin();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => selection.refocus(), [app.hidden, app.hiddenParts, app.column, app.grain]);
+
+  // Only on the switch: a link opened in the render mode may carry a selection of its own
+  const wasMeasuring = useRef(app.wireframe);
+  useEffect(() => {
+    if (wasMeasuring.current && !app.wireframe) selection.unpin();
+    wasMeasuring.current = app.wireframe;
+  }, [app.wireframe]);
+
+  // The wrist menu opens and closes doors too
+  useEffect(() => {
+    if (!app.presenting) setOpen(open => (app.parts.current ? Boolean(app.parts.current.openState()) : open));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.presenting]);
 
   const toggleOpen = () => {
     if (open) app.parts.current?.closeAll();
@@ -85,7 +99,6 @@ export default function Editor() {
           }}
         >
           <XR store={app.xr}>
-            <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
             <Scene editorCamera link={link} orbitCenter={selection.orbitCenter}>
               <Wardrobe />
               <Suspense fallback={null}>

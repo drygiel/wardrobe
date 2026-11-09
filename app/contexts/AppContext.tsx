@@ -1,7 +1,8 @@
 import { createXRStore } from '@react-three/xr';
 import type { LineData } from '@/components/Mesh';
 import { type Column, columnsOf, type GroupId, groupOf, HIDDEN_GROUPS, type useParts } from '@/components/parts';
-import { createContext, ReactNode, use, useRef, useState } from 'react';
+import { isShown } from '@/xr/placement';
+import { createContext, ReactNode, use, useRef, useState, useSyncExternalStore } from 'react';
 import type { RootState } from '@react-three/fiber';
 import type * as THREE from 'three';
 export type SceneView = 'initial' | 'left-side' | 'front' | 'side' | 'side-z' | 'top' | 'last-3d';
@@ -18,10 +19,21 @@ const storedUnit = (): Unit => {
 };
 
 // The XR emulator's dev button covers the editor toolbar: opt in with ?xr
-const xr = createXRStore({ emulate: new URLSearchParams(location.search).has('xr') ? 'metaQuest3' : false });
+const emulated = new URLSearchParams(location.search).has('xr');
+// three would hand the emulated session to the browser's own XRWebGLBinding, which only takes a native one
+if (emulated) delete (window as { XRWebGLBinding?: unknown }).XRWebGLBinding;
+
+const xr = createXRStore({
+  emulate: emulated ? 'metaQuest3' : false,
+  offerSession: false, // only the AR and VR buttons start a session
+  frameRate: 'low', // the store's default asks a Quest 3 for 120 Hz, which a scene with this many parts cannot hold
+  // minDistance: the menu is closer than the default 20 cm; clickThresholdMs: the default 300 ms drops an unhurried trigger press
+  controller: { teleportPointer: false, grabPointer: false, rayPointer: { minDistance: 0, clickThresholdMs: 1000, filter: isShown } },
+});
 
 const useAppStore = (initial?: Partial<AppContextInitial>) => {
   const [three, setThree] = useState<RootState>();
+  const presenting = useSyncExternalStore(xr.subscribe, () => xr.getState().session != null);
   const [grid, setGrid] = useState(initial?.grid ?? true);
   const [wireframe, setWireframe] = useState(initial?.wireframe ?? false);
   const [orthographic, setOrthographic] = useState(initial?.orthographic ?? false);
@@ -122,6 +134,7 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     toggleView,
     viewTick,
     xr,
+    presenting,
     three,
     setThree,
   };

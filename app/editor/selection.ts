@@ -2,19 +2,24 @@ import * as THREE from 'three';
 import { useSyncExternalStore } from 'react';
 import type { LineData } from '@/components/Mesh';
 
-type Selection = { hover: THREE.Mesh | null; pinned: THREE.Mesh | null; edge: LineData | null }; // edge: the red one, on any part
+type Selection = {
+  hover: THREE.Mesh | null;
+  group: readonly THREE.Mesh[]; // every part of the folder under the cursor in the list
+  pinned: THREE.Mesh | null;
+  edge: LineData | null; // the red one, on any part
+};
 
 // Outside React context: hovering must re-render the inspector only, not the whole scene
-let state: Selection = { hover: null, pinned: null, edge: null };
+let state: Selection = { hover: null, group: [], pinned: null, edge: null };
 const listeners = new Set<() => void>();
 
 // Hover brightens a part, unless it is the selected one
-const lit = ({ hover, pinned }: Selection) => (hover === pinned ? null : hover);
+const lit = ({ hover, group, pinned }: Selection) => new Set([hover, ...group].filter(mesh => mesh && mesh !== pinned));
 
 const focusOf = (object: THREE.Object3D) => {
   if (!state.pinned) return 'none';
   if (object === state.pinned) return 'selected';
-  return object === state.hover ? 'hover' : 'dim';
+  return object === state.hover || state.group.includes(object as THREE.Mesh) ? 'hover' : 'dim';
 };
 
 const applyFocus = () => selection.root?.traverse(object => object.userData.focus?.(focusOf(object)));
@@ -22,13 +27,13 @@ const applyFocus = () => selection.root?.traverse(object => object.userData.focu
 const update = (next: Partial<Selection>) => {
   const before = state;
   state = { ...state, ...next };
-  if (lit(before) !== lit(state)) {
-    lit(before)?.userData.highlight?.(false);
-    lit(state)?.userData.highlight?.(true);
-  }
+  const litBefore = lit(before);
+  const litNow = lit(state);
+  litBefore.forEach(mesh => litNow.has(mesh) || mesh?.userData.highlight?.(false));
+  litNow.forEach(mesh => litBefore.has(mesh) || mesh?.userData.highlight?.(true));
   if (before.pinned !== state.pinned) applyFocus();
-  else if (state.pinned && before.hover !== state.hover) {
-    [before.hover, state.hover].forEach(mesh => mesh?.userData.focus?.(focusOf(mesh))); // hover must not walk the whole scene
+  else if (state.pinned && (before.hover !== state.hover || before.group !== state.group)) {
+    new Set([before.hover, state.hover, ...before.group, ...state.group]).forEach(mesh => mesh?.userData.focus?.(focusOf(mesh))); // hover must not walk the whole scene
   }
   listeners.forEach(listener => listener());
 };
@@ -57,6 +62,10 @@ export const selection = {
   },
   hover(mesh: THREE.Mesh | null, edge: LineData | null = null) {
     if (state.hover !== mesh || state.edge !== edge) update({ hover: mesh, edge });
+  },
+  // Brightens a whole folder of the list; selects nothing and leaves the inspector alone
+  hoverGroup(names: string[]) {
+    if (names.length || state.group.length) update({ group: names.flatMap(name => selection.find(name) ?? []) });
   },
   setEdge(edge: LineData | null) {
     if (state.edge !== edge) update({ edge });

@@ -1,7 +1,7 @@
 // Run with: npx tsx tests/grain.test.ts
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { grainAxis, grainHatch } from '../app/components/grain';
+import { grainAxis, grainHatch, sheetAxes } from '../app/components/grain';
 
 const shelf = new THREE.BoxGeometry(0.443, 0.018, 0.383);
 assert.equal(grainAxis('IN_B_Shelf-03', shelf), 2); // across the 443 mm depth: along z, the shorter side
@@ -22,4 +22,8 @@ const reach = (name: string, geometry: THREE.BoxGeometry, length: number) => {
 const big = reach('IN_B_Shelf-02', new THREE.BoxGeometry(0.492, 0.018, 1.159), 1.159);
 const small = reach('IN_B_Shelf-03', shelf, 0.383);
 assert.ok(small < big, `${small} < ${big}`);
+
+// The drawing: grain left to right even along the shorter side, the longest side when there is no grain
+assert.deepEqual(sheetAxes([0.443, 0.018, 0.358], 2), [2, 0, 1]);
+assert.deepEqual(sheetAxes([0.443, 0.018, 0.358]), [0, 2, 1]);
 console.log('grain ok');

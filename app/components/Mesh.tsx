@@ -7,10 +7,15 @@ import { ATLAS } from '@/assets';
 import { GrainMarks } from './GrainMarks';
 import { DIMMED_OPACITY, HOVERED_OPACITY } from './parts';
 
+// Measuring rays carry a camera. XR rays do not, LineSegments2 throws without one, and an exception stops the WebXR frame loop for good
+export function cameraRaycast(this: THREE.Object3D, raycaster: THREE.Raycaster, hits: THREE.Intersection[]) {
+  if (raycaster.camera) Object.getPrototypeOf(this).raycast.call(this, raycaster, hits);
+}
+
 // `overlay`: flat colour drawn over everything, for hardware without atlas space that sits inside the boards
 export function Mesh({ overlay, ...props }: ThreeElements['mesh'] & { overlay?: string }) {
   const texture = useTexture(ATLAS);
-  const { wireframe, grain } = useApp();
+  const { wireframe, grain, presenting } = useApp();
   const meshRef = useRef<THREE.Mesh>(null!);
   const wireframeGroup = useRef<THREE.Group>(null!);
   const edgesRef = useRef<ComponentRef<typeof Edges>>(null);
@@ -151,6 +156,7 @@ export function Mesh({ overlay, ...props }: ThreeElements['mesh'] & { overlay?: 
       points={linePoints!}
       lineWidth={5}
       userData={{ lines }}
+      raycast={cameraRaycast}
       layers={visible ? 1 : 2}
     />
   );
@@ -166,7 +172,7 @@ export function Mesh({ overlay, ...props }: ThreeElements['mesh'] & { overlay?: 
         visible={visible}
         renderOrder={overlay ? 10 : 1}
         layers={0}
-        userData={{ overlay: !!overlay, highlight: (on: boolean) => materials.xray.emissive.set(on ? '#5e4a2c' : '#000000'), focus }}
+        userData={{ overlay: !!overlay, highlight: (on: boolean) => materials.xray.emissive.set(on ? '#5e4a2c' : '#000000'), focus, lines }}
         material={
           wireframe
             ? materials.xray // new THREE.MeshBasicMaterial({ visible: false })
@@ -202,7 +208,8 @@ export function Mesh({ overlay, ...props }: ThreeElements['mesh'] & { overlay?: 
         />
       </mesh>
 
-      <group ref={wireframeGroup} visible={wireframe}>
+      {/* three adds layers 1 and 2 to the eye cameras, so in a headset these black pick lines would be drawn */}
+      <group ref={wireframeGroup} visible={wireframe && !presenting}>
         {edges}
       </group>
     </>

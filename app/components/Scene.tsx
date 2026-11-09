@@ -14,6 +14,7 @@ import {
 import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useXR } from '@react-three/xr';
+import { XRStage } from '@/xr/XRStage';
 import { orbitShift } from './orbitAround';
 
 interface ViewState {
@@ -107,8 +108,8 @@ export default function Scene({
   const orthoCamRef = useRef<THREE.OrthographicCamera>(null!);
   // A copy: this ref is overwritten on every projection switch and must not change the presets
   const target = useRef(camState.target.clone());
-  const xr = useXR();
-  const isPresenting = !!xr.session;
+  const isPresenting = useXR(xr => xr.session != null);
+  const isAR = useXR(xr => xr.mode === 'immersive-ar');
   // Camera orientation when the current drag began; set only while a pointer is down
   const grabbed = useRef<THREE.Quaternion | null>(null);
   // drei rebuilds the controls for a new camera, which would drop an orbit that leaves ortho mid-drag.
@@ -295,7 +296,7 @@ export default function Scene({
   return (
     <>
       <Grid
-        visible={app.grid}
+        visible={app.grid && !isAR}
         renderOrder={-1}
         position={[0.5, 0, 0.5]}
         infiniteGrid
@@ -404,7 +405,8 @@ export default function Scene({
         />
       )}
 
-      {app.gizmo && (
+      {/* The gizmo's Hud renders the scene itself, which a headset must not get twice per frame */}
+      {app.gizmo && !isPresenting && (
         <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
           <GizmoViewport hideNegativeAxes axisHeadScale={0.8} {...editorGizmo} />
         </GizmoHelper>
@@ -412,14 +414,6 @@ export default function Scene({
 
       <ambientLight intensity={app.wireframe ? 1 : 10} />
       <pointLight position={[0.8, 2.2, -1.5]} color="white" intensity={app.wireframe ? 2 : 10} />
-      
-      {/* VR-specific elements */}
-      {isPresenting && (
-        <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[10, 10]} />
-          <meshBasicMaterial color="white" transparent opacity={0.1} />
-        </mesh>
-      )}
 
       <Suspense
         fallback={
@@ -435,9 +429,11 @@ export default function Scene({
           </group>
         }
       >
-        <group position={[-0.5, 0, -1.5]} rotation={[0, Math.PI, 0]}>
-          {children}
-        </group>
+        <XRStage>
+          <group position={[-0.5, 0, -1.5]} rotation={[0, Math.PI, 0]}>
+            {children}
+          </group>
+        </XRStage>
       </Suspense>
     </>
   );

@@ -126,7 +126,7 @@ export function Inspector() {
       </dl>
 
       <div className={styles.sheet}>
-        <PartDrawing ref={svg} geometry={mesh.geometry} code={part.name} unit={app.unit} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} grain={app.grain && typeof grain === 'number' ? grain : undefined} />
+        <PartDrawing ref={svg} geometry={mesh.geometry} code={part.name} unit={app.unit} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} onEdgeClick={line => app.centerOn.current?.(line.meshRef.current.localToWorld(line.midPoint.clone()))} grain={typeof grain === 'number' ? grain : undefined} />
       </div>
 
       <dl className={styles.facts}>

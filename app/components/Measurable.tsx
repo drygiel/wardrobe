@@ -2,15 +2,13 @@ import * as THREE from 'three';
 import { type ComponentRef, type ReactNode, type Ref, useEffect, useRef } from 'react';
 import { Line } from '@react-three/drei';
 import { type ThreeElements, useFrame, useThree } from '@react-three/fiber';
-import type { LineData } from './Mesh';
+import { cameraRaycast, type LineData } from './Mesh';
 import { useApp } from '@/contexts/AppContext';
 import { useEventListener } from '@/hooks/useEventListener';
 import { LineHint } from '@/components/LineHint';
+import { isShown } from '@/xr/placement';
 
 type Props = Omit<ThreeElements['group'], 'ref'> & { ref?: Ref<THREE.Group>; children: ReactNode };
-
-// The raycaster does not skip invisible objects
-const isShown = (object: THREE.Object3D | null): boolean => !object || (object.visible && isShown(object.parent));
 
 // Hover measuring shared by every model: raycasts edge lines on layer 1 and shows the red line with its length
 export function Measurable({ ref, children, ...props }: Props) {
@@ -109,6 +107,7 @@ export function Measurable({ ref, children, ...props }: Props) {
           visible={wireframe}
           points={[0, 0, 0, 0, 0, 0]}
           lineWidth={2.5}
+          raycast={cameraRaycast}
           color="red"
           renderOrder={1000}
           // renderOrder sorts only within a queue, and three draws all opaque objects before transparent ones:

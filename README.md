@@ -81,8 +81,8 @@ app/
 
 ### VR/AR Controls
 - **Head Movement**: Natural head tracking
-- **Controllers**: Hand tracking for interactions
-- **Teleportation**: Move around the scene
+- **Grip (hold)**: Move the wardrobe with the hand, turn it with the wrist; the thumbstick carries it further. It snaps to walls and corners detected by the headset
+- **Trigger**: Menu above the left controller, doors and drawers; in measure mode point at an edge to read its length, press to pin the part
 
 ## 🔧 Development
 

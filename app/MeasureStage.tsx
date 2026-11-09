@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { Stats } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { XR, XROrigin } from '@react-three/xr';
+import { XR } from '@react-three/xr';
 import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
 import Scene from '@/components/Scene';
@@ -109,11 +109,10 @@ export default function MeasureStage({ children, embedded, electric }: Props) {
       <Canvas
         className={styles.canvas}
         dpr={[1, 1.75]}
-        frameloop={visible ? 'always' : 'never'}
+        frameloop={visible || app.presenting ? 'always' : 'never'}
         onPointerDown={() => !app.active && app.setActive(true)}
       >
         <XR store={app.xr}>
-          <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
           <Scene>{children}</Scene>
         </XR>
         {import.meta.env.DEV && <Stats className={styles.stats} />}

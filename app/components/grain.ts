@@ -16,6 +16,14 @@ export const markScale = (a: number, b: number) => Math.min(1, Math.max(0.15, Ma
 // The normal of a part's main face: its thinnest axis
 const mainNormal = (size: number[]) => size.indexOf(Math.min(...size));
 
+// Axes of a part's drawing: left to right, bottom to top, into the sheet.
+// The grain runs left to right, as on a cutting list; without one the longest side does.
+export function sheetAxes(size: number[], grain?: number): [number, number, number] {
+  const byLength = [0, 1, 2].sort((p, q) => size[q] - size[p]) as [number, number, number];
+  const thin = byLength[2];
+  return grain === undefined || grain === thin ? byLength : [grain, 3 - grain - thin, thin];
+}
+
 // Grain axis on the main face; '?' when the model does not settle it, null for parts without wood
 export function grainAxis(name: string, geometry: THREE.BufferGeometry): number | '?' | null {
   const faces = GRAIN[name];

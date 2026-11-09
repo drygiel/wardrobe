@@ -44,4 +44,26 @@ selection.setEdge(null);
 assert.deepEqual(take(), []);
 selection.unpin();
 assert.deepEqual(take(), ['a none', 'b none']);
+
+// A folder under the cursor brightens all its parts and selects nothing
+selection.hoverGroup(['a', 'b', 'missing']);
+assert.deepEqual(take(), ['a lit', 'b lit']);
+assert.equal(selection.pinned, null);
+// The part is already lit by the folder, so the cursor reaching it must not flicker
+selection.hover(a);
+assert.deepEqual(take(), []);
+selection.hover(null);
+assert.deepEqual(take(), []);
+selection.hoverGroup([]);
+assert.deepEqual(take(), ['a unlit', 'b unlit']);
+
+// With a part selected, the folder brings the faded ones forward and leaves the selected one alone
+selection.pin(a);
+take();
+selection.hoverGroup(['a', 'b']);
+assert.deepEqual(take(), ['a selected', 'b hover', 'b lit']);
+selection.hoverGroup([]);
+assert.deepEqual(take(), ['a selected', 'b dim', 'b unlit']);
+selection.unpin();
+take();
 console.log('selection ok');

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { type Ref, useMemo } from 'react';
-import { markScale } from '@/components/grain';
+import { markScale, sheetAxes } from '@/components/grain';
 import type { LineData } from '@/components/Mesh';
 import { contoursOf, edgeRuns } from './edgeView';
 import type { Unit } from '@/contexts/AppContext';
@@ -56,6 +56,7 @@ export function PartDrawing({
   edge,
   lines,
   onEdge,
+  onEdgeClick,
   ref,
 }: {
   geometry: THREE.BufferGeometry;
@@ -65,6 +66,7 @@ export function PartDrawing({
   edge?: readonly [THREE.Vector3, THREE.Vector3] | null; // the edge measured in the model, in the part's own axes
   lines?: LineData[]; // the part's measurable edges; hovering one on the sheet reports it
   onEdge?: (line: LineData | null) => void;
+  onEdgeClick?: (line: LineData) => void;
   ref?: Ref<SVGSVGElement>;
 }) {
   const drawing = useMemo(() => {
@@ -73,7 +75,7 @@ export function PartDrawing({
     const lo = min.toArray();
     const hi = max.toArray();
     const size = hi.map((v, i) => v - lo[i]);
-    const [a, b, c] = [0, 1, 2].sort((p, q) => size[q] - size[p]);
+    const [a, b, c] = sheetAxes(size, grain);
 
     const scale = Math.min((W - LEFT - RIGHT - GAP) / (size[a] + size[c] || 1), (H - TITLE - TOP - GAP - 8) / (size[b] + size[c] || 1));
     const wa = size[a] * scale;
@@ -116,8 +118,8 @@ export function PartDrawing({
         contour += `M${px(fx)} ${px(fy)}L${px(tx)} ${px(ty)}`;
       }
     });
-    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [dimension(a), dimension(b), dimension(c)] };
-  }, [geometry, unit]);
+    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [dimension(a), dimension(b), dimension(c)] };
+  }, [geometry, unit, grain]);
 
   // The measured edge in each view: solid where visible, dashed where it lies under something, a dot when seen end-on
   const measured = useMemo(() => {
@@ -158,18 +160,15 @@ export function PartDrawing({
     );
   }, [lines, drawing]);
 
-  const { d, contour, x0, y0, wa, wb, wc, xSide, a, b, markSize, labels } = drawing;
+  const { d, contour, x0, y0, wa, wb, wc, xSide, a, markSize, labels } = drawing;
 
   // Double-headed arrow along the grain, the usual mark on a cutting drawing
   let grainArrow = '';
-  if (grain === a || grain === b) {
-    const horizontal = grain === a;
+  if (grain === a) {
     const cx = x0 + wa / 2;
     const cy = y0 + wb / 2;
-    const half = Math.max(8, Math.min(60, (horizontal ? wa : wb) * markSize)); // the sheet fits every part; the arrow still tells size
-    grainArrow = horizontal
-      ? `M${cx - half} ${cy}H${cx + half}M${cx - half + 5} ${cy - 4}L${cx - half} ${cy}L${cx - half + 5} ${cy + 4}M${cx + half - 5} ${cy - 4}L${cx + half} ${cy}L${cx + half - 5} ${cy + 4}`
-      : `M${cx} ${cy - half}V${cy + half}M${cx - 4} ${cy - half + 5}L${cx} ${cy - half}L${cx + 4} ${cy - half + 5}M${cx - 4} ${cy + half - 5}L${cx} ${cy + half}L${cx + 4} ${cy + half - 5}`;
+    const half = Math.max(8, Math.min(60, wa * markSize)); // the sheet fits every part; the arrow still tells size
+    grainArrow = `M${cx - half} ${cy}H${cx + half}M${cx - half + 5} ${cy - 4}L${cx - half} ${cy}L${cx - half + 5} ${cy + 4}M${cx + half - 5} ${cy - 4}L${cx + half} ${cy}L${cx + half - 5} ${cy + 4}`;
   }
 
   return (
@@ -193,7 +192,7 @@ export function PartDrawing({
       {pickPaths.length > 0 && (
         <g data-pick fill="none" stroke="transparent" strokeWidth={8} pointerEvents="stroke" style={{ cursor: 'pointer' }} onPointerLeave={() => onEdge?.(null)}>
           {pickPaths.map(pick => (
-            <path key={pick.key} d={pick.d} onPointerEnter={() => onEdge?.(pick.line)} />
+            <path key={pick.key} d={pick.d} onPointerEnter={() => onEdge?.(pick.line)} onClick={() => onEdgeClick?.(pick.line)} />
           ))}
         </g>
       )}

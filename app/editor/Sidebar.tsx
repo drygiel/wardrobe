@@ -22,6 +22,9 @@ const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
 
 type TreeNode = { key: string; label: string; group: GroupId; names: string[]; children: TreeNode[]; part?: Part };
 
+type Visibility = { hidden: ReadonlySet<GroupId>; hiddenParts: ReadonlySet<string> };
+type Soloed = Visibility & { key: string; before: Visibility };
+
 // Group > folders > parts. Empty groups disappear, so a search or a column filter leaves only what matches
 function buildTree(parts: Part[]) {
   const roots = GROUPS.filter(g => rootOf(g.id) === g.id).map((g): TreeNode => ({ key: g.id, label: g.label, group: g.id, names: [], children: [] }));
@@ -53,7 +56,10 @@ export function Sidebar() {
   const { pinned } = useSelection();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
+  const [soloed, setSoloed] = useState<Soloed | null>(null);
   const treeRef = useRef<HTMLUListElement>(null);
+  // Any other change of visibility makes new sets, and then there is nothing left to undo
+  const soloActive = soloed?.hidden === app.hidden && soloed.hiddenParts === app.hiddenParts ? soloed : null;
 
   const q = query.trim().toLowerCase();
   const tree = useMemo(
@@ -73,6 +79,9 @@ export function Sidebar() {
     setExpanded(current => new Set([...current, ...ancestors(part)]));
     requestAnimationFrame(() => treeRef.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest' }));
   }, [pinned, catalog]);
+
+  // A filter can remove the row under the cursor, and then no leave event comes
+  useEffect(() => selection.hoverGroup([]), [q, app.column]);
 
   const groupOfPart = (name: string) => catalog.byName.get(name)!.group;
   const isOn = (name: string) => !app.hidden.has(groupOfPart(name)) && !app.hiddenParts.has(name);
@@ -99,8 +108,18 @@ export function Sidebar() {
 
   const solo = (node: TreeNode) => {
     const groups = new Set(node.names.map(groupOfPart));
-    app.setHidden(new Set(GROUPS.map(g => g.id).filter(id => !groups.has(id))));
-    app.setHiddenParts(new Set(catalog.parts.filter(p => groups.has(p.group) && !node.names.includes(p.name)).map(p => p.name)));
+    const hidden = new Set(GROUPS.map(g => g.id).filter(id => !groups.has(id)));
+    const hiddenParts = new Set(catalog.parts.filter(p => groups.has(p.group) && !node.names.includes(p.name)).map(p => p.name));
+    // Going from one "only" to another still comes back to what was there before the first
+    setSoloed({ key: node.key, hidden, hiddenParts, before: soloActive?.before ?? { hidden: app.hidden, hiddenParts: app.hiddenParts } });
+    app.setHidden(hidden);
+    app.setHiddenParts(hiddenParts);
+  };
+
+  const undoSolo = ({ before }: Soloed) => {
+    setSoloed(null);
+    app.setHidden(before.hidden);
+    app.setHiddenParts(before.hiddenParts);
   };
 
   const reset = (hidden: GroupId[]) => {
@@ -144,7 +163,14 @@ export function Sidebar() {
           />
           {depth === 0 && <i style={{ background: SWATCH[node.group] }} />}
           {folder ? (
-            <button className={styles.rowLabel} onClick={() => toggleFolder(node.key)}>
+            <button
+              className={styles.rowLabel}
+              onMouseEnter={() => selection.hoverGroup(node.names)}
+              onMouseLeave={() => selection.hoverGroup([])}
+              onFocus={() => selection.hoverGroup(node.names)}
+              onBlur={() => selection.hoverGroup([])}
+              onClick={() => toggleFolder(node.key)}
+            >
               <span>{node.label}</span>
             </button>
           ) : (
@@ -167,9 +193,15 @@ export function Sidebar() {
             </button>
           )}
           {folder && <small className={styles.count}>{node.names.length}</small>}
-          <button className={styles.solo} aria-label={`Pokaż tylko: ${node.label}`} onClick={() => solo(node)}>
-            tylko
-          </button>
+          {soloActive?.key === node.key ? (
+            <button className={`${styles.solo} ${styles.soloOn}`} aria-label={`Cofnij pokazywanie tylko: ${node.label}`} onClick={() => undoSolo(soloActive)}>
+              Cofnij
+            </button>
+          ) : (
+            <button className={styles.solo} aria-label={`Pokaż tylko: ${node.label}`} onClick={() => solo(node)}>
+              tylko
+            </button>
+          )}
         </div>
         {folder && open && <ul>{node.children.map(child => row(child, depth + 1))}</ul>}
       </li>

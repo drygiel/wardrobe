@@ -4,8 +4,8 @@ export const WARDROBE_GLB = `${base}models/Wardrobe.glb`;
 export const FRAME_GLB = `${base}models/Frame.glb`;
 export const ELECTRIC_GLB = `${base}models/Electric.glb`;
 export const HARDWARE_GLB = `${base}models/Hardware.glb`;
-// Desktops get the 8K atlas; phones keep 4K (about 43 MB of GPU memory instead of 170 MB)
-const desktop = window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches;
+// Desktops get the 8K atlas; phones and headsets keep 4K (about 43 MB of GPU memory instead of 170 MB)
+const desktop = window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches && !/OculusBrowser|Quest/.test(navigator.userAgent);
 export const ATLAS = `${base}models/Wardrobe${desktop ? '-8k' : ''}.webp`;
 
 export const RENDER_COUNT = 33;
