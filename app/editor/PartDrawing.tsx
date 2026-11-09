@@ -3,7 +3,8 @@ import { type Ref, useMemo } from 'react';
 import { markScale } from '@/components/grain';
 import type { LineData } from '@/components/Mesh';
 import { contoursOf, edgeRuns } from './edgeView';
-import { mm } from './labels';
+import type { Unit } from '@/contexts/AppContext';
+import { inUnit } from './labels';
 
 const W = 340;
 const H = 268;
@@ -46,10 +47,11 @@ function Dimension({ x1, y1, x2, y2, label, vertical }: { x1: number; y1: number
   );
 }
 
-// Three orthographic views of a part from its own edges, longest side horizontal; dimensions in millimetres
+// Three orthographic views of a part from its own edges, longest side horizontal
 export function PartDrawing({
   geometry,
   code,
+  unit,
   grain,
   edge,
   lines,
@@ -58,6 +60,7 @@ export function PartDrawing({
 }: {
   geometry: THREE.BufferGeometry;
   code: string;
+  unit: Unit;
   grain?: number;
   edge?: readonly [THREE.Vector3, THREE.Vector3] | null; // the edge measured in the model, in the part's own axes
   lines?: LineData[]; // the part's measurable edges; hovering one on the sheet reports it
@@ -95,7 +98,7 @@ export function PartDrawing({
       d += `M${px(X(p))} ${px(YP(p))}L${px(X(q))} ${px(YP(q))}`;
       d += `M${px(XS(p))} ${px(Y(p))}L${px(XS(q))} ${px(Y(q))}`;
     }
-    const size_mm = (axis: number) => mm(size[axis] * 1000);
+    const dimension = (axis: number) => inUnit(size[axis] * 1000, unit);
     // Screen right × screen up points at the viewer; (a, b, c) may be an odd permutation of the axes
     const cyclic = (b - a + 3) % 3 === 1 ? 1 : -1;
     const views = [
@@ -113,8 +116,8 @@ export function PartDrawing({
         contour += `M${px(fx)} ${px(fy)}L${px(tx)} ${px(ty)}`;
       }
     });
-    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [size_mm(a), size_mm(b), size_mm(c)] };
-  }, [geometry]);
+    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [dimension(a), dimension(b), dimension(c)] };
+  }, [geometry, unit]);
 
   // The measured edge in each view: solid where visible, dashed where it lies under something, a dot when seen end-on
   const measured = useMemo(() => {
@@ -170,7 +173,7 @@ export function PartDrawing({
   }
 
   return (
-    <svg ref={ref} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rysunek techniczny ${code}, wymiary w milimetrach: ${labels.join(' na ')}`}>
+    <svg ref={ref} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rysunek techniczny ${code}, wymiary w ${unit}: ${labels.join(' na ')}`}>
       <rect width={W} height={H} fill={PAPER} />
       <path d={d} fill="none" stroke={INK} strokeWidth={0.7} strokeLinecap="round" />
       <path d={contour} fill="none" stroke={INK} strokeWidth={1.1} strokeLinecap="round" />
@@ -199,7 +202,7 @@ export function PartDrawing({
         {code}
       </text>
       <text x={W - 10} y={H - 8} fill={DIM} fontFamily={FONT} fontSize={11} textAnchor="end">
-        wymiary w mm
+        wymiary w {unit}
       </text>
     </svg>
   );

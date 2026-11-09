@@ -26,7 +26,7 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 ### Frontend
 - **React 19** - Modern React with latest features
 - **Vite 8** - Dev server and bundler
-- **React Router 7** - Client-side routes: `/`, `/rama`, `/elektryka`, `/editor`
+- **React Router 7** - Client-side routes: `/`, `/rama`, `/elektryka`, `/pomiar`
 - **TypeScript** - Type-safe development
 - **Sass** - CSS preprocessing with modules
 

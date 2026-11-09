@@ -1,6 +1,6 @@
 // Run with: npx tsx tests/labels.test.ts
 import assert from 'node:assert/strict';
-import { mm, partLabel, treePath } from '../app/editor/labels';
+import { inUnit, mm, partLabel, treePath } from '../app/editor/labels';
 
 const cases: Record<string, string> = {
   'P14_B_Side-L': 'Bok lewy',
@@ -28,6 +28,9 @@ assert.deepEqual(treePath('J05_Dowel-2', 'dowels', ['B']), ['Kołki', 'Złącze 
 assert.deepEqual(treePath('H01_F01_Cup', 'hinges', ['B']), ['Drzwi F01', 'Zawias H01']);
 assert.deepEqual(treePath('Dimmer_Jumpers', 'electric', ['C']), ['Zasilanie']);
 assert.deepEqual(treePath('LED_P03', 'led', ['C']), []);
+assert.equal(inUnit(1159, 'mm'), '1159');
+assert.equal(inUnit(1159, 'cm'), '115,9');
+assert.equal(inUnit(18, 'cm'), '1,8');
 assert.equal(mm(2660), '2660');
 assert.equal(mm(18.25), '18,3');
 console.log('labels ok');

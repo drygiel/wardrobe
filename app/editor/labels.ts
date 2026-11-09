@@ -1,3 +1,4 @@
+import type { Unit } from '../contexts/AppContext';
 import { LEDS } from '../electric/data';
 
 type Gender = 0 | 1 | 2; // masculine, feminine, neuter or plural
@@ -114,3 +115,6 @@ export function treePath(name: string, group: string, columns: string[]): string
 
 // Millimetres, Polish decimal comma, no grouping: technical drawings write 2660
 export const mm = (value: number) => value.toLocaleString('pl-PL', { maximumFractionDigits: 1, useGrouping: false });
+
+// A length given in millimetres, written in the chosen unit
+export const inUnit = (millimetres: number, unit: Unit) => mm(unit === 'cm' ? millimetres / 10 : millimetres);

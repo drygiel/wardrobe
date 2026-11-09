@@ -20,6 +20,9 @@ export type Part = {
 
 const isMesh = (o: THREE.Object3D): o is THREE.Mesh => (o as THREE.Mesh).isMesh;
 
+// The dowels sit inside the frame: their own group for loading and defaults, a folder of Rama in the tree
+export const rootOf = (group: GroupId): GroupId => (group === 'dowels' ? 'frame' : group);
+
 export function useCatalog() {
   const wardrobe = useGLTF(WARDROBE_GLB) as unknown as GLTF;
   const frame = useGLTF(FRAME_GLB) as unknown as GLTF;

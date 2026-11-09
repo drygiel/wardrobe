@@ -6,7 +6,7 @@ export default function EditorPage() {
   const link = readLink();
 
   return (
-    <AppProvider initial={{ grid: true, gizmo: true, view: link.view ?? 'initial', orthographic: Boolean(link.view), hideFronts: true, wireframe: link.wireframe }}>
+    <AppProvider initial={{ grid: true, gizmo: true, view: link.view ?? 'initial', orthographic: Boolean(link.view), hideFronts: true, wireframe: link.wireframe, rememberUnit: true }}>
       <title>Szafa 2025 – edytor pomiarów</title>
       <meta name="theme-color" content="#161412" />
       <Editor />

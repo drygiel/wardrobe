@@ -21,7 +21,7 @@ export default function Footer() {
             <Link to="/elektryka">Elektryka</Link>
           </li>
           <li>
-            <Link to="/editor">Edytor pomiarów</Link>
+            <Link to="/pomiar">Edytor pomiarów</Link>
           </li>
         </ul>
         <ul>

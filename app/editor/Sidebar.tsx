@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { COLUMNS, type Column, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
-import { type Part, useCatalog } from './catalog';
+import { type Part, rootOf, useCatalog } from './catalog';
 import { selection, useSelection } from './selection';
 import styles from './Editor.module.scss';
 
@@ -21,9 +21,6 @@ const SWATCH: Record<GroupId, string> = {
 const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
 
 type TreeNode = { key: string; label: string; group: GroupId; names: string[]; children: TreeNode[]; part?: Part };
-
-// The dowels sit inside the frame: their own group for loading and defaults, a folder of Rama in the tree
-const rootOf = (group: GroupId): GroupId => (group === 'dowels' ? 'frame' : group);
 
 // Group > folders > parts. Empty groups disappear, so a search or a column filter leaves only what matches
 function buildTree(parts: Part[]) {

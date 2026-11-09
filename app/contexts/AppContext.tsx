@@ -5,6 +5,17 @@ import { createContext, ReactNode, use, useRef, useState } from 'react';
 import type { RootState } from '@react-three/fiber';
 import type * as THREE from 'three';
 export type SceneView = 'initial' | 'left-side' | 'front' | 'side' | 'side-z' | 'top' | 'last-3d';
+export type Unit = 'mm' | 'cm';
+
+const UNIT_KEY = 'wardrobe.unit';
+
+const storedUnit = (): Unit => {
+  try {
+    return localStorage.getItem(UNIT_KEY) === 'cm' ? 'cm' : 'mm';
+  } catch {
+    return 'mm';
+  }
+};
 
 // The XR emulator's dev button covers the editor toolbar: opt in with ?xr
 const xr = createXRStore({ emulate: new URLSearchParams(location.search).has('xr') ? 'metaQuest3' : false });
@@ -20,6 +31,8 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
   const [hiddenParts, setHiddenParts] = useState<ReadonlySet<string>>(() => new Set());
   const [column, setColumn] = useState<Column | null>(null);
   const [grain, setGrain] = useState(false);
+  // The editor remembers its unit; the pages around it always say centimetres
+  const [unit, setUnitState] = useState<Unit>(() => (initial?.rememberUnit ? storedUnit() : 'cm'));
   const [view, setViewName] = useState<SceneView>(initial?.view ?? 'initial');
   const [viewTick, setViewTick] = useState(0); // counts requests, so the same view can be asked for again
   const [gizmo, setGizmo] = useState(initial?.gizmo ?? false);
@@ -51,6 +64,15 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     setView(closing ? 'last-3d' : next);
   };
 
+  const setUnit = (next: Unit) => {
+    setUnitState(next);
+    try {
+      localStorage.setItem(UNIT_KEY, next);
+    } catch {
+      // private mode: the choice just lasts this visit
+    }
+  };
+
   const toggleGroup = (id: GroupId) =>
     setHidden(current => {
       const next = new Set(current);
@@ -75,6 +97,8 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     setHiddenParts,
     grain,
     setGrain,
+    unit,
+    setUnit,
     hideFronts: hidden.has('fronts'),
     electric: !hidden.has('electric'),
     column,
@@ -111,6 +135,7 @@ type AppContextInitial = {
   view: SceneView;
   gizmo: boolean;
   active: boolean;
+  rememberUnit: boolean;
 };
 
 type AppContextType = ReturnType<typeof useAppStore>;
