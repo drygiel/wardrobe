@@ -1,5 +1,7 @@
 # Wardrobe 2025
 
+![Measure editor: the wardrobe with a part selected and its dimensions](.github/preview.webp)
+
 A modern 3D wardrobe visualization application built with React Three Fiber, featuring interactive 3D models, VR/AR support, and responsive design.
 
 [**Live Demo**](https://drygiel.github.io/wardrobe/)
@@ -11,8 +13,9 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 - **Multiple View Modes**: Switch between texture, wireframe, and orthographic views
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **VR/AR Support**: Full VR and AR capabilities with proper head tracking
-- **Measurement Tools**: Interactive measurement system with visual guides
-- **Image Gallery**: Built-in photo gallery showcasing project stages
+- **Measure Editor** (`/pomiar`): Tree of all parts, edge measuring, part drawings with grain direction, SVG download, mm/cm units
+- **Frame and Electrics Pages** (`/rama`, `/elektryka`): Frame build with cut plan, wiring with live circuit and drill sheet
+- **Image Gallery** (`/galeria`): Renders of the finished wardrobe
 
 ### Technical Features
 - **Real-time 3D Rendering**: High-performance WebGL rendering with shadows
@@ -26,7 +29,7 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 ### Frontend
 - **React 19** - Modern React with latest features
 - **Vite 8** - Dev server and bundler
-- **React Router 7** - Client-side routes: `/`, `/rama`, `/elektryka`, `/pomiar`
+- **React Router 7** - Client-side routes: `/`, `/rama`, `/elektryka`, `/pomiar`, `/galeria`
 - **TypeScript** - Type-safe development
 - **Sass** - CSS preprocessing with modules
 
@@ -49,21 +52,26 @@ A modern 3D wardrobe visualization application built with React Three Fiber, fea
 
 ```
 app/
-├── components/
+├── components/            # 3D scene, models, measuring
 │   ├── Scene.tsx          # Main 3D scene with camera controls
 │   ├── Wardrobe.tsx       # Interactive wardrobe model
 │   ├── Mesh.tsx           # Custom mesh component with measurement
 │   └── LineHint.tsx       # Measurement line hints
 ├── contexts/
 │   └── AppContext.tsx     # Global state management
+├── editor/                # Measure editor (/pomiar)
+├── electric/              # Electrics page sections (/elektryka)
+├── sections/              # Sections of the content pages
+├── xr/                    # VR/AR stage, menu, wall placement
 ├── hooks/
-│   ├── useEventListener.ts
-│   └── useNonInitialEffect.ts
-├── Intro.tsx              # Landing page with project info
-├── App.tsx                # Main application component
+│   ├── useEventListener.tsx
+│   └── useReveal.ts
+├── assets.ts              # Model, atlas and image paths
 ├── main.tsx               # Entry and route table
-├── szafa.tsx, rama.tsx, elektryka.tsx, editor.tsx  # Route pages
-└── *.module.scss          # Component-specific styles
+├── szafa.tsx, rama.tsx, elektryka.tsx, editor.tsx, galeria.tsx  # Route pages
+└── global.scss            # Global styles
+scripts/                   # Blender bake/export and asset processing
+tests/                     # Unit tests (yarn test)
 ```
 
 ## 🎮 Controls & Navigation
@@ -72,7 +80,7 @@ app/
 - **Mouse**: Orbit around the wardrobe
 - **Scroll**: Zoom in/out
 - **Click**: Interact with doors and drawers
-- **Keyboard**: Layer switching (0-3)
+- **Keyboard** (measure editor): `M` measure mode, `S` grain, `1`-`4` views, `Esc` unpin the part
 
 ### Mobile Controls
 - **Touch**: Pan and zoom gestures
@@ -87,7 +95,7 @@ app/
 ## 🔧 Development
 
 ### Prerequisites
-- Node.js 18+
+- Node.js 20.19+ or 22.12+ (CI uses 24)
 - Yarn package manager
 
 ### Installation
@@ -109,13 +117,21 @@ yarn dev          # Start development server (port 4000)
 yarn build         # Build for production
 yarn preview       # Preview production build (port 4001)
 yarn lint          # Run ESLint
-yarn deploy        # Deploy to production
+yarn tscheck       # Type-check without emitting
+yarn test          # Run unit tests
+yarn bake          # Bake textures in Blender, then build the atlas
+yarn atlas         # Build the texture atlas only
+yarn export:model  # Export GLB models from Blender
+yarn transform     # Process exported models
 ```
+
+### Deployment
+Every push to `main` builds the site and publishes it to GitHub Pages (`.github/workflows/deploy.yml`).
 
 ### Environment Variables
 ```env
 BASE_PATH=/your-base-path/  # Optional base path (Vite `base`)
-BLENDER=path/to/blender.exe  # `yarn bake` / `yarn export` (see .env.sample)
+BLENDER=path/to/blender.exe  # `yarn bake` / `yarn export:model` (see .env.sample)
 BLEND_FILE=../Szafa4.blend   # Scene the Blender scripts run on
 ```
 
@@ -123,30 +139,32 @@ BLEND_FILE=../Szafa4.blend   # Scene the Blender scripts run on
 
 ### Adding New Wardrobe Models
 1. Place GLB files in `/public/models/`
-2. Update the model path in `Wardrobe.tsx`
+2. Update the model path in `app/assets.ts`
 3. Adjust materials and animations as needed
 
 ### Styling
 - Component styles: `*.module.scss` files
-- Global styles: `App.module.scss`
-- Responsive breakpoints: 768px (tablet), 480px (mobile)
+- Global styles: `app/global.scss`
+- Main responsive breakpoint: 767px (the measure editor uses 1179px and 759px)
 
 ### State Management
 The application uses React Context for state management:
 - `wireframe`: Toggle wireframe mode
 - `orthographic`: Switch camera projection
 - `grid`: Show/hide grid overlay
-- `hideFronts`: Hide wardrobe fronts
-- `layer`: Current rendering layer (0-3)
+- `hidden`, `hiddenParts`: Hidden part groups and single parts (`hideFronts` is derived from `hidden`)
+- `grain`: Show grain direction
+- `unit`: Measurement unit (mm/cm)
+- `layer`: Current camera layer
 - `view`: Camera view state
 - `gizmo`: Show navigation gizmo
 
 ## 📱 Responsive Design
 
 ### Breakpoints
-- **Desktop**: > 768px - Full feature set
-- **Tablet**: ≤ 768px - Optimized layout
-- **Mobile**: ≤ 480px - Touch-optimized interface
+- **Desktop**: ≥ 768px - Full layout
+- **Mobile**: ≤ 767px - Single-column sections
+- **Measure editor**: Rearranges panels at ≤ 1179px and ≤ 759px
 
 ### Mobile Optimizations
 - Touch-friendly controls

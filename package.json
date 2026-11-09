@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
+    "tscheck": "tsc --noEmit",
     "test": "tsx --test \"tests/*.test.ts\"",
     "transform": "tsx scripts/transform.ts",
     "atlas": "tsx scripts/atlas.ts",

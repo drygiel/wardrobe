@@ -18,18 +18,25 @@
         font-size: var(--step-head);
     }
 
-    p {
+    div {
         grid-column: 8 / 12;
+    }
+
+    a {
+        display: inline-block;
+        margin-top: 12px;
     }
 }
 
+.carousel {
+    position: relative;
+}
+
+// Edge to edge and without snapping: the row loops, so it has no first or last photo to align
 .strip {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 0 var(--m);
-    scroll-padding: 0 var(--m);
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
@@ -41,7 +48,6 @@
         border: 0;
         padding: 0;
         background: none;
-        scroll-snap-align: start;
         cursor: zoom-in;
     }
 
@@ -59,6 +65,40 @@
     .on img {
         filter: none;
     }
+}
+
+.arrow {
+    position: absolute;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border: 0;
+    background: rgb(22 20 18 / 80%);
+    color: var(--ink);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(-50%);
+    transition: opacity 160ms, background-color 160ms, color 160ms;
+
+    .carousel:hover &,
+    &:focus-visible {
+        opacity: 1;
+    }
+
+    &:hover {
+        background: var(--ink);
+        color: var(--bg);
+    }
+}
+
+.prev {
+    left: 16px;
+}
+
+.next {
+    right: 16px;
 }
 
 .caption {
@@ -94,12 +134,19 @@
         grid-template-columns: 1fr;
 
         h2,
-        p {
+        div {
             grid-column: 1;
         }
     }
 
     .strip img {
         height: 46vh;
+    }
+}
+
+// Fingers swipe the row
+@media (hover: none) {
+    .arrow {
+        display: none;
     }
 }

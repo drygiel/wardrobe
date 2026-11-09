@@ -23,6 +23,9 @@ export default function Footer() {
           <li>
             <Link to="/pomiar">Edytor pomiarów</Link>
           </li>
+          <li>
+            <Link to="/galeria">Galeria</Link>
+          </li>
         </ul>
         <ul>
           <li>Pliki</li>

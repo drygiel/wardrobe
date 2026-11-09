@@ -1,13 +1,15 @@
 import { Link } from 'react-router';
-import { AppProvider } from '@/contexts/AppContext';
-import { FrameModel } from '@/components/FrameModel';
 import { FrameShowcase } from '@/components/FrameShowcase';
-import MeasureStage from '@/MeasureStage';
+import { GROUPS } from '@/components/parts';
+import MeasureLink from '@/sections/MeasureLink';
 import Showcase from '@/sections/Showcase';
 import PartsSection from '@/sections/PartsSection';
 import PlanSection from '@/sections/PlanSection';
 import Footer from '@/sections/Footer';
 import { picture, renderSmall } from '@/assets';
+
+// The measuring page with every group but the frame switched off
+const MEASURE_FRAME = `/pomiar?hide=${GROUPS.map(group => group.id).filter(id => id !== 'frame').join()}`;
 
 export default function RamaPage() {
   return (
@@ -19,7 +21,8 @@ export default function RamaPage() {
           { href: '/', label: 'Szafa' },
           { href: '#rozkroj', label: 'Rozkrój' },
           { href: '#formatki', label: 'Formatki' },
-          { href: '#pomiar', label: 'Pomiar' },
+          { href: MEASURE_FRAME, label: 'Pomiar' },
+          { href: '/galeria', label: 'Galeria' },
           { href: '/rama', label: 'Rama', current: true },
           { href: '/elektryka', label: 'Elektryka' },
         ]}
@@ -49,17 +52,11 @@ export default function RamaPage() {
       />
       <main>
         <PartsSection />
-        <AppProvider initial={{ wireframe: true, grid: true, gizmo: true, active: false, view: 'left-side' }}>
-          <MeasureStage
-            embedded={{
-              id: 'pomiar',
-              title: 'Zmierz ramę',
-              text: 'Ten sam tryb pomiaru co dla szafy. Najedź na krawędź formatki, aby zobaczyć jej długość.',
-            }}
-          >
-            <FrameModel />
-          </MeasureStage>
-        </AppProvider>
+        <MeasureLink
+          title="Zmierz ramę"
+          text="Pomiary otworzą się na samej ramie. Najedź na krawędź formatki, aby zobaczyć jej długość."
+          to={MEASURE_FRAME}
+        />
         <PlanSection
           title="Rozkrój i wymiary"
           rows={[

@@ -1,0 +1,56 @@
+// Holds the wordmark and the menu, which sit absolutely like on the other pages' heroes
+.top {
+    position: relative;
+    height: 104px;
+}
+
+.page {
+    padding: clamp(32px, 6vw, 80px) var(--m) var(--section);
+
+    h1 {
+        font-size: var(--step-head);
+    }
+
+    > p {
+        margin: 12px 0 40px;
+        color: var(--muted);
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: 10px;
+
+    // The box keeps its size: only the photo grows inside it, clipped by the rounded corners
+    button {
+        overflow: hidden;
+        border: 0;
+        border-radius: 0;
+        outline: 1.5px solid transparent;
+        outline-offset: 3px;
+        padding: 0;
+        background: none;
+        cursor: zoom-in;
+        transition: border-radius 200ms, outline-color 200ms;
+
+        &:hover,
+        &:focus-visible {
+            border-radius: 10px;
+            outline-color: var(--ink);
+
+            img {
+                transform: scale(1.035);
+            }
+        }
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        transition: transform 350ms var(--ease);
+    }
+}

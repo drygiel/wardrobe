@@ -1,0 +1,39 @@
+.section {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gap);
+    align-content: center;
+    min-height: 100svh; // the showcase's fixed canvas must not show past a shorter section
+    padding: 0 var(--m);
+    background: var(--bg);
+
+    h2 {
+        grid-column: 1 / 7;
+        font-size: var(--step-head);
+    }
+
+    div {
+        grid-column: 7 / 13;
+    }
+
+    p {
+        max-width: 44ch;
+        margin-bottom: 24px;
+    }
+}
+
+@media (max-width: 767px) {
+    .section {
+        grid-template-columns: 1fr;
+
+        > * {
+            grid-column: 1 !important;
+        }
+
+        h2 {
+            margin-bottom: 24px;
+        }
+    }
+}

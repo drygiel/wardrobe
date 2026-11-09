@@ -26,6 +26,7 @@ const router = createBrowserRouter(
         page('/rama', () => import('@/rama')),
         page('/elektryka', () => import('@/elektryka')),
         page('/pomiar', () => import('@/editor')),
+        page('/galeria', () => import('@/galeria')),
         { path: '*', element: <Navigate to="/" replace /> },
       ],
     },

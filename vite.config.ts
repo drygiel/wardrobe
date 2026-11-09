@@ -8,7 +8,7 @@ const routeFallbacks: Plugin = {
   name: 'route-fallbacks',
   apply: 'build',
   async writeBundle({ dir }) {
-    for (const file of ['rama.html', 'elektryka.html', 'pomiar.html', '404.html']) {
+    for (const file of ['rama.html', 'elektryka.html', 'pomiar.html', 'galeria.html', '404.html']) {
       await copyFile(resolve(dir!, 'index.html'), resolve(dir!, file));
     }
   },

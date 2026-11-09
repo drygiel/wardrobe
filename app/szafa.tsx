@@ -1,8 +1,6 @@
 import { Link } from 'react-router';
-import { AppProvider } from '@/contexts/AppContext';
-import { Model as Wardrobe } from '@/components/Wardrobe';
 import { WardrobeShowcase } from '@/components/WardrobeShowcase';
-import MeasureStage from '@/MeasureStage';
+import MeasureLink from '@/sections/MeasureLink';
 import Showcase from '@/sections/Showcase';
 import PlanSection from '@/sections/PlanSection';
 import Gallery from '@/sections/Gallery';
@@ -18,9 +16,9 @@ export default function SzafaPage() {
       <Showcase
         nav={[
           { href: '#budowa', label: 'Budowa' },
-          { href: '#pomiar', label: 'Pomiar' },
+          { href: '/pomiar', label: 'Pomiar' },
           { href: '#plan', label: 'Plan' },
-          { href: '#galeria', label: 'Galeria' },
+          { href: '/galeria', label: 'Galeria' },
           { href: '/rama', label: 'Rama' },
           { href: '/elektryka', label: 'Elektryka' },
         ]}
@@ -32,7 +30,7 @@ export default function SzafaPage() {
             <Link className="link" to="#budowa">
               Rozłóż na części
             </Link>
-            <Link className="btn" to="#pomiar">
+            <Link className="btn" to="/pomiar">
               Zmierz szafę
             </Link>
           </>
@@ -56,18 +54,11 @@ export default function SzafaPage() {
         scene={progress => <WardrobeShowcase progress={progress} />}
       />
       <main>
-        <AppProvider initial={{ wireframe: true, grid: true, gizmo: true, active: false, view: 'left-side' }}>
-          <MeasureStage
-            electric
-            embedded={{
-              id: 'pomiar',
-              title: 'Zmierz sam',
-              text: 'Najedź kursorem na krawędź. Długość pojawi się przy czerwonej linii.',
-            }}
-          >
-            <Wardrobe />
-          </MeasureStage>
-        </AppProvider>
+        <MeasureLink
+          title="Zmierz sam"
+          text="Najedź kursorem na krawędź, a pojawi się jej długość. Kliknij element, aby zobaczyć jego wymiary i rysunek."
+          to="/pomiar"
+        />
         <PlanSection />
         <Gallery />
         <FrameTeaser />
