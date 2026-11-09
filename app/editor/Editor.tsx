@@ -8,7 +8,9 @@ import Scene from '@/components/Scene';
 import { Model as Wardrobe } from '@/components/Wardrobe';
 import { Icon, type IconName } from './icons';
 import { Inspector } from './Inspector';
+import { PanelResizer } from './PanelResizer';
 import { selection } from './selection';
+import { readLink, ShareLink } from './ShareLink';
 import { Sidebar } from './Sidebar';
 import styles from './Editor.module.scss';
 
@@ -23,7 +25,8 @@ export default function Editor() {
   const app = useApp();
   const shell = useRef<HTMLDivElement>(null!);
   const press = useRef<[number, number] | null>(null);
-  const [open, setOpen] = useState(false);
+  const [link] = useState(readLink);
+  const [open, setOpen] = useState(link.open === 'all');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -83,8 +86,11 @@ export default function Editor() {
         >
           <XR store={app.xr}>
             <XROrigin position={[2.5, 0, -0.5]} rotation={[0, Math.PI / 2, 0]} scale={1} />
-            <Scene editorCamera>
+            <Scene editorCamera link={link} orbitCenter={selection.orbitCenter}>
               <Wardrobe />
+              <Suspense fallback={null}>
+                <ShareLink />
+              </Suspense>
             </Scene>
           </XR>
         </Canvas>
@@ -131,6 +137,9 @@ export default function Editor() {
           <Inspector />
         </Suspense>
       </aside>
+
+      <PanelResizer shell={shell} panel="side" />
+      <PanelResizer shell={shell} panel="insp" />
     </div>
   );
 }

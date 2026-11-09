@@ -207,5 +207,17 @@ export function useParts(root: RefObject<THREE.Object3D | null>, scene: THREE.Ob
     invalidate();
   };
 
-  return { toggle, closeAll, openAll };
+  const openOnly = (names: string[]) => {
+    get()?.springs.forEach((sp, name) => (sp.target = names.includes(name) ? 1 : 0));
+    invalidate();
+  };
+
+  // For the share link: "all", the names set to open, or empty when everything is closed
+  const openState = () => {
+    const springs = [...(get()?.springs ?? [])];
+    const open = springs.filter(([, sp]) => sp.target).map(([name]) => name);
+    return open.length && open.length === springs.length ? 'all' : open.join();
+  };
+
+  return { toggle, closeAll, openAll, openOnly, openState };
 }

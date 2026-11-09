@@ -1,4 +1,4 @@
-// Run with: npx tsx scripts/selection.check.ts
+// Run with: npx tsx tests/selection.test.ts
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import type { LineData } from '../app/components/Mesh';

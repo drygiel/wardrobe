@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { type Ref, useMemo } from 'react';
 import { markScale } from '@/components/grain';
 import type { LineData } from '@/components/Mesh';
-import { edgeRuns } from './edgeView';
+import { contoursOf, edgeRuns } from './edgeView';
 import { mm } from './labels';
 
 const W = 340;
@@ -103,7 +103,17 @@ export function PartDrawing({
       { axis: b, sign: -cyclic, at: (v: number[]) => [X(v), YP(v)] },
       { axis: a, sign: -cyclic, at: (v: number[]) => [XS(v), Y(v)] },
     ];
-    return { d, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [size_mm(a), size_mm(b), size_mm(c)] };
+    const contours = contoursOf(geometry);
+    let contour = '';
+    views.forEach(view => {
+      const segments = contours[view.axis];
+      for (let i = 0; i < segments.length; i += 6) {
+        const [fx, fy] = view.at(segments.slice(i, i + 3));
+        const [tx, ty] = view.at(segments.slice(i + 3, i + 6));
+        contour += `M${px(fx)} ${px(fy)}L${px(tx)} ${px(ty)}`;
+      }
+    });
+    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [size_mm(a), size_mm(b), size_mm(c)] };
   }, [geometry]);
 
   // The measured edge in each view: solid where visible, dashed where it lies under something, a dot when seen end-on
@@ -145,8 +155,7 @@ export function PartDrawing({
     );
   }, [lines, drawing]);
 
-  const { d, x0, y0, wa, wb, wc, xSide, yPlan, a, b, markSize, labels } = drawing;
-  const outline = { fill: 'none', stroke: INK, strokeWidth: 1.1 };
+  const { d, contour, x0, y0, wa, wb, wc, xSide, a, b, markSize, labels } = drawing;
 
   // Double-headed arrow along the grain, the usual mark on a cutting drawing
   let grainArrow = '';
@@ -164,9 +173,7 @@ export function PartDrawing({
     <svg ref={ref} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Rysunek techniczny ${code}, wymiary w milimetrach: ${labels.join(' na ')}`}>
       <rect width={W} height={H} fill={PAPER} />
       <path d={d} fill="none" stroke={INK} strokeWidth={0.7} strokeLinecap="round" />
-      <rect x={x0} y={y0} width={Math.max(wa, 1)} height={Math.max(wb, 1)} {...outline} />
-      <rect x={x0} y={yPlan} width={Math.max(wa, 1)} height={Math.max(wc, 1)} {...outline} />
-      <rect x={xSide} y={y0} width={Math.max(wc, 1)} height={Math.max(wb, 1)} {...outline} />
+      <path d={contour} fill="none" stroke={INK} strokeWidth={1.1} strokeLinecap="round" />
       {grainArrow && <path d={grainArrow} fill="none" stroke={INK} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />}
       <Dimension x1={x0} y1={y0 - 11} x2={x0 + wa} y2={y0 - 11} label={labels[0]} />
       <Dimension x1={x0 - 11} y1={y0} x2={x0 - 11} y2={y0 + wb} label={labels[1]} vertical />

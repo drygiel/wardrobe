@@ -158,7 +158,12 @@ export function Sidebar() {
               onMouseEnter={() => selection.hover(selection.find(node.key))}
               onMouseLeave={() => selection.hover(null)}
               onFocus={() => selection.hover(selection.find(node.key))}
-              onClick={() => selection.pin(selection.find(node.key))}
+              onClick={() => {
+                const mesh = selection.find(node.key);
+                const selecting = mesh !== pinned;
+                selection.pin(mesh);
+                if (selecting && mesh) app.centerOn.current?.(selection.orbitCenter()!);
+              }}
             >
               <span>{node.label}</span>
               <small>{node.key}</small>

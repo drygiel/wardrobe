@@ -1,4 +1,4 @@
-// Run with: npx tsx scripts/grain.check.ts
+// Run with: npx tsx tests/grain.test.ts
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { grainAxis, grainHatch } from '../app/components/grain';

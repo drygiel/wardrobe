@@ -1,4 +1,4 @@
-// Run with: npx tsx scripts/edgeView.check.ts
+// Run with: npx tsx tests/edgeView.test.ts
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { edgeRuns } from '../app/editor/edgeView';

@@ -1,4 +1,4 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { useSyncExternalStore } from 'react';
 import type { LineData } from '@/components/Mesh';
 
@@ -42,8 +42,18 @@ export const useSelection = () => useSyncExternalStore(subscribe, () => state);
 
 export const selection = {
   root: null as THREE.Object3D | null,
+  get pinned() {
+    return state.pinned;
+  },
   find(name: string) {
     return (selection.root?.getObjectByName(name) as THREE.Mesh | undefined) ?? null;
+  },
+  // World centre of the selected part, else of the one under the cursor
+  orbitCenter() {
+    const mesh = state.pinned ?? state.hover;
+    if (!mesh) return null;
+    mesh.geometry.computeBoundingBox();
+    return mesh.geometry.boundingBox!.getCenter(new THREE.Vector3()).applyMatrix4(mesh.matrixWorld);
   },
   hover(mesh: THREE.Mesh | null, edge: LineData | null = null) {
     if (state.hover !== mesh || state.edge !== edge) update({ hover: mesh, edge });

@@ -28,6 +28,7 @@
   "include": [
     "app",
     "scripts",
+    "tests",
     "*.ts"
   ]
 }

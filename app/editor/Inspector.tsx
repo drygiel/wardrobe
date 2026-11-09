@@ -4,6 +4,7 @@ import type { LineData } from '@/components/Mesh';
 import { GROUPS } from '@/components/parts';
 import { grainAxis, sizeOf } from '@/components/grain';
 import { useCatalog } from './catalog';
+import { Icon } from './icons';
 import { mm, partLabel } from './labels';
 import { PartDrawing } from './PartDrawing';
 import { selection, useSelection } from './selection';
@@ -84,6 +85,11 @@ export function Inspector() {
   return (
     <div className={styles.inspector}>
       <h2 className={styles.partName}>{part.label}</h2>
+      {pinned && (
+        <button className={`${styles.tool} ${styles.unpin}`} aria-label="Odepnij" title="Odepnij" onClick={() => selection.unpin()}>
+          <Icon name="pin" />
+        </button>
+      )}
       <p className={styles.partMeta}>
         <span>Słupek {columnLabel(part.columns)}</span>
         <code>{part.name}</code>
@@ -124,7 +130,6 @@ export function Inspector() {
       <div className={styles.inspectorActions}>
         <button className={styles.tool} onClick={copy}>{copied ? 'Skopiowano' : 'Kopiuj wymiary'}</button>
         <button className={styles.tool} onClick={download}>Pobierz SVG</button>
-        {pinned && <button className={styles.tool} onClick={() => selection.unpin()}>Odepnij</button>}
       </div>
     </div>
   );

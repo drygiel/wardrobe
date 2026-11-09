@@ -3,9 +3,12 @@
     --panel: #1c1a17;
     --line: #38332c;
     --control: #2a2622;
+    --side-w: 280px;
+    --insp-w: 360px;
 
+    position: relative;
     display: grid;
-    grid-template: 'side view insp' 100svh / 280px minmax(0, 1fr) 360px;
+    grid-template: 'side view insp' 100svh / var(--side-w) minmax(0, 1fr) var(--insp-w);
     background: var(--bg);
     font-size: 0.8125rem;
     line-height: 1.4;
@@ -58,6 +61,44 @@
     position: relative;
     min-height: 0;
     overflow: hidden;
+}
+
+// Straddles the panel's 1px border, so the line it lights up covers that border
+.resizer {
+    position: absolute;
+    inset-block: 0;
+    z-index: 2;
+    width: 9px;
+    cursor: col-resize;
+    touch-action: none;
+    user-select: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset-block: 0;
+        left: 3px;
+        width: 3px;
+        transition: background-color 120ms;
+    }
+
+    &:hover::after,
+    &:active::after,
+    &:focus-visible::after {
+        background: var(--ink);
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+.resizerSide {
+    left: calc(var(--side-w) - 5px);
+}
+
+.resizerInsp {
+    right: calc(var(--insp-w) - 5px);
 }
 
 .canvas {
@@ -420,12 +461,14 @@
 }
 
 .inspector {
+    position: relative;
     display: grid;
     gap: 14px;
     padding: 18px 16px;
 }
 
 .partName {
+    padding-right: 40px; // room for .unpin, also unpinned so pinning does not re-wrap the name
     font-family: var(--font-display) !important;
     font-size: 1.875rem !important;
     font-weight: 500 !important;
@@ -509,6 +552,16 @@
         border-color: var(--muted);
     }
 
+    &.unpin {
+        position: absolute;
+        top: 14px;
+        right: 12px;
+        display: grid;
+        place-items: center;
+        width: 32px;
+        padding: 0;
+    }
+
     &:active {
         background: var(--line);
     }
@@ -517,9 +570,15 @@
 // The model and the inspector stay side by side; the lists move under the model
 @media (max-width: 1179px) {
     .shell {
+        --insp-w: 340px;
+
         grid-template:
             'view insp' 76svh
-            'side insp' auto / minmax(0, 1fr) 340px;
+            'side insp' auto / minmax(0, 1fr) var(--insp-w);
+    }
+
+    .resizerSide {
+        display: none;
     }
 
     .insp {
@@ -550,6 +609,10 @@
             'view' 58svh
             'insp' auto
             'side' auto / minmax(0, 1fr);
+    }
+
+    .resizer {
+        display: none;
     }
 
     .insp {
@@ -601,6 +664,16 @@
 @media (hover: none) {
     .solo {
         opacity: 1;
+    }
+
+    // A finger needs a wider target than a cursor
+    .resizer {
+        width: 21px;
+        margin-inline: -6px;
+
+        &::after {
+            left: 9px;
+        }
     }
 
     .count,

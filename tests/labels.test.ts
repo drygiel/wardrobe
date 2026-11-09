@@ -1,4 +1,4 @@
-// Run with: npx tsx scripts/labels.check.ts
+// Run with: npx tsx tests/labels.test.ts
 import assert from 'node:assert/strict';
 import { mm, partLabel, treePath } from '../app/editor/labels';
 

@@ -14,6 +14,7 @@ import {
 import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useXR } from '@react-three/xr';
+import { orbitShift } from './orbitAround';
 
 interface ViewState {
   position: THREE.Vector3;
@@ -37,34 +38,68 @@ const Views: Record<SceneView, ViewState> = {
   front: { position: new THREE.Vector3(4, 1.33, -0.156), target: new THREE.Vector3(-0.235, 1.33, -0.156), zoom: 1, fit: [1.5, 1.5] },
   side: { position: new THREE.Vector3(-0.235, 1.33, -5), target: new THREE.Vector3(-0.235, 1.33, -0.156), zoom: 1, fit: [0.5, 1.5] },
   'side-z': { position: new THREE.Vector3(-0.235, 1.33, 5), target: new THREE.Vector3(-0.235, 1.33, -0.156), zoom: 1, fit: [0.5, 1.5] },
-  // Rewritten every time the editor leaves perspective
-  'last-3d': { position: new THREE.Vector3(), target: new THREE.Vector3(), zoom: 1 },
+  // Rewritten every time the editor leaves perspective; a link opened straight in ortho falls back on this
+  'last-3d': { position: new THREE.Vector3(3.3077, 0.2, -3.6753), target: new THREE.Vector3(-0.235, 1.33, -0.156), zoom: 1 },
   top: { position: new THREE.Vector3(-0.225, 5.5, -0.156), target: new THREE.Vector3(-0.235, 1.33, -0.156), zoom: 1, fit: [1.5, 0.45] },
 };
 
-export default function Scene({ children, editorCamera = false }: { children: ReactNode; editorCamera?: boolean }) {
+// The orthographic presets already aim at the middle of the wardrobe
+export const editorGoal = (view: SceneView): ViewState => (view === 'initial' ? { ...Views[view], target: Views.front.target } : Views[view]);
+
+// Zoom that frames an orthographic preset when the frustum is one metre tall from its centre
+export const fitZoom = (view: SceneView, aspect: number) => {
+  const fit = Views[view].fit;
+  return fit ? 1 / Math.max(fit[1], fit[0] / aspect) : 1;
+};
+
+type LinkCamera = { position?: THREE.Vector3; target?: THREE.Vector3; zoom?: number };
+
+export default function Scene({
+  children,
+  editorCamera = false,
+  link,
+  orbitCenter,
+}: {
+  children: ReactNode;
+  editorCamera?: boolean;
+  link?: LinkCamera;
+  orbitCenter?: () => THREE.Vector3 | null; // what the middle mouse button orbits around
+}) {
   const app = useApp();
   const size = useThree(s => s.size);
   // The editor flies to an orthographic preset in perspective; app.orthographic is what was asked for, ortho what is on screen
   const [arrived, setArrived] = useState(app.orthographic);
   if (!app.orthographic && arrived) setArrived(false);
   const ortho = app.orthographic && (arrived || !editorCamera);
-  // The orthographic presets already aim at the middle of the wardrobe
-  const goalOf = (view: SceneView): ViewState => (editorCamera && view === 'initial' ? { ...Views[view], target: Views.front.target } : Views[view]);
+  const goalOf = (view: SceneView): ViewState => (editorCamera ? editorGoal(view) : Views[view]);
 
   const camState = useMemo(() => {
-    const stored = sessionStorage.getItem('camera');
-    // Zoom is tuned for a wide stage; a tall canvas (the editor between its panels) must not crop the model
-    if (!stored) return { ...goalOf(app.view), zoom: Views[app.view].zoom * Math.min(1, size.width / size.height / 1.2) };
+    // The editor keeps its view in the address, so an empty one always means the default view
+    const stored = editorCamera ? null : sessionStorage.getItem('camera');
+    if (!stored) {
+      const goal = goalOf(app.view);
+      return {
+        ...goal,
+        position: link?.position ?? goal.position,
+        target: link?.target ?? goal.target,
+        // Zoom is tuned for a wide stage; a tall canvas (the editor between its panels) must not crop the model
+        zoom: Views[editorCamera ? 'initial' : app.view].zoom * Math.min(1, size.width / size.height / 1.2),
+      };
+    }
     const state = JSON.parse(stored);
 
     return {
       position: new THREE.Vector3(...state.position),
-      target: editorCamera ? Views.front.target : new THREE.Vector3(...state.target),
+      target: new THREE.Vector3(...state.target),
       zoom: state?.zoom as number,
     } as ViewState;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // A link opened in ortho starts on a one-metre frustum, see fitZoom
+  const [orthoStartZoom] = useState(() =>
+    editorCamera && app.orthographic ? (link?.zoom ?? fitZoom(app.view, size.width / size.height)) : camState.zoom,
+  );
 
   const camera = useThree(t => t.camera);
   const controls = useThree(state => state.controls as ComponentRef<typeof OrbitControls>);
@@ -79,6 +114,22 @@ export default function Scene({ children, editorCamera = false }: { children: Re
   // drei rebuilds the controls for a new camera, which would drop an orbit that leaves ortho mid-drag.
   // Built on this stand-in, one instance serves both cameras.
   const standIn = useMemo(() => new THREE.PerspectiveCamera(), []);
+  // Set by a middle-button press
+  const orbitPoint = useRef<THREE.Vector3 | null>(null);
+  const orbitFrom = useRef(new THREE.Quaternion());
+
+  // Capture: this must run before OrbitControls handles the same press
+  useEffect(() => {
+    const element = controls?.domElement;
+    if (!element || !orbitCenter) return;
+    const onPress = (event: PointerEvent) => {
+      if (event.button === 1) event.preventDefault(); // no browser autoscroll
+      orbitPoint.current = event.button === 1 && !event.shiftKey && !event.ctrlKey && !event.metaKey ? orbitCenter() : null;
+      orbitFrom.current.copy(controls.object.quaternion);
+    };
+    element.addEventListener('pointerdown', onPress, true);
+    return () => element.removeEventListener('pointerdown', onPress, true);
+  }, [controls, orbitCenter]);
 
   useLayoutEffect(() => {
     if (editorCamera && controls) controls.object = camera;
@@ -102,6 +153,25 @@ export default function Scene({ children, editorCamera = false }: { children: Re
     frustumHeightAtDistance(camera, distance) * camera.aspect;
 
   const tweens = useRef<TWEEN.Group>(new TWEEN.Group());
+  const centering = useRef<TWEEN.Group>(new TWEEN.Group());
+
+  // Moves camera and target together: the element comes to the middle, angle and distance stay
+  useEffect(() => {
+    if (!controls || !editorCamera) return;
+    app.centerOn.current = point => {
+      if (tweens.current.getAll().some(tween => tween.isPlaying())) return; // a flight to a preset finishes first
+      const position = controls.object.position.clone().add(point).sub(controls.target);
+      centering.current.removeAll();
+      centering.current.add(
+        new TWEEN.Tween(controls.object.position).to(position, 400).easing(TWEEN.Easing.Quadratic.InOut).start(),
+        new TWEEN.Tween(controls.target).to(point, 400).easing(TWEEN.Easing.Quadratic.InOut).start(),
+      );
+    };
+    return () => {
+      app.centerOn.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [controls, editorCamera]);
 
   const orthoHalfHeight = useRef(1);
   const servedTick = useRef(0);
@@ -200,6 +270,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
 
   useFrame(() => {
     tweens.current?.update();
+    centering.current.update();
   });
 
   // Enlarges the hovered axis head, which drei only does for a gizmo it drives itself
@@ -253,7 +324,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
           makeDefault={ortho}
           ref={orthoCamRef}
           position={camState.position}
-          zoom={camState.zoom}
+          zoom={orthoStartZoom}
           near={0.01}
           far={1000}
         />
@@ -266,10 +337,20 @@ export default function Scene({ children, editorCamera = false }: { children: Re
           enabled={app.active}
           target={target.current}
           zoomToCursor={!editorCamera}
+          // ROTATE on the middle button also makes Shift + middle a pan, built into OrbitControls
+          {...(editorCamera && { mouseButtons: { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.PAN } })}
           onStart={() => {
+            centering.current.removeAll(); // the user takes the camera over
             grabbed.current = controls.object.quaternion.clone();
           }}
           onChange={() => {
+            if (orbitPoint.current) {
+              const turn = controls.object.quaternion.clone().multiply(orbitFrom.current.clone().invert());
+              const shift = orbitShift(controls.target, orbitPoint.current, turn);
+              controls.object.position.add(shift);
+              controls.target.add(shift);
+              orbitFrom.current.copy(controls.object.quaternion);
+            }
             if (!grabbed.current) return;
             // A preset turning the camera is not the user orbiting
             if (tweens.current.getAll().some(tween => tween.isPlaying())) grabbed.current.copy(controls.object.quaternion);
@@ -281,8 +362,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
           }}
           onEnd={() => {
             grabbed.current = null;
-            // Only perspective views are restored after a reload
-            if (editorCamera && app.orthographic) return;
+            if (editorCamera) return; // its view lives in the address
 
             // console.log('target', {
             //   p: controls.object.position
@@ -297,7 +377,6 @@ export default function Scene({ children, editorCamera = false }: { children: Re
             // });
 
             if (
-              !editorCamera &&
               !app.orthographic &&
               Math.abs(controls.getPolarAngle() - Math.PI / 2) < 0.02 &&
               Math.abs(controls.getAzimuthalAngle() - Math.PI / 2) < 0.02
@@ -319,7 +398,7 @@ export default function Scene({ children, editorCamera = false }: { children: Re
           maxDistance={6}
           minDistance={0.3}
           zoomSpeed={2}
-          enableDamping
+          enableDamping={!editorCamera}
           dampingFactor={0.05}
           // maxPolarAngle={Math.PI/2}
         />

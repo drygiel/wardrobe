@@ -44,6 +44,63 @@ function isCovered(point: THREE.Vector3, { axis, sign }: View, geometry: THREE.B
   return false;
 }
 
+const SIDE_STEP = 0.0002; // metres: how far to each side of an edge the surface is probed
+const contourCache = new WeakMap<THREE.BufferGeometry, number[][]>();
+
+// The outer outline seen along one axis, as flat [x1, y1, z1, x2, y2, z2, …]: triangle edges with empty space on one side
+function contourAlong(geometry: THREE.BufferGeometry, axis: number) {
+  const u = (axis + 1) % 3;
+  const w = (axis + 2) % 3;
+  const position = geometry.attributes.position as THREE.BufferAttribute;
+  const count = geometry.index ? geometry.index.count : position.count;
+  const corner = (i: number) => {
+    const v = geometry.index ? geometry.index.getX(i) : i;
+    return [position.getX(v), position.getY(v), position.getZ(v)];
+  };
+
+  // Only the faces towards the viewer: on a solid part they alone cover its whole projection
+  const faces: number[][][] = [];
+  for (let i = 0; i < count; i += 3) {
+    const [p, q, r] = [corner(i), corner(i + 1), corner(i + 2)];
+    if ((q[u] - p[u]) * (r[w] - p[w]) - (q[w] - p[w]) * (r[u] - p[u]) > 1e-12) faces.push([p, q, r]);
+  }
+
+  const covered = (x: number, y: number) =>
+    faces.some(face => face.every((s, i) => {
+      const t = face[(i + 1) % 3];
+      return (t[u] - s[u]) * (y - s[w]) - (t[w] - s[w]) * (x - s[u]) >= 0;
+    }));
+
+  const key = (v: number[]) => v.map(n => Math.round(n * 1e4)).join();
+  const edges = new Map<string, number[]>();
+  faces.forEach(face => face.forEach((s, i) => {
+    const t = face[(i + 1) % 3];
+    edges.set([key(s), key(t)].sort().join('|'), [...s, ...t]);
+  }));
+
+  return [...edges.values()].flatMap(edge => {
+    const du = edge[3 + u] - edge[u];
+    const dw = edge[3 + w] - edge[w];
+    const length = Math.hypot(du, dw);
+    if (!length) return [];
+    const x = (edge[u] + edge[3 + u]) / 2;
+    const y = (edge[w] + edge[3 + w]) / 2;
+    const nx = (-dw / length) * SIDE_STEP;
+    const ny = (du / length) * SIDE_STEP;
+    return covered(x + nx, y + ny) && covered(x - nx, y - ny) ? [] : edge;
+  });
+}
+
+// One outline per local axis, so a notched part is drawn notched instead of as its bounding box
+export function contoursOf(geometry: THREE.BufferGeometry) {
+  let contours = contourCache.get(geometry);
+  if (!contours) {
+    contours = [0, 1, 2].map(axis => contourAlong(geometry, axis));
+    contourCache.set(geometry, contours);
+  }
+  return contours;
+}
+
 // Splits an edge into stretches the viewer sees and stretches lying under something else
 export function edgeRuns(geometry: THREE.BufferGeometry, [p, q]: readonly [THREE.Vector3, THREE.Vector3], view: View, sharp: ArrayLike<number>): Run[] {
   const runs: Run[] = [];
