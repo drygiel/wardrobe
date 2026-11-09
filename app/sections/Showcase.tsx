@@ -137,11 +137,14 @@ export default function Showcase({ nav, heading, facts, hint, actions, id, title
           <h1>{heading}</h1>
           <p>{facts}</p>
         </div>
-        <p className={styles.hint}>{hint}</p>
+        <p className={styles.hint}>
+          <span className="drag-cue" aria-hidden="true" />
+          {hint}
+        </p>
         <div className={styles.actions}>{actions}</div>
       </header>
 
-      <section id={id} ref={sectionRef} className={styles.breakdown} style={{ height: `calc(100svh + ${count} * 75vh)` }} aria-labelledby={`${id}-h`}>
+      <section id={id} ref={sectionRef} className={styles.breakdown} style={{ height: `calc(100svh + ${count} * 45vh)` }} aria-labelledby={`${id}-h`}>
         <div className={styles.sticky}>
           <ol ref={stepsRef} className={styles.steps}>
             <li>

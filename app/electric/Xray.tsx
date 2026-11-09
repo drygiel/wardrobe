@@ -220,7 +220,10 @@ export function Xray() {
             <XrayScene focus={focus} fly={fly} active={active} fine={fine} />
           </Suspense>
         </Canvas>
-        <p className={styles.stageHint}>{fine ? 'Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.' : 'Stuknij, aby obracać. Stuknij drzwi, aby je otworzyć.'}</p>
+        <p className={styles.stageHint}>
+          {fine && <span className="drag-cue" aria-hidden="true" />}
+          {fine ? 'Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.' : 'Stuknij, aby obracać. Stuknij drzwi, aby je otworzyć.'}
+        </p>
       </div>
 
       <aside className={styles.xrayPanel}>

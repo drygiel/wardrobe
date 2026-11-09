@@ -13,6 +13,7 @@
     "transform": "tsx scripts/transform.ts",
     "atlas": "tsx scripts/atlas.ts",
     "bake": "tsx scripts/blender.ts scripts/bake.py && yarn atlas",
+    "bake:frame": "tsx scripts/blender.ts scripts/bake.py --frame && yarn atlas",
     "export:model": "tsx scripts/blender.ts scripts/export.py"
   },
   "dependencies": {

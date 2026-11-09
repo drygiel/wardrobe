@@ -2,55 +2,118 @@
     position: relative;
     z-index: 1;
     margin-top: var(--section);
-    min-height: 100svh;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    padding: 40px var(--m) 24px;
-    background: var(--ink);
-    color: var(--bg);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px var(--gap);
+    padding: 48px var(--m) 32px;
+    background: var(--bg);
+    view-timeline-name: --footer;
+
+    // The strip in its channel
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: var(--m);
+        right: var(--m);
+        height: 2px;
+        background: #ffd9a0;
+        box-shadow:
+            0 0 6px 1px var(--accent),
+            0 2px 28px 3px rgb(240 179 90 / 45%);
+    }
+
+    // Its light falling on the band below; the ends fade because the strip stops short of the edges
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0 0 auto;
+        height: 100%;
+        background: linear-gradient(rgb(240 179 90 / 15%), transparent 85%);
+        mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+        pointer-events: none;
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    a {
+        text-decoration: none;
+        transition: color 160ms;
+
+        &:hover {
+            color: #fff;
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-decoration-thickness: 1px;
+            text-underline-offset: 4px;
+        }
+    }
 }
 
-.cols {
+// The strip dims up as the page reaches its end; where this is unsupported it is simply on
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .footer::before,
+        .footer::after {
+            animation: dim-up linear both;
+            animation-timeline: --footer;
+            animation-range: entry 0% entry 100%;
+        }
+    }
+}
+
+@keyframes dim-up {
+    from {
+        opacity: 0.08;
+    }
+}
+
+.name {
+    font-family: var(--font-display);
+    font-size: var(--step-lead);
+}
+
+.brand p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: var(--step-small);
+}
+
+.links {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--gap);
+    gap: 6px;
+    justify-items: end;
 
     ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 4px 28px;
         list-style: none;
     }
-
-    li:first-child {
-        font-weight: 600;
-    }
-
-    li:not(:first-child) {
-        color: #4d473f;
-    }
-
-    a:hover {
-        color: var(--bg);
-    }
 }
 
-.mark {
-    width: 100%;
-    height: auto;
-
-    text {
-        fill: var(--bg);
-        font: 500 168px var(--font-display);
-    }
-}
-
-.legal {
-    margin-top: 20px;
+.files {
+    color: var(--muted);
     font-size: var(--step-small);
-    color: #4d473f;
 }
 
 @media (max-width: 767px) {
-    .cols {
-        grid-template-columns: 1fr 1fr;
-        row-gap: 32px;
+    .footer {
+        padding-top: 36px;
+    }
+
+    .links {
+        justify-items: start;
+
+        ul {
+            justify-content: flex-start;
+            gap: 4px 20px;
+        }
     }
 }

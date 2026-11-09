@@ -1,39 +1,42 @@
+// A single row between the sections around it
 .section {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
+    grid-template-columns: 5fr 7fr;
+    align-items: center;
     column-gap: var(--gap);
-    align-content: center;
-    min-height: 100svh; // the showcase's fixed canvas must not show past a shorter section
-    padding: 0 var(--m);
+    padding: var(--section) var(--m) 0;
     background: var(--bg);
 
     h2 {
-        grid-column: 1 / 7;
         font-size: var(--step-head);
     }
 
     div {
-        grid-column: 7 / 13;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--gap);
     }
 
     p {
         max-width: 44ch;
-        margin-bottom: 24px;
+    }
+
+    a {
+        flex: none;
     }
 }
 
 @media (max-width: 767px) {
     .section {
         grid-template-columns: 1fr;
+        row-gap: 16px;
 
-        > * {
-            grid-column: 1 !important;
-        }
-
-        h2 {
-            margin-bottom: 24px;
+        div {
+            display: grid;
+            justify-items: start;
         }
     }
 }

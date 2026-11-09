@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 
-// Runs a Python script in headless Blender on the scene set in .env: `tsx scripts/blender.ts scripts/bake.py`
+// Runs a Python script in headless Blender on the scene set in .env: `tsx scripts/blender.ts scripts/bake.py [--flags]`;
+// flags after the script reach it in sys.argv
 try {
   process.loadEnvFile();
 } catch {
@@ -12,7 +13,7 @@ if (!BLENDER || !BLEND_FILE)
 
 const { status, error } = spawnSync(
   BLENDER,
-  ['-b', BLEND_FILE, '--python-exit-code', '1', '-P', process.argv[2]],
+  ['-b', BLEND_FILE, '--python-exit-code', '1', '-P', process.argv[2], '--', ...process.argv.slice(3)],
   {
     stdio: 'inherit',
   },

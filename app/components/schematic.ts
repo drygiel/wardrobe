@@ -38,6 +38,11 @@ export const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t +
 // Frame-rate independent approach factor
 export const damp = (lambda: number, dt: number) => 1 - Math.exp(-lambda * Math.min(dt, 0.1));
 
+const STILL = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// A slow drift of a few degrees for a camera at rest, so the model reads as 3D and not as a picture; degrees for az and el
+export const drift = (seconds: number) => (STILL ? null : { az: Math.sin(seconds * 0.35) * 4, el: Math.sin(seconds * 0.23) * 1.5 });
+
 // Camera distance that fits a box of the given half extents into the visible fraction of the viewport
 export function fitDistance(camera: THREE.PerspectiveCamera, halfW: number, halfH: number, fracW: number, fracH: number) {
   const tan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));

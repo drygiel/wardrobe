@@ -6,8 +6,13 @@
 # 4. Edges and inner faces of the fronts, doors open at the end of their clips.
 # Each bake is one temporary joined copy: Blender bakes selected objects one by one and walks the whole
 # 8K image for each (~15 s apiece), while a joined copy takes the whole atlas in about a minute.
+# With --frame (`yarn bake:frame`) it bakes only the frame pieces P01-P14, alone in the scene and spread apart, into
+# Frame.jpg (4096x2048, same "Baked" UVs): the site shows them that way in the frame chapter.
+import re
+import sys
 import bpy
 import bmesh
+from mathutils import Vector
 
 if not bpy.app.background:
     raise SystemExit('scripts/bake.py hides and edits scene objects; run it headless with `yarn bake`')
@@ -105,6 +110,33 @@ def closed_side(o, i):
 def open_side(o, i):
     return i not in outer[o]
 
+
+if '--frame' in sys.argv:
+    pieces = [o for o in baked if re.match(r'P\d\d_', o.name)]
+    for o in view_layer.objects:
+        if o.type != 'LIGHT' and o not in pieces:
+            o.hide_render = True
+    # Spread the pieces as far as the site's frame chapter does (`apart` in app/home/HomeScene.tsx, glTF axes turned
+    # into Blender's), so no piece shades the joints of its neighbours
+    for o in pieces:
+        corners = [o.matrix_world @ Vector(c) for c in o.bound_box]
+        centre = sum(corners, Vector()) / 8
+        moved = o.matrix_world.copy()
+        moved.translation += Vector(((centre.x + 0.265) * 1.2, (centre.y - 1.14) * 0.2, (centre.z - 1.33) * 0.14))
+        o.matrix_world = moved
+    atlas = bpy.data.images['Baked']
+    target = bpy.data.images.new('BakedFrame', 4096, 2048, alpha=False)
+    # The bake writes into each material's active image node; point those at the new image (never saved to the .blend)
+    for material in {m for o in pieces for m in o.data.materials if m and m.node_tree}:
+        node = material.node_tree.nodes.active
+        if node and node.type == 'TEX_IMAGE' and node.image == atlas:
+            node.image = target
+    bake(pieces, use_clear=True, margin=4)
+    target.file_format = 'JPEG'
+    path = bpy.path.abspath('//wardrobe/public/models/Frame.jpg')
+    target.save(filepath=path, quality=95)
+    print('Saved', path)
+    sys.exit(0)
 
 hidden_in_step1 = (fronts | {o for o in wardrobe if carried_by_front(o)}) - electric
 for o in hidden_in_step1:

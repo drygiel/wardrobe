@@ -1,0 +1,192 @@
+.page {
+    padding: clamp(32px, 6vw, 80px) 0 0;
+}
+
+.intro {
+    padding: 0 var(--m);
+    max-width: 52rem;
+
+    h1 {
+        font-size: clamp(2.75rem, 1.2rem + 4.4vw, 6rem);
+    }
+
+    p {
+        margin-top: 20px;
+        color: var(--muted);
+        max-width: 34rem;
+    }
+}
+
+// A tall section whose drawing stays pinned while the scroll drives it
+.scrub {
+    position: relative;
+    height: 260svh;
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+    padding: 0 var(--m);
+}
+
+.text {
+    h2 {
+        font-size: var(--step-head);
+    }
+
+    p {
+        margin-top: 18px;
+        color: var(--muted);
+    }
+}
+
+.readout {
+    display: flex;
+    flex-direction: column;
+
+    span {
+        font-size: var(--step-small);
+    }
+
+    b {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        color: var(--ink);
+        line-height: 1.1;
+    }
+}
+
+.note {
+    font-size: var(--step-small);
+}
+
+.drawing {
+    width: 100%;
+    max-height: 82svh;
+    overflow: hidden;
+
+    * {
+        vector-effect: non-scaling-stroke;
+    }
+
+    pattern line {
+        stroke: var(--muted);
+        stroke-width: 0.6;
+    }
+}
+
+.cut {
+    fill: url(#hatch);
+    stroke: var(--ink);
+    stroke-width: 1;
+}
+
+.part {
+    fill: var(--bg);
+    stroke: var(--ink);
+    stroke-width: 1;
+}
+
+.door {
+    fill: var(--bg);
+    stroke: var(--ink);
+    stroke-width: 1.5;
+}
+
+.link {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.pin {
+    fill: var(--bg);
+    stroke: var(--ink);
+    stroke-width: 1;
+}
+
+.label {
+    polyline,
+    line {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 0.75;
+    }
+
+    text {
+        fill: var(--muted);
+        font-size: 4.6px;
+        font-family: var(--font-text);
+    }
+}
+
+// A drawing in whole-drawer scale needs bigger figures than the hinge close-up
+.large .label text {
+    font-size: 17px;
+}
+
+.tables {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: clamp(32px, 5vw, 72px);
+    padding: var(--section) var(--m) 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+
+    caption {
+        margin-bottom: 16px;
+        text-align: left;
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
+    }
+
+    th,
+    td {
+        padding: 10px 12px 10px 0;
+        border-top: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+        text-align: left;
+        font-weight: 400;
+    }
+
+    thead th {
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+}
+
+@media (max-width: 767px) {
+    .sticky {
+        grid-template-columns: 1fr;
+        align-content: center;
+        gap: 12px;
+    }
+
+    .drawing {
+        order: -1;
+        max-height: 52svh;
+    }
+
+    .text p:not(.readout) {
+        font-size: var(--step-small);
+    }
+
+    // The drawings shrink to a third on a phone; the figures must not
+    .label text {
+        font-size: 8px;
+    }
+
+    .large .label text {
+        font-size: 30px;
+    }
+}

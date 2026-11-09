@@ -138,6 +138,46 @@ h3 {
     }
 }
 
+// A fingertip sliding to and fro over a track, set before the words that ask for a drag
+.drag-cue {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 12px;
+    margin-right: 10px;
+    vertical-align: -1px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: currentColor;
+        opacity: 0.5;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 1px;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        border: 1.5px solid var(--ink);
+        border-radius: 50%;
+        background: var(--bg);
+        animation: drag-cue 1.8s var(--ease) infinite alternate;
+    }
+}
+
+@keyframes drag-cue {
+    to {
+        transform: translateX(20px);
+    }
+}
+
 .link {
     border: 0;
     background: none;

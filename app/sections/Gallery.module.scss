@@ -57,7 +57,7 @@
         aspect-ratio: 16 / 10;
         object-fit: cover;
         filter: brightness(0.55);
-        transition: filter 300ms;
+        transition: filter 150ms;
     }
 
     button:hover img,
@@ -122,6 +122,10 @@
     :global(.image-gallery-slide .image-gallery-image) {
         max-height: 100vh !important;
         object-fit: contain;
+    }
+
+    :global(.image-gallery-icon) {
+        transition-duration: 150ms; // the library's 300 ms feels slow
     }
 
     :global(.image-gallery-icon:hover) {

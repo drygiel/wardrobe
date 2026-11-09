@@ -7,6 +7,8 @@ export const HARDWARE_GLB = `${base}models/Hardware.glb`;
 // Desktops get the 8K atlas; phones and headsets keep 4K (about 43 MB of GPU memory instead of 170 MB)
 const desktop = window.matchMedia('(pointer: fine) and (min-width: 1024px)').matches && !/OculusBrowser|Quest/.test(navigator.userAgent);
 export const ATLAS = `${base}models/Wardrobe${desktop ? '-8k' : ''}.webp`;
+// The frame baked alone (`yarn bake:frame`), same UVs as the atlas, for the home page's frame chapter
+export const FRAME_ATLAS = `${base}models/Frame.webp`;
 
 export const RENDER_COUNT = 33;
 export const renderSmall = (n: number) => `${base}images/s/${n}.webp`;

@@ -5,7 +5,7 @@
 }
 
 .page {
-    padding: clamp(32px, 6vw, 80px) var(--m) var(--section);
+    padding: clamp(32px, 6vw, 80px) var(--m) 0; // the footer's margin spaces the end
 
     h1 {
         font-size: var(--step-head);
@@ -32,7 +32,7 @@
         padding: 0;
         background: none;
         cursor: zoom-in;
-        transition: border-radius 200ms, outline-color 200ms;
+        transition: border-radius 150ms, outline-color 150ms;
 
         &:hover,
         &:focus-visible {
@@ -51,6 +51,6 @@
         height: auto;
         aspect-ratio: 16 / 10;
         object-fit: cover;
-        transition: transform 350ms var(--ease);
+        transition: transform 150ms var(--ease);
     }
 }

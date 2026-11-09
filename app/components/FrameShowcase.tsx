@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import type { GLTF } from 'three-stdlib';
 import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece } from '@/assets';
-import { damp, easeInOut, fitDistance, moveCamera, type Pose, poseAt, type ShowcaseProgress, smoothstep } from './schematic';
+import { damp, drift, easeInOut, fitDistance, moveCamera, type Pose, poseAt, type ShowcaseProgress, smoothstep } from './schematic';
 
 type Result = GLTF & { nodes: Record<string, THREE.Mesh> };
 
@@ -120,6 +120,12 @@ export function FrameShowcase({ progress }: { progress: RefObject<ShowcaseProgre
     pose.dist *= fit;
     // Keep the model clear of the step list: below it on desktop, above it on phones
     pose.ty += (narrow ? -0.5 : 0.6) * smoothstep(0, 1, T) * (fit / 7);
+    const sway = drift(state.clock.elapsedTime);
+    if (sway) {
+      pose.az += sway.az;
+      pose.el += sway.el;
+      moving = true;
+    }
     if (moveCamera(camera, look.current, CENTER, pose, dt, state.clock.elapsedTime < 0.2)) moving = true;
 
     if (moving) invalidate();
