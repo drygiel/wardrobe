@@ -55,7 +55,7 @@ export const groupOf = (name: string): GroupId => {
 // Columns ("słupki") along model z, front view left to right; dividers taken at their centres
 export const COLUMNS = { A: [-2.688, -2.28], B: [-2.28, -1.054], C: [-1.054, -0.694], D: [-0.694, 0] } as const;
 export type Column = keyof typeof COLUMNS;
-const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
+export const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
 const DOOR_COLUMN: Record<string, Column> = { F01: 'B', F02: 'B', F03: 'B', F04: 'B', F05: 'C', F06: 'D', F07: 'D' };
 
 const columnCache = new WeakMap<THREE.Object3D, Column[]>();

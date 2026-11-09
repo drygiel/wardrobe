@@ -41,7 +41,7 @@ export default function Editor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => selection.refocus(), [app.hidden, app.hiddenParts, app.column, app.grain]);
+  useEffect(() => selection.refocus(), [app.hidden, app.hiddenParts, app.columns, app.grain]);
 
   // Only on the switch: a link opened in the render mode may carry a selection of its own
   const wasMeasuring = useRef(app.wireframe);
@@ -121,28 +121,35 @@ export default function Editor() {
             </div>
           </div>
           <div className={styles.toolsEnd}>
-            <div className={styles.seg} role="group" aria-label="Model">
-              <button aria-pressed={app.grain} onClick={() => app.setGrain(g => !g)}><Icon name="grain" />Słoje</button>
-              <button aria-pressed={open} title={open ? 'Zamknij drzwi i szuflady' : 'Otwórz drzwi i szuflady'} onClick={toggleOpen}>
-                <Icon name={open ? 'close' : 'open'} />{open ? 'Zamknij wszystko' : 'Otwórz wszystko'}
-              </button>
-            </div>
             <div className={`${styles.seg} ${styles.pair}`} role="group" aria-label="Prezentacja">
               <button aria-pressed={isFullscreen} onClick={fullscreen}><Icon name="fullscreen" />Pełny ekran</button>
               <button onClick={() => app.xr.enterAR()}><Icon name="ar" />AR</button>
               <button onClick={() => app.xr.enterVR()}><Icon name="vr" />VR</button>
             </div>
+            {app.isolated && (
+              <div className={styles.seg}>
+                <button className={styles.exitIsolation} onClick={app.exitIsolation}><Icon name="undo" />Wyjść z izolacji</button>
+              </div>
+            )}
           </div>
         </div>
 
-        <p className={styles.status} aria-live="polite">
-          {app.wireframe && (
-            <span>
-              Krawędź <b ref={app.readout}>–</b>
-            </span>
-          )}
-          <span className={styles.keys}>M pomiar · S słoje · 1–4 widoki · klik przypina · Esc odpina</span>
-        </p>
+        <div className={styles.corner}>
+          <div className={styles.seg} role="group" aria-label="Model">
+            <button aria-pressed={app.grain} onClick={() => app.setGrain(g => !g)}><Icon name="grain" />Słoje</button>
+            <button aria-pressed={open} title={open ? 'Zamknij drzwi i szuflady' : 'Otwórz drzwi i szuflady'} onClick={toggleOpen}>
+              <Icon name={open ? 'close' : 'open'} />{open ? 'Zamknij wszystko' : 'Otwórz wszystko'}
+            </button>
+          </div>
+          <p className={styles.status} aria-live="polite">
+            {app.wireframe && (
+              <span>
+                Krawędź <b ref={app.readout}>–</b>
+              </span>
+            )}
+            <span className={styles.keys}>M pomiar · S słoje · 1–4 widoki · klik przypina · Esc odpina</span>
+          </p>
+        </div>
       </main>
 
       <aside className={styles.insp} aria-label="Inspektor elementu" aria-live="polite">

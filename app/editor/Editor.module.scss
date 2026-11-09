@@ -419,6 +419,18 @@
     }
 }
 
+// The same call to action as .soloOn in the list
+.seg .exitIsolation {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+
+    &:hover {
+        background: #f7c98a;
+        color: var(--bg);
+    }
+}
+
 .seg {
     display: inline-grid;
     grid-auto-flow: column;
@@ -461,11 +473,20 @@
     }
 }
 
-.status {
+// One stack, so the buttons ride above the status line however many rows it wraps to; `right` keeps clear of the gizmo
+.corner {
     position: absolute;
     left: 16px;
     right: 180px;
     bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.status {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 20px;
@@ -719,7 +740,7 @@
         display: none;
     }
 
-    .status {
+    .corner {
         left: 12px;
         bottom: 10px;
     }

@@ -8,6 +8,9 @@ import type * as THREE from 'three';
 export type SceneView = 'initial' | 'left-side' | 'front' | 'side' | 'side-z' | 'top' | 'last-3d';
 export type Unit = 'mm' | 'cm';
 
+type Visibility = { hidden: ReadonlySet<GroupId>; hiddenParts: ReadonlySet<string> };
+type Isolation = Visibility & { key: string; before: Visibility }; // key: the list row that asked for it
+
 const UNIT_KEY = 'wardrobe.unit';
 
 const storedUnit = (): Unit => {
@@ -41,7 +44,8 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     () => new Set([...HIDDEN_GROUPS, ...(initial?.hideFronts ? (['fronts'] as const) : [])]),
   );
   const [hiddenParts, setHiddenParts] = useState<ReadonlySet<string>>(() => new Set());
-  const [column, setColumn] = useState<Column | null>(null);
+  const [isolation, setIsolation] = useState<Isolation | null>(null);
+  const [columns, setColumns] = useState<ReadonlySet<Column>>(() => new Set()); // none chosen: the whole wardrobe
   const [grain, setGrain] = useState(false);
   // The editor remembers its unit; the pages around it always say centimetres
   const [unit, setUnitState] = useState<Unit>(() => (initial?.rememberUnit ? storedUnit() : 'cm'));
@@ -92,8 +96,32 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
       return next;
     });
 
+  // Any other change of visibility makes new sets, and then there is nothing left to exit
+  const isolated = isolation?.hidden === hidden && isolation.hiddenParts === hiddenParts ? isolation : null;
+
+  // Going from one isolation to another still comes back to what was there before the first
+  const isolate = (key: string, nextHidden: ReadonlySet<GroupId>, nextParts: ReadonlySet<string>) => {
+    setIsolation({ key, hidden: nextHidden, hiddenParts: nextParts, before: isolated?.before ?? { hidden, hiddenParts } });
+    setHidden(nextHidden);
+    setHiddenParts(nextParts);
+  };
+
+  const exitIsolation = () => {
+    if (!isolated) return;
+    setIsolation(null);
+    setHidden(isolated.before.hidden);
+    setHiddenParts(isolated.before.hiddenParts);
+  };
+
+  const toggleColumn = (id: Column) =>
+    setColumns(current => {
+      const next = new Set(current);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+
   const shown = (node: THREE.Object3D) =>
-    !hidden.has(groupOf(node.name)) && !hiddenParts.has(node.name) && (!column || columnsOf(node).includes(column));
+    !hidden.has(groupOf(node.name)) && !hiddenParts.has(node.name) && (!columns.size || columnsOf(node).some(id => columns.has(id)));
 
   return {
     grid,
@@ -107,14 +135,18 @@ const useAppStore = (initial?: Partial<AppContextInitial>) => {
     toggleGroup,
     hiddenParts,
     setHiddenParts,
+    isolated,
+    isolate,
+    exitIsolation,
     grain,
     setGrain,
     unit,
     setUnit,
     hideFronts: hidden.has('fronts'),
     electric: !hidden.has('electric'),
-    column,
-    setColumn,
+    columns,
+    setColumns,
+    toggleColumn,
     shown,
     layer,
     setLayer,

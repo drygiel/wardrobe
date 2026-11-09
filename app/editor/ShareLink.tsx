@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { OrbitControls } from 'three-stdlib';
-import { type Column, COLUMNS, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
+import { type Column, COLUMN_NAMES, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
 import { editorGoal, fitZoom } from '@/components/Scene';
 import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useCatalog } from './catalog';
@@ -26,6 +26,7 @@ export function readLink() {
   const query = new URLSearchParams(location.search);
   const zoom = Number(query.get('zoom'));
   const hide = list(query.get('hide'));
+  const columns = list(query.get('col'));
   return {
     view: ORTHO_VIEWS.find(view => view === query.get('view')),
     position: vector(query.get('pos')),
@@ -33,7 +34,7 @@ export function readLink() {
     zoom: Number.isFinite(zoom) && zoom > 0 ? zoom : undefined,
     wireframe: query.get('mode') !== 'render',
     grain: query.has('grain'),
-    column: (Object.keys(COLUMNS) as Column[]).find(column => column === query.get('col')),
+    columns: columns?.length && columns.every(id => COLUMN_NAMES.includes(id as Column)) ? (columns as Column[]) : undefined,
     hidden: hide?.every(id => GROUPS.some(group => group.id === id)) ? (hide as GroupId[]) : undefined,
     off: list(query.get('off')),
     only: list(query.get('only')),
@@ -54,7 +55,7 @@ export function ShareLink() {
     lastWrite.current = performance.now(); // lets the state set below land before the first write
     const link = readLink();
     if (link.grain) app.setGrain(true);
-    if (link.column) app.setColumn(link.column);
+    if (link.columns) app.setColumns(new Set(link.columns));
     if (link.hidden) app.setHidden(new Set(link.hidden));
     const hidden = new Set(link.hidden ?? [...HIDDEN_GROUPS, 'fronts']);
     if (link.off) app.setHiddenParts(new Set(link.off));
@@ -102,7 +103,7 @@ export function ShareLink() {
     set('zoom', ortho && Math.abs(zoom - fitZoom(app.view, size.width / size.height)) > 0.002 ? String(round(zoom)) : null);
     set('mode', app.wireframe ? null : 'render');
     set('grain', app.grain ? '1' : null);
-    set('col', app.column);
+    set('col', COLUMN_NAMES.filter(id => app.columns.has(id)).join() || null);
     set('hide', hide === DEFAULT_HIDDEN ? null : hide);
     set('off', hiddenParts.length && !useOnly ? hiddenParts.join() : null);
     set('only', useOnly ? shown.join() : null);

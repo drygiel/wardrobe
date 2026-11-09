@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { COLUMNS, type Column, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
+import { COLUMN_NAMES, COLUMNS, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
 import { type Part, rootOf, useCatalog } from './catalog';
 import { selection, useSelection } from './selection';
 import styles from './Editor.module.scss';
@@ -18,12 +18,7 @@ const SWATCH: Record<GroupId, string> = {
   electric: '#e8352c',
 };
 
-const COLUMN_NAMES = Object.keys(COLUMNS) as Column[];
-
 type TreeNode = { key: string; label: string; group: GroupId; names: string[]; children: TreeNode[]; part?: Part };
-
-type Visibility = { hidden: ReadonlySet<GroupId>; hiddenParts: ReadonlySet<string> };
-type Soloed = Visibility & { key: string; before: Visibility };
 
 // Group > folders > parts. Empty groups disappear, so a search or a column filter leaves only what matches
 function buildTree(parts: Part[]) {
@@ -56,20 +51,17 @@ export function Sidebar() {
   const { pinned } = useSelection();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
-  const [soloed, setSoloed] = useState<Soloed | null>(null);
   const treeRef = useRef<HTMLUListElement>(null);
-  // Any other change of visibility makes new sets, and then there is nothing left to undo
-  const soloActive = soloed?.hidden === app.hidden && soloed.hiddenParts === app.hiddenParts ? soloed : null;
 
   const q = query.trim().toLowerCase();
   const tree = useMemo(
     () =>
       buildTree(
         catalog.parts.filter(
-          p => (!app.column || p.columns.includes(app.column)) && (!q || p.label.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)),
+          p => (!app.columns.size || p.columns.some(id => app.columns.has(id))) && (!q || p.label.toLowerCase().includes(q) || p.name.toLowerCase().includes(q)),
         ),
       ),
-    [catalog, app.column, q],
+    [catalog, app.columns, q],
   );
 
   // A part pinned in the model opens its folders and scrolls into view
@@ -81,7 +73,7 @@ export function Sidebar() {
   }, [pinned, catalog]);
 
   // A filter can remove the row under the cursor, and then no leave event comes
-  useEffect(() => selection.hoverGroup([]), [q, app.column]);
+  useEffect(() => selection.hoverGroup([]), [q, app.columns]);
 
   const groupOfPart = (name: string) => catalog.byName.get(name)!.group;
   const isOn = (name: string) => !app.hidden.has(groupOfPart(name)) && !app.hiddenParts.has(name);
@@ -110,16 +102,7 @@ export function Sidebar() {
     const groups = new Set(node.names.map(groupOfPart));
     const hidden = new Set(GROUPS.map(g => g.id).filter(id => !groups.has(id)));
     const hiddenParts = new Set(catalog.parts.filter(p => groups.has(p.group) && !node.names.includes(p.name)).map(p => p.name));
-    // Going from one "only" to another still comes back to what was there before the first
-    setSoloed({ key: node.key, hidden, hiddenParts, before: soloActive?.before ?? { hidden: app.hidden, hiddenParts: app.hiddenParts } });
-    app.setHidden(hidden);
-    app.setHiddenParts(hiddenParts);
-  };
-
-  const undoSolo = ({ before }: Soloed) => {
-    setSoloed(null);
-    app.setHidden(before.hidden);
-    app.setHiddenParts(before.hiddenParts);
+    app.isolate(node.key, hidden, hiddenParts);
   };
 
   const reset = (hidden: GroupId[]) => {
@@ -193,8 +176,8 @@ export function Sidebar() {
             </button>
           )}
           {folder && <small className={styles.count}>{node.names.length}</small>}
-          {soloActive?.key === node.key ? (
-            <button className={`${styles.solo} ${styles.soloOn}`} aria-label={`Cofnij pokazywanie tylko: ${node.label}`} onClick={() => undoSolo(soloActive)}>
+          {app.isolated?.key === node.key ? (
+            <button className={`${styles.solo} ${styles.soloOn}`} aria-label={`Cofnij pokazywanie tylko: ${node.label}`} onClick={app.exitIsolation}>
               Cofnij
             </button>
           ) : (
@@ -212,18 +195,18 @@ export function Sidebar() {
     <>
       <section className={styles.block} aria-labelledby="columns-h">
         <header className={styles.blockHead}>
-          <h2 id="columns-h">Słupek</h2>
-          <button className={styles.textButton} disabled={!app.column} onClick={() => app.setColumn(null)}>Cała szafa</button>
+          <h2 id="columns-h">Słupki</h2>
+          <button className={styles.textButton} disabled={!app.columns.size} onClick={() => app.setColumns(new Set())}>Cała szafa</button>
         </header>
         {/* Button widths follow the real column widths */}
         <div className={styles.columns}>
           {COLUMN_NAMES.map(name => (
             <button
               key={name}
-              aria-pressed={app.column === name}
+              aria-pressed={app.columns.has(name)}
               aria-label={`Słupek ${name}`}
               style={{ flexGrow: COLUMNS[name][1] - COLUMNS[name][0] }}
-              onClick={() => app.setColumn(app.column === name ? null : name)}
+              onClick={() => app.toggleColumn(name)}
             >
               {name}
             </button>

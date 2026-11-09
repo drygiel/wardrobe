@@ -13,6 +13,7 @@ const PATHS = {
   ar: 'M2 5V2h3M11 2h3v3M14 11v3h-3M5 14H2v-3M8 4.75l2.75 1.6v3.3L8 11.25l-2.75-1.6v-3.3ZM5.25 6.35 8 7.95l2.75-1.6M8 7.95v3.3',
   vr: 'M1.5 4.5h13v7H10.5L9 9.5H7l-1.5 2H1.5ZM4.75 7.5h1M10.25 7.5h1',
   pin: 'M5 2h6M6 2v5l-2 3h8l-2-3V2M8 10v4.5',
+  undo: 'M6 2.5 2.5 6 6 9.5M2.5 6h7a3.75 3.75 0 0 1 0 7.5H6',
 };
 
 export type IconName = keyof typeof PATHS;
