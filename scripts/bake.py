@@ -12,6 +12,7 @@ import re
 import sys
 import bpy
 import bmesh
+import numpy as np
 from mathutils import Vector
 
 if not bpy.app.background:
@@ -21,6 +22,7 @@ OPEN_FRAME = 40  # the door clips end fully open
 MARGIN = 16
 # Parts baked over step 1 must not bleed into other islands: the closest gap between islands is ~12 px at 8096x4096.
 OVER_MARGIN = 6
+RING = 12  # texels around a joint that set the brightness of the texels it covers
 SLIDE = 0.7  # drawers slide out by this share of their depth, as in app/components/parts.ts
 
 scene = bpy.context.scene
@@ -49,6 +51,7 @@ for o in baked:
 panels = [o for o in baked if o in fronts and not o.name.endswith('_Handle')]
 handles = [o for o in baked if o.name.endswith('_Handle')]
 drawers = [o for o in baked if o.name.startswith('DR_')]
+leds = set(bpy.data.collections['5_LED'].all_objects)
 
 
 def carried_by_front(o):
@@ -73,7 +76,7 @@ for o in panels:
     bpy.data.meshes.remove(mesh)
 
 
-def bake(objs, use_clear, margin, keep=None, slide=0.0):
+def bake(objs, use_clear, margin, keep=None, slide=0.0, type='COMBINED', **options):
     """Bakes one joined copy of objs; keep(o, face_index) limits which faces of o get baked, slide moves them to the front (-X)."""
     copies = []
     for o in objs:
@@ -96,11 +99,150 @@ def bake(objs, use_clear, margin, keep=None, slide=0.0):
     bpy.ops.object.join()
     joined = view_layer.objects.active
     joined.data.uv_layers.active = joined.data.uv_layers['Baked']
-    bpy.ops.object.bake(type='COMBINED', target='IMAGE_TEXTURES', use_selected_to_active=False,
-                        use_clear=use_clear, margin=margin, margin_type='ADJACENT_FACES')
+    bpy.ops.object.bake(type=type, target='IMAGE_TEXTURES', use_selected_to_active=False,
+                        use_clear=use_clear, margin=margin, margin_type='ADJACENT_FACES', **options)
     bpy.data.objects.remove(joined)
     for o in objs:
         o.hide_render = False
+
+
+def world_box(o):
+    corners = [o.matrix_world @ Vector(c) for c in o.bound_box]
+    return Vector(min(c[i] for c in corners) for i in range(3)), Vector(max(c[i] for c in corners) for i in range(3))
+
+
+def touch(a, b, tol=0.001):
+    return all(a[0][i] - tol <= b[1][i] and b[0][i] - tol <= a[1][i] for i in range(3))
+
+
+def box(values, radius):
+    """Sum of values over a (2 radius + 1) square around each texel."""
+    total = np.asarray(values, np.float64)
+    for axis in (0, 1):
+        size = total.shape[axis]
+        running = np.concatenate([np.zeros_like(np.take(total, [0], axis=axis)), np.cumsum(total, axis=axis)], axis=axis)
+        index = np.arange(size)
+        total = np.take(running, np.minimum(index + radius + 1, size), axis=axis) - np.take(running, np.maximum(index - radius, 0), axis=axis)
+    return total
+
+
+def pixels(image):
+    flat = np.empty(len(image.pixels), np.float32)
+    image.pixels.foreach_get(flat)
+    return flat.reshape(-1, 4)
+
+
+def probe(image):
+    """A material that glows only where a ray from a baked texel lands inside another part: on a back face, or on a
+    face lying right on the texel (two boards that share a plane). Its diffuse bake is the share of covered rays."""
+    material = bpy.data.materials.new('ContactProbe')
+    material.use_nodes = True
+    tree = material.node_tree
+    tree.nodes.clear()
+    geometry = tree.nodes.new('ShaderNodeNewGeometry')
+    path = tree.nodes.new('ShaderNodeLightPath')
+    close = tree.nodes.new('ShaderNodeMath')
+    close.operation = 'LESS_THAN'
+    close.inputs[1].default_value = 0.001  # boards up to 1 mm apart count as touching
+    inside = tree.nodes.new('ShaderNodeMath')
+    inside.operation = 'MAXIMUM'
+    glow = tree.nodes.new('ShaderNodeEmission')
+    add = tree.nodes.new('ShaderNodeAddShader')
+    output = tree.nodes.new('ShaderNodeOutputMaterial')
+    tree.links.new(path.outputs['Ray Length'], close.inputs[0])
+    tree.links.new(geometry.outputs['Backfacing'], inside.inputs[0])
+    tree.links.new(close.outputs[0], inside.inputs[1])
+    tree.links.new(inside.outputs[0], glow.inputs['Strength'])
+    tree.links.new(tree.nodes.new('ShaderNodeBsdfDiffuse').outputs[0], add.inputs[0])
+    tree.links.new(glow.outputs[0], add.inputs[1])
+    tree.links.new(add.outputs[0], output.inputs['Surface'])
+    target = tree.nodes.new('ShaderNodeTexImage')
+    target.image = image
+    target.select = True
+    tree.nodes.active = target
+    return material
+
+
+def uncover(receivers, margin, keep=None):
+    """Bakes again the texels of receivers that a touching part covers (black in the atlas), as if that part were gone.
+
+    A probe bake marks the covered texels (their rays start inside the touching part); the receivers are then baked
+    in groups that do not touch each other, with the parts touching them hidden, and only the marked texels are copied
+    into the atlas. Every other texel keeps its normal bake, contact shadows next to the joints included."""
+    atlas = bpy.data.images['Baked']
+    width, height = atlas.size
+    nodes = [m.node_tree.nodes.active for m in bpy.data.materials if m.node_tree]
+    nodes = [n for n in nodes if n and n.type == 'TEX_IMAGE' and n.image == atlas]
+    view_layer.update()  # drops the joined copies that bake() removed
+    visible = [o for o in view_layer.objects if o.type == 'MESH' and not o.hide_render]
+    # LED strips stay: hiding a light would darken the very texels being fixed
+    blockers = [o for o in visible if o not in leds]
+    boxes = {o: world_box(o) for o in visible}
+    near = {o: {b for b in blockers if b != o and touch(boxes[o], boxes[b])} for o in receivers}
+    receivers = sorted((o for o in receivers if near[o]), key=lambda o: -len(near[o]))
+    groups = []
+    for o in receivers:
+        group = next((g for g in groups if not any(m in near[o] or o in near[m] for m in g)), None)
+        if group is None:
+            groups.append(group := [])
+        group.append(o)
+
+    mask = bpy.data.images.new('ContactMask', width, height, alpha=False)
+    mask.colorspace_settings.is_data = True
+    lit = bpy.data.images.new('Uncovered', width, height, alpha=False)
+    lit.colorspace_settings.name = atlas.colorspace_settings.name
+
+    material = probe(mask)
+    swapped, added = [], []
+    for o in visible:
+        if not o.material_slots:
+            o.data.materials.append(None)
+            added.append(o)
+        for slot in o.material_slots:
+            swapped.append((slot, slot.material))
+            slot.material = material
+    world, samples, bounces = scene.world, scene.cycles.samples, scene.cycles.max_bounces
+    scene.world, scene.cycles.samples, scene.cycles.max_bounces = None, 32, 1
+    bake(receivers, use_clear=True, margin=margin, keep=keep, type='DIFFUSE', pass_filter={'DIRECT', 'INDIRECT'})
+    scene.world, scene.cycles.samples, scene.cycles.max_bounces = world, samples, bounces
+    for slot, original in swapped:
+        slot.material = original
+    for o in added:
+        o.data.materials.pop()
+    bpy.data.materials.remove(material)
+
+    for n in nodes:
+        n.image = lit
+    for group in groups:
+        hidden = set().union(*(near[o] for o in group))
+        for o in hidden:
+            o.hide_render = True
+        bake(group, use_clear=False, margin=margin, keep=keep)
+        for o in hidden:
+            o.hide_render = False
+    for n in nodes:
+        n.image = atlas
+
+    # Covered texels see the probe on nearly all rays; open ones right at a joint on well under half
+    weight = np.clip((pixels(mask)[:, 0] - 0.25) / 0.5, 0, 1)
+    merged, fresh = pixels(atlas), pixels(lit)
+    # With every touching part gone the fresh bake sees more light than its neighbours, so it takes the brightness of
+    # the open texels around each joint; a face covered whole has no such ring and keeps its own light
+    covered = (weight > 0).reshape(height, width)
+    ring = (~covered & (box(covered, RING) > 0)).ravel()
+    trust = np.clip(box(ring.reshape(height, width), RING).ravel() / (0.3 * (2 * RING + 1) ** 2), 0, 1)
+    rows = np.nonzero(weight)[0]
+    for c in range(3):
+        near_old = box(np.where(ring, merged[:, c], 0).reshape(height, width), RING).ravel()[rows]
+        near_new = box(np.where(ring, fresh[:, c], 0).reshape(height, width), RING).ravel()[rows]
+        gain = np.where(near_new > 1e-3, near_old / np.maximum(near_new, 1e-3), 1)
+        gain = 1 + (np.clip(gain, 0, 4) - 1) * trust[rows]
+        old = merged[rows, c]
+        merged[rows, c] = old + (fresh[rows, c] * gain - old) * weight[rows]
+    atlas.pixels.foreach_set(merged.ravel())
+    bpy.data.images.remove(mask)
+    bpy.data.images.remove(lit)
+    print(f'Uncovered {len(rows)} texels of {len(receivers)} parts in {len(groups)} bakes')
 
 
 def closed_side(o, i):
@@ -142,15 +284,18 @@ hidden_in_step1 = (fronts | {o for o in wardrobe if carried_by_front(o)}) - elec
 for o in hidden_in_step1:
     o.hide_render = True
 bake([o for o in baked if o not in fronts], use_clear=True, margin=MARGIN)
+uncover([o for o in baked if o not in fronts and o not in drawers], MARGIN)
 for drawer in drawers:
     bake([drawer], use_clear=False, margin=OVER_MARGIN, slide=drawer.dimensions.x * SLIDE)
 for o in hidden_in_step1:
     o.hide_render = False
 
 bake(panels + handles, use_clear=False, margin=OVER_MARGIN, keep=closed_side)
+uncover(panels + handles, OVER_MARGIN, keep=closed_side)
 
 scene.frame_set(OPEN_FRAME)
 bake(panels, use_clear=False, margin=OVER_MARGIN, keep=open_side)
+uncover(panels, OVER_MARGIN, keep=open_side)
 
 atlas = bpy.data.images['Baked']
 atlas.file_format = 'JPEG'
