@@ -149,7 +149,8 @@ export function PlanDrawing({ view }: { view: PlanView }) {
         const tx = horizontal ? (x1 + x2) / 2 : x1 + 70;
         const ty = horizontal ? y1 + (d.side === 'above' ? -45 : 120) : (y1 + y2) / 2;
         return (
-          <g key={i} className="dim">
+          // Keyed by view so the opening animation in global.scss replays for every drawing
+          <g key={`${view}-${i}`} className={horizontal ? 'dim' : 'dim v'}>
             <path d={`M${x1} ${y1}L${x2} ${y2}${tick(x1, y1)}${tick(x2, y2)}`} />
             <text x={tx} y={ty} transform={horizontal ? undefined : `rotate(-90 ${tx} ${ty})`}>
               {d.label}

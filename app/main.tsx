@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createBrowserRouter, Navigate, Outlet, ScrollRestoration } from 'react-router';
+import { createBrowserRouter, Navigate, Outlet, ScrollRestoration, type RouterNavigateOptions, type To } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import './global.scss';
 
@@ -35,5 +35,10 @@ const router = createBrowserRouter(
   ],
   { basename: import.meta.env.BASE_URL },
 );
+
+// Every page change runs as a view transition, styled in global.scss; in-page #hash jumps stay instant
+const navigate = router.navigate as (to: To | number | null, opts?: RouterNavigateOptions) => Promise<void>;
+router.navigate = ((to: To | number | null, opts?: RouterNavigateOptions) =>
+  navigate(to, typeof to === 'string' && to.startsWith('#') ? opts : { ...opts, viewTransition: true })) as typeof router.navigate;
 
 createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />);

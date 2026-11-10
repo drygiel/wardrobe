@@ -41,7 +41,7 @@ export default function PlanSection({ id = 'plan', title = 'Rysunek techniczny',
                 <span className={styles.name}>{row.name}</span>
                 <span className={styles.value}>{row.value}</span>
               </button>
-              {row.view === active && <p>{row.text}</p>}
+              <p>{row.text}</p>
             </li>
           ))}
         </ul>

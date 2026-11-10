@@ -93,10 +93,25 @@
             color: var(--ink);
         }
 
+        // Every description stays in the list, closed; the active one opens
         p {
             max-width: 40ch;
-            padding-bottom: 14px;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
             color: var(--ink);
+            // Lets height run from 0 to auto; where unsupported the text simply appears
+            interpolate-size: allow-keywords;
+            transition:
+                height 280ms var(--ease),
+                padding-bottom 280ms var(--ease),
+                visibility 280ms;
+        }
+
+        &.on p {
+            height: auto;
+            padding-bottom: 14px;
+            visibility: visible;
         }
     }
 

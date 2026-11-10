@@ -111,6 +111,39 @@ h3 {
     color: var(--accent-ink);
 }
 
+// Page change: the new page slides over the old one from the left, like a door closing across it
+::view-transition-old(root) {
+    animation: page-dim 420ms var(--ease) both;
+}
+
+::view-transition-new(root) {
+    animation: page-door 420ms var(--ease) both;
+}
+
+@keyframes page-dim {
+    to {
+        opacity: 0.35;
+    }
+}
+
+@keyframes page-door {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+
+    to {
+        clip-path: inset(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
 // Shared controls
 .btn {
     display: inline-flex;
@@ -157,6 +190,12 @@ h3 {
 
     &:active {
         transform: translateY(1px) scale(0.98);
+    }
+
+    // One corner cut at 45°, like the mitred ends of the frame boards; square where corner-shape is unknown
+    @supports (corner-shape: bevel) {
+        border-top-right-radius: 12px;
+        corner-shape: bevel;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -240,6 +279,46 @@ h3 {
     }
     &:nth-child(4) {
         transition-delay: 240ms;
+    }
+}
+
+// Dimension lines of a plan drawing open from their middle like a caliper, then the number inks in
+svg.plan .dim {
+    path {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: dim-open 700ms var(--ease) backwards;
+    }
+
+    &.v path {
+        animation-name: dim-open-v;
+    }
+
+    text {
+        animation: dim-ink 400ms 350ms backwards;
+    }
+}
+
+// Held until the section's text has scrolled in, so the opening is seen
+section:has(> .reveal:not(.in)) svg.plan .dim :is(path, text) {
+    animation-play-state: paused;
+}
+
+@keyframes dim-open {
+    from {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes dim-open-v {
+    from {
+        transform: scaleY(0);
+    }
+}
+
+@keyframes dim-ink {
+    from {
+        opacity: 0;
     }
 }
 
