@@ -125,16 +125,44 @@ h3 {
     font: 600 var(--step-body) / 1 var(--font-text);
     text-decoration: none;
     cursor: pointer;
+    position: relative;
     transition:
         transform 160ms var(--ease),
-        background-color 160ms;
+        background-color 160ms,
+        box-shadow 320ms var(--ease);
 
-    &:hover {
+    // LED strip along the lower edge: it lights from the left and throws its glow down, like the strips in the wardrobe
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background: #fff3d6;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 320ms var(--ease);
+    }
+
+    &:hover,
+    &:focus-visible {
         background: #f6c57a;
+        box-shadow: 0 12px 28px -10px rgb(240 179 90 / 0.6);
+
+        &::after {
+            transform: scaleX(1);
+        }
     }
 
     &:active {
         transform: translateY(1px) scale(0.98);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &::after {
+            transition: none;
+        }
     }
 }
 
