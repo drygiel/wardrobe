@@ -1,0 +1,1363 @@
+[
+ {
+  "name": "P01_D_Post-Rear-R",
+  "length": 2650.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG1",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J11",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      2622.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J12",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      12.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J13",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od prawej"
+     ],
+     [
+      2638.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J14",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od prawej"
+     ],
+     [
+      28.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P02_B_Rail-Bottom-Rear",
+  "length": 2200.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG1",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J12",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J12",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      12.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P03_C_Side-L",
+  "length": 1300.0,
+  "width": 530.0,
+  "thickness": 40.0,
+  "board": "BG1",
+  "mitres": 1,
+  "grooves": [
+   {
+    "face": "prawy bok",
+    "width": 18.0,
+    "depth": 7.5,
+    "from": 40.0,
+    "to": 1300.0,
+    "along": "od dołu",
+    "offset": 90.0,
+    "offsetAlong": "od frontu"
+   }
+  ],
+  "holes": [
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      265.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      480.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J07",
+    "face": "góra",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J07",
+    "face": "góra",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      365.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J15",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      150.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J15",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      320.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J15",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      490.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P04_C_Bottom",
+  "length": 530.0,
+  "width": 360.0,
+  "thickness": 40.0,
+  "board": "BG1",
+  "mitres": 2,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      265.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J05",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      480.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      265.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      480.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P05_C_Side-R",
+  "length": 1300.0,
+  "width": 530.0,
+  "thickness": 40.0,
+  "board": "BG1",
+  "mitres": 1,
+  "grooves": [
+   {
+    "face": "lewy bok",
+    "width": 18.0,
+    "depth": 7.5,
+    "from": 40.0,
+    "to": 1300.0,
+    "along": "od dołu",
+    "offset": 90.0,
+    "offsetAlong": "od frontu"
+   }
+  ],
+  "holes": [
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      265.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J06",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      480.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J08",
+    "face": "góra",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J08",
+    "face": "góra",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      365.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      150.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      320.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      490.0,
+      "od frontu"
+     ],
+     [
+      736.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P06_C_Top",
+  "length": 360.0,
+  "width": 330.0,
+  "thickness": 40.0,
+  "board": "BG2",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J07",
+    "face": "spód",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      165.0,
+      "od frontu"
+     ],
+     [
+      340.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J08",
+    "face": "spód",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      165.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J09",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      80.0,
+      "od prawej"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J09",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      280.0,
+      "od prawej"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J10",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      310.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J11",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      310.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P07_B_Rail-Top-Front",
+  "length": 2280.0,
+  "width": 200.0,
+  "thickness": 40.0,
+  "board": "BG2",
+  "mitres": 2,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J01",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      10.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J01",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      10.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J02",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      10.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J02",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      10.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J07",
+    "face": "spód",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      1025.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J08",
+    "face": "spód",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      50.0,
+      "od frontu"
+     ],
+     [
+      705.0,
+      "od prawej"
+     ]
+    ]
+   },
+   {
+    "dowel": "J09",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      765.0,
+      "od prawej"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J09",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      965.0,
+      "od prawej"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P08_B_Rail-Bottom-Front",
+  "length": 2280.0,
+  "width": 200.0,
+  "thickness": 40.0,
+  "board": "BG2",
+  "mitres": 2,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J03",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J03",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J04",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J04",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P09_D_Post-Front-R",
+  "length": 2650.0,
+  "width": 200.0,
+  "thickness": 40.0,
+  "board": "BG2",
+  "mitres": 2,
+  "grooves": [
+   {
+    "face": "lewy bok",
+    "width": 18.0,
+    "depth": 7.5,
+    "from": 32.5,
+    "to": 2617.5,
+    "along": "od dołu",
+    "offset": 90.0,
+    "offsetAlong": "od frontu"
+   }
+  ],
+  "holes": [
+   {
+    "dowel": "J02",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      2620.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J02",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      2620.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J04",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J04",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J13",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      10.0,
+      "od prawej"
+     ],
+     [
+      2625.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J14",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      10.0,
+      "od prawej"
+     ],
+     [
+      25.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P10_D_Rail-Top-Rear",
+  "length": 645.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J11",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J11",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      12.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P11_D_Crossbar-Bottom-R",
+  "length": 290.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J14",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      10.0,
+      "od prawej"
+     ],
+     [
+      25.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J14",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od prawej"
+     ],
+     [
+      28.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P12_D_Crossbar-Top-R",
+  "length": 290.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J13",
+    "face": "front",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      10.0,
+      "od prawej"
+     ],
+     [
+      15.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J13",
+    "face": "tył",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od prawej"
+     ],
+     [
+      28.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P13_B_Rail-Top-Rear",
+  "length": 1195.0,
+  "width": 40.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J10",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J10",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      20.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P14_B_Side-L",
+  "length": 2650.0,
+  "width": 530.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 2,
+  "grooves": [
+   {
+    "face": "lewy bok",
+    "width": 18.0,
+    "depth": 7.5,
+    "from": 580.0,
+    "to": 2630.0,
+    "along": "od dołu",
+    "offset": 90.0,
+    "offsetAlong": "od frontu"
+   }
+  ],
+  "holes": [
+   {
+    "dowel": "J01",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      2620.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J01",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      2620.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J03",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      40.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J03",
+    "face": "ścięcie 45°",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      160.0,
+      "od frontu"
+     ],
+     [
+      30.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J10",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      510.0,
+      "od frontu"
+     ],
+     [
+      2630.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J12",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      510.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ },
+ {
+  "name": "P15_C_Shelf",
+  "length": 422.0,
+  "width": 280.0,
+  "thickness": 40.0,
+  "board": "BG3",
+  "mitres": 0,
+  "grooves": [],
+  "holes": [
+   {
+    "dowel": "J15",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      42.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J15",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      212.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J15",
+    "face": "lewy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      382.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      42.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      212.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   },
+   {
+    "dowel": "J16",
+    "face": "prawy bok",
+    "d": 8.0,
+    "depth": 20.0,
+    "at": [
+     [
+      382.0,
+      "od frontu"
+     ],
+     [
+      20.0,
+      "od dołu"
+     ]
+    ]
+   }
+  ]
+ }
+]

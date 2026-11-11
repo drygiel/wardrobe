@@ -4,6 +4,7 @@ import { GROUPS } from '@/components/parts';
 import MeasureLink from '@/sections/MeasureLink';
 import Showcase from '@/sections/Showcase';
 import PartsSection from '@/sections/PartsSection';
+import CutList from '@/sections/CutList';
 import PlanSection from '@/sections/PlanSection';
 import Footer from '@/sections/Footer';
 import Meta from '@/sections/Meta';
@@ -46,6 +47,7 @@ export default function RamaPage() {
       />
       <main>
         <PartsSection />
+        <CutList />
         <MeasureLink
           title="Zmierz ramę"
           text="Pomiary otworzą się na samej ramie. Najedź na krawędź formatki, aby zobaczyć jej długość."

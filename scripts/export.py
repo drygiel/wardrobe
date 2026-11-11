@@ -5,8 +5,10 @@
 # Electric.glb: the Electric collection, cables as meshes, no UVs: the site colours it by name, it never enters the atlas.
 # Hardware.glb: dowels, hinges and mount blocks, no UVs: the editor colours them by name, they never enter the atlas.
 # app/components/grain.json: grain direction of every wooden part, read from its UVMap.
+# app/components/cutlist.json: the frame's order list (sizes, boards, 45° cuts, LED grooves, dowel holes) for /rama.
 import json
 import re
+import bmesh
 import bpy
 
 models = bpy.path.abspath('//wardrobe/public/models/')
@@ -107,6 +109,105 @@ def grain_of(o):
     return faces
 
 
+# Order list of the frame: size, board, 45° cuts, LED groove and dowel holes of every piece P01-P15, from the
+# pieces, their CutPlan copies, the LED strips lying in their grooves and the dowels in 1a_Dowels. Directions are
+# seen from the front: x+ to the back, y+ to the left, z+ up; positions are millimetres from the piece's own edges.
+def cut_list(pieces):
+    from mathutils import Vector
+    from mathutils.bvhtree import BVHTree
+
+    def box(o):
+        ws = [o.matrix_world @ v.co for v in o.data.vertices]
+        return [min(w[i] for w in ws) for i in range(3)], [max(w[i] for w in ws) for i in range(3)]
+
+    def mm(v):
+        return round(v * 1000, 1)
+
+    sheets = {o.name.split('-')[-1]: box(o) for o in bpy.data.collections['CutPlan'].objects if o.name.startswith('Plan_Sheet')}
+    copies = {o.name[5:]: o for o in bpy.data.collections['CutPlan'].objects if re.match(r'Plan_P\d\d$', o.name)}
+    strips = [o for o in bpy.data.collections['5_LED'].objects if o.type == 'MESH']
+    dowels = list(bpy.data.collections['1a_Dowels'].objects)
+    faces = {(0, 0): 'front', (0, 1): 'tył', (1, 0): 'prawy bok', (1, 1): 'lewy bok', (2, 0): 'spód', (2, 1): 'góra'}
+    along = {0: 'od frontu', 1: 'od prawej', 2: 'od dołu'}
+    rows = []
+    for o in sorted(pieces, key=lambda p: p.name):
+        lo, hi = box(o)
+        world = [o.matrix_world @ v.co for v in o.data.vertices]
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bm.transform(o.matrix_world)
+        bm.normal_update()
+        tree = BVHTree.FromBMesh(bm)
+        bm.free()
+        size = sorted((mm(hi[i] - lo[i]) for i in range(3)), reverse=True)
+        copy = copies.get(o.name[:3])
+        board = None
+        if copy:
+            clo, chi = box(copy)
+            centre = [(clo[i] + chi[i]) / 2 for i in range(2)]
+            board = next((name for name, (slo, shi) in sheets.items() if all(slo[i] <= centre[i] <= shi[i] for i in range(2))), None)
+        turn = o.matrix_world.to_3x3()
+        mitres = sum(1 for p in o.data.polygons if max(abs(c) for c in (turn @ p.normal).normalized()) < 0.99)
+
+        grooves = []
+        for s in strips:
+            slo, shi = box(s)
+            if not all(slo[i] >= lo[i] - 1e-4 and shi[i] <= hi[i] + 1e-4 for i in range(3)):
+                continue
+            thin = min(range(3), key=lambda i: shi[i] - slo[i])  # the strip lies flat on the piece's face over its groove
+            side = 0 if slo[thin] - lo[thin] < hi[thin] - shi[thin] else 1
+            face_at = lo[thin] if side == 0 else hi[thin]
+            levels = sorted({round(w[thin], 5) for w in world if abs(w[thin] - face_at) > 1e-5}, key=lambda v: abs(v - face_at))
+            bottom = levels[0]  # the groove's floor is the plane next to the face
+            length = max(range(3), key=lambda i: shi[i] - slo[i])
+            across = 3 - thin - length
+            floor = [w for w in world if abs(w[thin] - bottom) < 1e-5 and slo[across] - 1e-4 <= w[across] <= shi[across] + 1e-4]
+            start = min(w[length] for w in floor) if floor else slo[length]
+            end = max(w[length] for w in floor) if floor else shi[length]
+            grooves.append({
+                'face': faces[(thin, side)], 'width': mm(shi[across] - slo[across]), 'depth': mm(abs(bottom - face_at)),
+                'from': mm(start - lo[length]), 'to': mm(end - lo[length]), 'along': along[length],
+                'offset': mm(slo[across] - lo[across]), 'offsetAlong': along[across],
+            })
+
+        holes = []
+        for d in dowels:
+            dlo, dhi = box(d)
+            if not all(dhi[i] > lo[i] + 1e-4 and dlo[i] < hi[i] - 1e-4 for i in range(3)):
+                continue
+            ext = [dhi[i] - dlo[i] for i in range(3)]
+            ax = max(range(3), key=lambda i: ext[i])
+            c = Vector([(dlo[i] + dhi[i]) / 2 for i in range(3)])
+            ends = []
+            for t in (dlo[ax], dhi[ax]):
+                e = c.copy()
+                e[ax] = t
+                ends.append(e)
+            # the end buried in this piece; from it a ray back along the dowel meets the face the hole is drilled in
+            inner = [e for e in ends if all(lo[i] - 1e-4 <= e[i] <= hi[i] + 1e-4 for i in range(3))]
+            if not inner:
+                continue
+            e = inner[0]
+            other = ends[1] if e is ends[0] else ends[0]
+            direction = (other - e).normalized()
+            hit, normal, index, dist = tree.ray_cast(e + direction * 1e-6, direction)
+            if hit is None or dist > ext[ax]:
+                continue
+            n = (turn @ o.data.polygons[index].normal).normalized() if index < len(o.data.polygons) else normal
+            square = max(abs(v) for v in normal) > 0.99
+            nax = max(range(3), key=lambda i: abs(normal[i]))
+            others = [i for i in range(3) if i != ax]
+            holes.append({
+                'dowel': d.name[:3], 'face': faces[(nax, 0 if normal[nax] < 0 else 1)] if square else 'ścięcie 45°',
+                'd': mm(min(ext[i] for i in others)), 'depth': mm(dist),
+                'at': [[mm(hit[i] - lo[i]), along[i]] for i in others],
+            })
+        holes.sort(key=lambda h: (h['dowel'], h['face'], h['at']))
+        rows.append({'name': o.name, 'length': size[0], 'width': size[1], 'thickness': size[2], 'board': board,
+                     'mitres': mitres, 'grooves': grooves, 'holes': holes})
+    return rows
+
+
 try:
     export(parts, 'Wardrobe.glb', True)
     export(pieces + plan, 'Frame.glb', False)
@@ -116,6 +217,8 @@ try:
     grain = {o.name: grain_of(o) for o in pieces + parts if o.type == 'MESH' and 'UVMap' in o.data.uv_layers}
     with open(bpy.path.abspath('//wardrobe/app/components/grain.json'), 'w') as file:
         json.dump({name: faces for name, faces in grain.items() if faces}, file, indent=0, sort_keys=True)
+    with open(bpy.path.abspath('//wardrobe/app/components/cutlist.json'), 'w', encoding='utf-8') as file:
+        json.dump(cut_list(pieces), file, ensure_ascii=False, indent=1)
 finally:
     scene.frame_set(frame)
     for o in hidden:
