@@ -4,11 +4,19 @@
 export const DOOR_IDS = ['F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'F07'] as const;
 export type DoorId = (typeof DOOR_IDS)[number];
 export type LedId = 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6' | 'L7' | 'L8';
+export type DimmerId = 'Ś1' | 'Ś2' | 'Ś3';
+
+// Three dimmers; the strips of one dimmer hang on its output in parallel (Dimmer Outputs in Szafa4.blend)
+export const DIMMERS: { id: DimmerId; object: string; place: string; input: string }[] = [
+  { id: 'Ś1', object: 'Dimmer_1', place: 'Regał A, na zewnątrz', input: 'S1' },
+  { id: 'Ś2', object: 'Dimmer_2', place: 'Wnęka C, ozdobna', input: 'S1' },
+  { id: 'Ś3', object: 'Dimmer_3', place: 'Cały środek', input: 'K1–K7' },
+];
 
 export type Led = {
   id: LedId;
-  dimmer: string;
-  strip: string; // suffix of the LED_* and Dimmer * objects
+  dimmer: DimmerId;
+  strip: string; // suffix of the LED_* object
   wire: string; // glTF name of its cable
   place: string;
   metres: number;
@@ -16,15 +24,18 @@ export type Led = {
   doors: DoorId[] | null; // null: on the hidden switch
 };
 
+// K1 to K7 in series on the input of Ś3: any open door lights the whole middle
+const ANY_DOOR: DoorId[] = [...DOOR_IDS];
+
 export const LEDS: Led[] = [
-  { id: 'L1', dimmer: 'Ś1', strip: 'C_Side-R-Lower', wire: 'LED_Wire_C_Side-R-Lower', place: 'Dół wnęki C', metres: 0.934, wireMetres: 0.602, doors: ['F05'] },
-  { id: 'L2', dimmer: 'Ś2', strip: 'P09', wire: 'LED_Wire_P09', place: 'Szafa D', metres: 2.587, wireMetres: 1.202, doors: ['F06', 'F07'] },
-  { id: 'L3', dimmer: 'Ś3', strip: 'B_Shelf-02', wire: 'LED_Wire_B_Shelf-02', place: 'Pod półką szafy B', metres: 0.513, wireMetres: 0.829, doors: ['F02', 'F04'] },
-  { id: 'L4', dimmer: 'Ś4', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.612, wireMetres: 0.805, doors: ['F02', 'F04'] },
-  { id: 'L5', dimmer: 'Ś5', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.612, wireMetres: 1.921, doors: ['F01', 'F03'] },
-  { id: 'L6', dimmer: 'Ś6', strip: 'P05', wire: 'LED_Wire_P05', place: 'Wnęka C, prawy bok', metres: 1.27, wireMetres: 0.87, doors: null },
-  { id: 'L7', dimmer: 'Ś7', strip: 'P03', wire: 'LED_Wire_P03', place: 'Wnęka C, lewy bok', metres: 1.27, wireMetres: 0.706, doors: null },
-  { id: 'L8', dimmer: 'Ś8', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.06, wireMetres: 2.227, doors: null },
+  { id: 'L1', dimmer: 'Ś3', strip: 'C_Side-R-Lower', wire: 'LED_Wire_C_Side-R-Lower', place: 'Dół wnęki C', metres: 0.934, wireMetres: 0.602, doors: ANY_DOOR },
+  { id: 'L2', dimmer: 'Ś3', strip: 'P09', wire: 'LED_Wire_P09', place: 'Szafa D', metres: 2.587, wireMetres: 1.202, doors: ANY_DOOR },
+  { id: 'L3', dimmer: 'Ś3', strip: 'B_Shelf-02', wire: 'LED_Wire_B_Shelf-02', place: 'Pod półką szafy B', metres: 0.513, wireMetres: 0.829, doors: ANY_DOOR },
+  { id: 'L4', dimmer: 'Ś3', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.612, wireMetres: 0.805, doors: ANY_DOOR },
+  { id: 'L5', dimmer: 'Ś3', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.612, wireMetres: 1.921, doors: ANY_DOOR },
+  { id: 'L6', dimmer: 'Ś2', strip: 'P05', wire: 'LED_Wire_P05', place: 'Wnęka C, prawy bok', metres: 1.27, wireMetres: 0.87, doors: null },
+  { id: 'L7', dimmer: 'Ś2', strip: 'P03', wire: 'LED_Wire_P03', place: 'Wnęka C, lewy bok', metres: 1.27, wireMetres: 0.706, doors: null },
+  { id: 'L8', dimmer: 'Ś1', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.06, wireMetres: 2.227, doors: null },
 ];
 
 export const WATT_PER_METRE = 10; // assumed strip, 24 V
@@ -32,10 +43,11 @@ export const PSU_WATT = 150;
 export const VOLT = 24;
 export const LED_METRES = LEDS.reduce((sum, led) => sum + led.metres, 0);
 export const FULL_WATT = LED_METRES * WATT_PER_METRE;
-export const CABLE_METRES = 20.44;
+export const CABLE_METRES = 20.49;
 
 export const contact = (door: DoorId) => `K${Number(door.slice(1))}`;
 export const stripWatt = (led: Led) => led.metres * WATT_PER_METRE;
+export const dimmerWatt = (id: DimmerId) => LEDS.filter(led => led.dimmer === id).reduce((sum, led) => sum + stripWatt(led), 0);
 
 // Polish number format
 export const num = (value: number, digits = 0) => value.toLocaleString('pl-PL', { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false });
@@ -114,8 +126,8 @@ export function circuitsOf(name: string): LedId[] {
   if (name === 'LED_Wire') return ['L8'];
   const wire = /^LED_Wire_(.+)$/.exec(name);
   if (wire) return ledBySuffix(wire[1]);
-  const dimmer = /^Dimmer_(.+)$/.exec(name);
-  if (dimmer && dimmer[1] !== 'Jumpers') return ledBySuffix(dimmer[1]);
+  const dimmer = DIMMERS.find(d => d.object === name);
+  if (dimmer) return LEDS.filter(led => led.dimmer === dimmer.id).map(led => led.id);
   const route = ROUTES.find(r => r.id === name);
   if (route?.doors) return LEDS.filter(led => led.doors?.some(d => route.doors!.includes(d))).map(led => led.id);
   const door = /^Door_(?:Sensor|Magnet)_(F\d\d)$/.exec(name)?.[1] as DoorId | undefined;
@@ -246,10 +258,11 @@ export const axes = (board: Board) =>
 export const BOM: { name: string; amount: string; note: string }[] = [
   { name: 'Zasilacz LED 24 V, 150 W', amount: '1 szt.', note: 'Z dopuszczeniem do mebli, z wtyczką. Z1.' },
   { name: 'Pasek LED 24 V (taśma z rolki), do 10 W/m', amount: `${num(LED_METRES, 2)} m`, note: 'Osiem odcinków, L1 do L8.' },
-  { name: 'Ściemniacz 24 V z wejściem na styk', amount: '5 szt.', note: 'Świeci przy rozwartym styku. Ś1 do Ś5.' },
-  { name: 'Ściemniacz 24 V z pokrętłem', amount: '3 szt.', note: 'Ś6 do Ś8.' },
+  { name: 'Ściemniacz 24 V z wejściem na styk, min. 5 A', amount: '1 szt.', note: 'Świeci przy rozwartym styku. Ś3, cały środek: 7,26 m, ok. 73 W, 3 A.' },
+  { name: 'Ściemniacz 24 V z pokrętłem, min. 2 A', amount: '2 szt.', note: 'Ś1 regał A, Ś2 wnęka C.' },
+  { name: 'Złączka rozgałęźna 5-torowa (np. Wago 221-415)', amount: '3 szt.', note: 'Paski jednej grupy równolegle na wyjściu ściemniacza: dwie przy Ś3, jedna przy Ś2.' },
   { name: 'Włącznik kołyskowy 24 V, min. 3 A', amount: '1 szt.', note: 'S1, pod półką nad rozdzielnią.' },
-  { name: 'Kontaktron wpuszczany Ø8 z magnesem', amount: '7 kpl.', note: 'Styk zwarty przy zamkniętych drzwiach. K1 do K7.' },
+  { name: 'Kontaktron wpuszczany Ø8 z magnesem', amount: '7 kpl.', note: 'Styk zwarty przy zamkniętych drzwiach. K1 do K7 szeregowo na wejściu Ś3.' },
   { name: 'Szyna rozdzielcza 24 V', amount: '2 szt.', note: 'Stała i za włącznikiem.' },
   { name: 'Przewód 2 × 1,5 mm²', amount: '1 m', note: 'Z zasilacza do rozdzielni.' },
   { name: 'Przewód 2 × 0,5 mm²', amount: '11 m', note: 'Do pasków i do S1, z zapasem.' },
@@ -261,6 +274,6 @@ export const STEPS: { title: string; text: string }[] = [
   { title: 'Skręć korpus bez pleców', text: 'Plecy zostają zdjęte, dopóki kable nie leżą w narożnikach.' },
   { title: 'Przeciągnij kable od rozdzielni', text: 'Każdy kabel oznacz numerem paska przed włożeniem w otwór. Zostaw 15 cm zapasu na obu końcach.' },
   { title: 'Wklej kontaktrony i magnesy', text: 'Kontaktron wchodzi równo z krawędzią półki, magnes równo z drzwiami. Sprawdź miernikiem: zwarte przy zamkniętych drzwiach.' },
-  { title: 'Złóż rozdzielnię na plecach', text: 'Szyny, osiem ściemniaczy, włącznik S1 pod półką. Zasilacz przykręć pod półką nad szufladą.' },
+  { title: 'Złóż rozdzielnię na plecach', text: 'Szyny, trzy ściemniacze ze złączkami na wyjściach, włącznik S1 pod półką. Kontaktrony K1 do K7 połącz szeregowo na wejściu Ś3. Zasilacz przykręć pod półką nad szufladą.' },
   { title: 'Podłącz na końcu 230 V', text: 'Wtyczka zasilacza do gniazdka dopiero po sprawdzeniu, że plus i minus nie są zwarte na szynach.' },
 ];

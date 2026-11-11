@@ -11,7 +11,7 @@ export function wireColor(name: string) {
   if (name === 'Mains_Cord') return '#3f7dff';
   if (name === 'Switch_Wire') return '#ffd23c';
   if (name.startsWith('Door_Wire')) return '#f4f2e8';
-  if (/^(LED_Wire|Feed_24V|Dimmer_Jumpers)/.test(name)) return '#e8352c';
+  if (/^(LED_Wire|Feed_24V|Dimmer_Jumpers|Dimmer_Outputs)/.test(name)) return '#e8352c';
   if (name === 'Socket' || name === 'Wire') return '#d8d6cf';
   return '#17181a';
 }

@@ -1,8 +1,8 @@
 import { createContext, type ReactNode, use, useState } from 'react';
-import { DOOR_IDS, type DoorId, type Led, type LedId, LEDS, stripWatt, VOLT } from './data';
+import { DIMMERS, type DimmerId, DOOR_IDS, type DoorId, type Led, LEDS, stripWatt, VOLT } from './data';
 
 const allClosed = Object.fromEntries(DOOR_IDS.map(id => [id, false])) as Record<DoorId, boolean>;
-const allFull = Object.fromEntries(LEDS.map(led => [led.id, 1])) as Record<LedId, number>;
+const allFull = Object.fromEntries(DIMMERS.map(d => [d.id, 1])) as Record<DimmerId, number>;
 
 // The installation's live state, shared by the drawing, the schematic and the 3D view
 function useCircuitStore() {
@@ -11,7 +11,7 @@ function useCircuitStore() {
   const [dim, setDim] = useState(allFull);
 
   const on = (led: Led) => (led.doors ? led.doors.some(door => doors[door]) : s1);
-  const level = (led: Led) => (on(led) ? dim[led.id] : 0);
+  const level = (led: Led) => (on(led) ? dim[led.dimmer] : 0);
   const watt = LEDS.reduce((sum, led) => sum + stripWatt(led) * level(led), 0);
 
   return {
@@ -24,7 +24,7 @@ function useCircuitStore() {
     amp: watt / VOLT,
     toggleS1: () => setS1(value => !value),
     toggleDoor: (door: DoorId) => setDoors(state => ({ ...state, [door]: !state[door] })),
-    setDim: (id: LedId, value: number) => setDim(state => ({ ...state, [id]: value })),
+    setDim: (id: DimmerId, value: number) => setDim(state => ({ ...state, [id]: value })),
   };
 }
 

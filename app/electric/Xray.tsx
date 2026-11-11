@@ -254,7 +254,7 @@ export function Xray() {
                   {led.id}, {led.place}
                 </span>
                 <small>
-                  {led.doors ? led.doors.join(' i ') : 'S1'}, {num(led.wireMetres, 2)} m kabla
+                  {led.dimmer}, {led.doors ? 'dowolne drzwi' : 'S1'}, {num(led.wireMetres, 2)} m kabla
                 </small>
               </button>
             </li>

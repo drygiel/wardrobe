@@ -16,7 +16,8 @@ const cases: Record<string, string> = {
   MB1_D_MountBlock: 'Klocek montażowy 1',
   LED_P09: 'Taśma LED, Szafa D',
   LED_Wire_P09: 'Przewód LED, Szafa D',
-  Dimmer_P09: 'Ściemniacz Ś2, Szafa D',
+  Dimmer_3: 'Ściemniacz Ś3, Cały środek',
+  Dimmer_Outputs: 'Rozgałęzienia na wyjściach ściemniaczy',
   Door_Sensor_F01: 'Czujnik drzwi F01',
   Unknown: 'Unknown',
 };

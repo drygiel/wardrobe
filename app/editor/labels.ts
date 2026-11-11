@@ -1,5 +1,5 @@
 import type { Unit } from '../contexts/AppContext';
-import { LEDS } from '../electric/data';
+import { DIMMERS, LEDS } from '../electric/data';
 
 type Gender = 0 | 1 | 2; // masculine, feminine, neuter or plural
 
@@ -34,6 +34,7 @@ const ELECTRIC: Record<string, string> = {
   Feed_24V: 'Zasilanie 24 V',
   Switch_Wire: 'Przewód włącznika',
   Dimmer_Jumpers: 'Mostki ściemniaczy',
+  Dimmer_Outputs: 'Rozgałęzienia na wyjściach ściemniaczy',
   Bus_24V: 'Szyna 24 V',
   Bus_24V_Switched: 'Szyna 24 V za włącznikiem',
   PSU_24V: 'Zasilacz 24 V',
@@ -53,10 +54,8 @@ export function partLabel(name: string): string {
   if (wire) return `Przewód LED, ${wire.place}`;
 
   let match;
-  if ((match = /^Dimmer_(.+)$/.exec(name))) {
-    const led = LEDS.find(l => l.strip === match![1]);
-    if (led) return `Ściemniacz ${led.dimmer}, ${led.place}`;
-  }
+  const dimmer = DIMMERS.find(d => d.object === name);
+  if (dimmer) return `Ściemniacz ${dimmer.id}, ${dimmer.place}`;
   if ((match = /^LED_(.+)$/.exec(name))) {
     const led = LEDS.find(l => l.strip === match![1]);
     if (led) return `Taśma LED, ${led.place}`;
@@ -107,7 +106,7 @@ export function treePath(name: string, group: string, columns: string[]): string
     case 'electric':
       if (name.startsWith('Door_')) return ['Czujniki drzwi'];
       if (name.startsWith('LED_Wire')) return ['Przewody LED'];
-      if (name.startsWith('Dimmer_') && name !== 'Dimmer_Jumpers') return ['Ściemniacze'];
+      if (DIMMERS.some(d => d.object === name)) return ['Ściemniacze'];
       return ['Zasilanie'];
     default:
       return [];

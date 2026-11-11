@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import cn from 'classnames';
 import { useCircuit } from './circuit';
-import { contact, type DoorId, FULL_WATT, type LedId, LEDS, num, PSU_WATT, stripWatt, VOLT } from './data';
+import { contact, DIMMERS, type DimmerId, DOOR_IDS, type DoorId, FULL_WATT, type LedId, LEDS, num, PSU_WATT, stripWatt, VOLT } from './data';
 import styles from './Elektryka.module.scss';
 
 const W = 1320;
@@ -16,6 +16,8 @@ const STRIP = 900;
 const PX_PER_METRE = 120;
 
 const ROW: Record<LedId, number> = { L8: 90, L7: 170, L6: 250, L1: 350, L2: 440, L3: 530, L4: 615, L5: 705 };
+// K1 to K7 in series, two rows between the rail and Ś3
+const REEDS: { door: DoorId; x: number; y: number }[] = DOOR_IDS.map((door, i) => ({ door, x: i < 4 ? 392 + i * 58 : 566 - (i - 4) * 58, y: i < 4 ? 400 : 480 }));
 
 function Wire({ d, kind, live }: { d: string; kind: 'power' | 'signal' | 'mains'; live: boolean }) {
   return (
@@ -60,13 +62,20 @@ export function LiveCircuit() {
   const circuit = useCircuit();
   const load = circuit.watt / PSU_WATT;
   const rowOf = (id: LedId) => ROW[id];
-  const contacts: { led: LedId; doors: DoorId[] }[] = [
-    { led: 'L1', doors: ['F05'] },
-    { led: 'L2', doors: ['F06', 'F07'] },
-    { led: 'L4', doors: ['F02', 'F04'] },
-    { led: 'L5', doors: ['F01', 'F03'] },
-  ];
-  const loopLive = (doors: DoorId[]) => doors.some(door => circuit.doors[door]);
+  const rows = (id: DimmerId) => LEDS.filter(led => led.dimmer === id).map(led => rowOf(led.id));
+  const box = (id: DimmerId) => ({ top: Math.min(...rows(id)) - 28, bottom: Math.max(...rows(id)) + 28 });
+  const centre = (id: DimmerId) => (box(id).top + box(id).bottom) / 2;
+  const loopLive = DOOR_IDS.some(door => circuit.doors[door]);
+  // Left to right along the top row, down, right to left along the bottom row, then into Ś3
+  const top = REEDS.filter(r => r.y === REEDS[0].y);
+  const back = REEDS.filter(r => r.y !== REEDS[0].y);
+  const turn = top[top.length - 1].x + 44;
+  const chain =
+    `M${RAIL + 30} ${top[0].y}` +
+    top.map(r => `H${r.x - 15}M${r.x + 15} ${r.y}`).join('') +
+    `H${turn}V${back[0].y}` +
+    back.map(r => `H${r.x + 15}M${r.x - 15} ${r.y}`).join('') +
+    `H${RAIL + 30}V560H${DIMMER}`;
 
   const overlays: ReactNode[] = [];
 
@@ -75,7 +84,7 @@ export function LiveCircuit() {
       <div className={styles.circuitHead}>
         <div>
           <h2 id="obwod-h">Obwód na żywo</h2>
-          <p>Każdy pasek ma własny ściemniacz i własny kabel do rozdzielni. Włącz S1, klikaj kontaktrony, przesuwaj jasność.</p>
+          <p>Trzy ściemniacze: Ś1 regał A, Ś2 wnęka C, Ś3 cały środek. Paski jednej grupy wiszą równolegle na jej ściemniaczu. Włącz S1, klikaj kontaktrony, przesuwaj jasność.</p>
         </div>
         <dl className={styles.meter} aria-live="polite">
           <div>
@@ -98,7 +107,7 @@ export function LiveCircuit() {
 
       <div className={styles.scroller}>
         <div className={styles.diagram}>
-          <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Schemat połączeń: gniazdko, zasilacz 24 V, szyny, włącznik S1, kontaktrony, osiem ściemniaczy i pasków LED">
+          <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Schemat połączeń: gniazdko, zasilacz 24 V, szyny, włącznik S1, kontaktrony, trzy ściemniacze i osiem pasków LED">
             <Wire d={`M108 370H170`} kind="mains" live />
             <Wire d={`M300 370H${RAIL}`} kind="power" live />
             <Wire d={`M${RAIL} 170V705`} kind="power" live />
@@ -136,6 +145,23 @@ export function LiveCircuit() {
               </text>
             </g>
 
+            {DIMMERS.map(d => {
+              const { top, bottom } = box(d.id);
+              const y = centre(d.id);
+              const on = LEDS.some(led => led.dimmer === d.id && circuit.on(led));
+              return (
+                <g key={d.id}>
+                  {d.input === 'S1' ? <Wire d={`M${SWITCHED} ${y}H${DIMMER}`} kind="power" live={circuit.s1} /> : <Wire d={`M${RAIL} ${top + 16}H${DIMMER}`} kind="power" live />}
+                  <g className={cn(styles.box, on && styles.boxOn)}>
+                    <rect x={DIMMER} y={top} width={DIMMER_W} height={bottom - top} />
+                    <text x={DIMMER + 24} y={y - 22}>
+                      {d.id}
+                    </text>
+                  </g>
+                </g>
+              );
+            })}
+
             {LEDS.map(led => {
               const y = rowOf(led.id);
               const on = circuit.on(led);
@@ -143,18 +169,7 @@ export function LiveCircuit() {
               const barW = led.metres * PX_PER_METRE;
               return (
                 <g key={led.id}>
-                  {led.doors ? (
-                    <Wire d={`M${RAIL} ${y - 10}H${DIMMER}`} kind="power" live />
-                  ) : (
-                    <Wire d={`M${SWITCHED} ${y}H${DIMMER}`} kind="power" live={circuit.s1} />
-                  )}
                   <Wire d={`M${DIMMER + DIMMER_W} ${y}H${STRIP}`} kind="power" live={on} />
-                  <g className={cn(styles.box, on && styles.boxOn)}>
-                    <rect x={DIMMER} y={y - 28} width={DIMMER_W} height={56} />
-                    <text x={DIMMER + 24} y={y + 6}>
-                      {led.dimmer}
-                    </text>
-                  </g>
                   <rect className={styles.barGlow} x={STRIP} y={y - 12} width={barW} height={24} style={{ opacity: level }} />
                   <rect className={cn(styles.bar, on && styles.barOn)} x={STRIP} y={y - 5} width={barW} height={10} style={{ opacity: 0.35 + 0.65 * (on ? level : 0) }} />
                   <text className={styles.rowLabel} x={STRIP} y={y - 19}>
@@ -167,23 +182,10 @@ export function LiveCircuit() {
               );
             })}
 
-            {contacts.map(({ led, doors }) => {
-              const y = rowOf(led) + 18;
-              const xs = doors.length === 2 ? [452, 524] : [488];
-              return (
-                <g key={led}>
-                  <Wire d={`M${RAIL + 40} ${y}H${xs[0] - 15}`} kind="signal" live={loopLive(doors)} />
-                  {xs.slice(1).map((x, i) => (
-                    <Wire key={x} d={`M${xs[i] + 15} ${y}H${x - 15}`} kind="signal" live={loopLive(doors)} />
-                  ))}
-                  <Wire d={`M${xs[xs.length - 1] + 15} ${y}H${DIMMER}`} kind="signal" live={loopLive(doors)} />
-                  {doors.map((door, i) => (
-                    <ReedSymbol key={door} x={xs[i]} y={y} door={door} />
-                  ))}
-                </g>
-              );
-            })}
-            <Wire d={`M600 ${rowOf('L4') + 18}V${rowOf('L3') + 18}H${DIMMER}`} kind="signal" live={loopLive(['F02', 'F04'])} />
+            <Wire d={chain} kind="signal" live={loopLive} />
+            {REEDS.map(r => (
+              <ReedSymbol key={r.door} x={r.x} y={r.y} door={r.door} />
+            ))}
           </svg>
 
           <button
@@ -195,23 +197,21 @@ export function LiveCircuit() {
             onClick={circuit.toggleS1}
           />
 
-          {contacts.flatMap(({ led, doors }) => {
-            const y = rowOf(led) + 18;
-            const xs = doors.length === 2 ? [452, 524] : [488];
-            return doors.map((door, i) => <ReedButton key={door} x={xs[i]} y={y} door={door} />);
-          })}
+          {REEDS.map(r => (
+            <ReedButton key={r.door} x={r.x} y={r.y} door={r.door} />
+          ))}
 
-          {LEDS.map(led => (
+          {DIMMERS.map(d => (
             <input
-              key={led.id}
+              key={d.id}
               className={styles.slider}
-              style={{ ...at(DIMMER + 104, rowOf(led.id)), width: `${(106 / W) * 100}%` }}
+              style={{ ...at(DIMMER + 104, centre(d.id) + 10), width: `${(106 / W) * 100}%` }}
               type="range"
               min={5}
               max={100}
-              value={Math.round(circuit.dim[led.id] * 100)}
-              aria-label={`Jasność ${led.id}, ${led.place}`}
-              onChange={event => circuit.setDim(led.id, Number(event.target.value) / 100)}
+              value={Math.round(circuit.dim[d.id] * 100)}
+              aria-label={`Jasność ${d.id}, ${d.place}`}
+              onChange={event => circuit.setDim(d.id, Number(event.target.value) / 100)}
             />
           ))}
           {overlays}
@@ -221,7 +221,7 @@ export function LiveCircuit() {
       <ul className={styles.legend}>
         <li className={styles.lPower}>24 V, plus. Minus jest wspólny i na schemacie go nie ma.</li>
         <li className={styles.lMains}>230 V, tylko przewód fabryczny zasilacza.</li>
-        <li className={styles.lSignal}>Pętla kontaktronów. Otwarcie drzwi ją rozwiera i pasek płynnie się rozjaśnia.</li>
+        <li className={styles.lSignal}>Pętla kontaktronów K1 do K7, połączonych szeregowo. Otwarcie dowolnych drzwi ją rozwiera i cały środek płynnie się rozjaśnia.</li>
       </ul>
     </section>
   );
