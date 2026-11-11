@@ -1,7 +1,7 @@
 // Figures the copy quotes, in millimetres. `parts` is every board, front, handle and LED strip, without hardware and wiring.
 // `depthOverall` runs from the front of the handles to the back of the frame; the HDF backs sit inside it.
 // tests/site.test.ts counts and measures them again in the exported models.
-export const SIZE = { width: 2688, height: 2660, depth: 530, depthOverall: 560 };
+export const SIZE = { width: 2688, height: 2650, depth: 530, depthOverall: 560 };
 export const SIZE_TEXT = `${SIZE.width} × ${SIZE.height} × ${SIZE.depth} mm`;
 export const COUNTS = { parts: 98, sections: 4, framePieces: 15, boards: 3, drawers: 6, hinges: 17, hingedDoors: 7 };
 

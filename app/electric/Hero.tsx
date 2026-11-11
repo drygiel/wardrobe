@@ -10,7 +10,7 @@ import { CABLE_METRES, CONTACTS, contact, DOOR_IDS, DRILLS, FULL_WATT, LED_METRE
 import styles from './Elektryka.module.scss';
 
 const WIDE = 2688;
-const HIGH = 2655;
+const HIGH = 2645; // top of the frame, Blender z in mm
 type Flat = [number, number];
 // Front elevation: section A on the left, millimetres from the top left corner
 const front = (y: number, z: number): Flat => [WIDE - y, HIGH - z];

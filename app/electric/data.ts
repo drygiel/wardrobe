@@ -29,13 +29,13 @@ const ANY_DOOR: DoorId[] = [...DOOR_IDS];
 
 export const LEDS: Led[] = [
   { id: 'L1', dimmer: 'Ś3', strip: 'C_Side-R-Lower', wire: 'LED_Wire_C_Side-R-Lower', place: 'Dół wnęki C', metres: 0.934, wireMetres: 0.602, doors: ANY_DOOR },
-  { id: 'L2', dimmer: 'Ś3', strip: 'P09', wire: 'LED_Wire_P09', place: 'Szafa D', metres: 2.587, wireMetres: 1.202, doors: ANY_DOOR },
+  { id: 'L2', dimmer: 'Ś3', strip: 'P09', wire: 'LED_Wire_P09', place: 'Szafa D', metres: 2.577, wireMetres: 1.202, doors: ANY_DOOR },
   { id: 'L3', dimmer: 'Ś3', strip: 'B_Shelf-02', wire: 'LED_Wire_B_Shelf-02', place: 'Pod półką szafy B', metres: 0.513, wireMetres: 0.829, doors: ANY_DOOR },
-  { id: 'L4', dimmer: 'Ś3', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.612, wireMetres: 0.805, doors: ANY_DOOR },
-  { id: 'L5', dimmer: 'Ś3', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.612, wireMetres: 1.921, doors: ANY_DOOR },
-  { id: 'L6', dimmer: 'Ś2', strip: 'P05', wire: 'LED_Wire_P05', place: 'Wnęka C, prawy bok', metres: 1.27, wireMetres: 0.87, doors: null },
-  { id: 'L7', dimmer: 'Ś2', strip: 'P03', wire: 'LED_Wire_P03', place: 'Wnęka C, lewy bok', metres: 1.27, wireMetres: 0.706, doors: null },
-  { id: 'L8', dimmer: 'Ś1', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.06, wireMetres: 2.227, doors: null },
+  { id: 'L4', dimmer: 'Ś3', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.602, wireMetres: 0.805, doors: ANY_DOOR },
+  { id: 'L5', dimmer: 'Ś3', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.602, wireMetres: 1.921, doors: ANY_DOOR },
+  { id: 'L6', dimmer: 'Ś2', strip: 'P05', wire: 'LED_Wire_P05', place: 'Wnęka C, prawy bok', metres: 1.26, wireMetres: 0.87, doors: null },
+  { id: 'L7', dimmer: 'Ś2', strip: 'P03', wire: 'LED_Wire_P03', place: 'Wnęka C, lewy bok', metres: 1.26, wireMetres: 0.706, doors: null },
+  { id: 'L8', dimmer: 'Ś1', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.05, wireMetres: 2.227, doors: null },
 ];
 
 export const WATT_PER_METRE = 10; // assumed strip, 24 V
@@ -148,11 +148,11 @@ export type Board = {
 };
 
 export const BOARDS: Record<string, Board> = {
-  'IN_B_Side-R': { label: 'Bok prawy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1045, 1063], z: [35, 2615] },
+  'IN_B_Side-R': { label: 'Bok prawy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1045, 1063], z: [35, 2605] },
   'IN_B_Side-R-Lower': { label: 'Bok prawy dolny B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1063, 1081], z: [35, 985] },
   'IN_B_Divider-02': { label: 'Przegroda przy suszarce', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1594, 1612], z: [130, 985] },
-  'IN_B_Side-L': { label: 'Bok lewy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [2222, 2240], z: [35, 2615] },
-  'P14_B_Side-L': { label: 'Bok zewnętrzny P14', group: 'Szafa B', form: 'side', x: [-530, 0], y: [2240, 2280], z: [-5, 2655] },
+  'IN_B_Side-L': { label: 'Bok lewy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [2222, 2240], z: [35, 2605] },
+  'P14_B_Side-L': { label: 'Bok zewnętrzny P14', group: 'Szafa B', form: 'side', x: [-530, 0], y: [2240, 2280], z: [-5, 2645] },
   'IN_B_Shelf-02': { label: 'Blat nad szufladami', group: 'Szafa B', form: 'shelf', x: [-492, -3], y: [1063, 2222], z: [985, 1003] },
   'IN_B_Shelf-06': { label: 'Półka środkowa 06', group: 'Szafa B', form: 'shelf', x: [-425, -3], y: [1463, 1821], z: [1459, 1477] },
   'IN_B_Shelf-09': { label: 'Półka środkowa 09', group: 'Szafa B', form: 'shelf', x: [-425, -3], y: [1463, 1821], z: [1639, 1657] },
@@ -171,11 +171,11 @@ export const BOARDS: Record<string, Board> = {
   'IN_D_Shelf-08': { label: 'Półka 08', group: 'Szafa D', form: 'shelf', x: [-492, -3], y: [40, 685], z: [2287, 2305] },
   F01: { label: 'Drzwi F01', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1644, 2237], z: [38, 2019], free: 'min' },
   F02: { label: 'Drzwi F02', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1048, 1641], z: [38, 2019], free: 'max' },
-  F03: { label: 'Drzwi F03', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1644, 2237], z: [2022, 2612], free: 'min' },
-  F04: { label: 'Drzwi F04', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1048, 1641], z: [2022, 2612], free: 'max' },
+  F03: { label: 'Drzwi F03', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1644, 2237], z: [2022, 2602], free: 'min' },
+  F04: { label: 'Drzwi F04', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1048, 1641], z: [2022, 2602], free: 'max' },
   F05: { label: 'Drzwi F05', group: 'Drzwi', form: 'door', x: [-510, -492], y: [685, 1045], z: [38, 1302], free: 'max' },
   F06: { label: 'Drzwi F06', group: 'Drzwi', form: 'door', x: [-510, -492], y: [148, 682], z: [38, 2019], free: 'max' },
-  F07: { label: 'Drzwi F07', group: 'Drzwi', form: 'door', x: [-510, -492], y: [148, 682], z: [2022, 2612], free: 'max' },
+  F07: { label: 'Drzwi F07', group: 'Drzwi', form: 'door', x: [-510, -492], y: [148, 682], z: [2022, 2602], free: 'max' },
 };
 
 export type Drill = {
@@ -258,7 +258,7 @@ export const axes = (board: Board) =>
 export const BOM: { name: string; amount: string; note: string }[] = [
   { name: 'Zasilacz LED 24 V, 150 W', amount: '1 szt.', note: 'Z dopuszczeniem do mebli, z wtyczką. Z1.' },
   { name: 'Pasek LED 24 V (taśma z rolki), do 10 W/m', amount: `${num(LED_METRES, 2)} m`, note: 'Osiem odcinków, L1 do L8.' },
-  { name: 'Ściemniacz 24 V z wejściem na styk, min. 5 A', amount: '1 szt.', note: 'Świeci przy rozwartym styku. Ś3, cały środek: 7,26 m, ok. 73 W, 3 A.' },
+  { name: 'Ściemniacz 24 V z wejściem na styk, min. 5 A', amount: '1 szt.', note: 'Świeci przy rozwartym styku. Ś3, cały środek: 7,23 m, ok. 72 W, 3 A.' },
   { name: 'Ściemniacz 24 V z pokrętłem, min. 2 A', amount: '2 szt.', note: 'Ś1 regał A, Ś2 wnęka C.' },
   { name: 'Złączka rozgałęźna 5-torowa (np. Wago 221-415)', amount: '3 szt.', note: 'Paski jednej grupy równolegle na wyjściu ściemniacza: dwie przy Ś3, jedna przy Ś2.' },
   { name: 'Włącznik kołyskowy 24 V, min. 3 A', amount: '1 szt.', note: 'S1, pod półką nad rozdzielnią.' },

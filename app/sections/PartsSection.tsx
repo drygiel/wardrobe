@@ -10,15 +10,15 @@ type Group = { name: string; size: string; pieces: string[]; text: string };
 
 // Dimensions from 1_Frame in Szafa4.blend; LED channels and 45° cuts from the cutting plan
 const GROUPS: Group[] = [
-  { name: 'Bok lewy', size: '2660 × 530 × 40', pieces: ['P14_B_Side-L'], text: 'Bok szafy B. Frez LED 18 × 7,5 mm od 580 do 2640 mm, końce chowają się pod deskami regału A. Ścięcie 45° od frontu.' },
-  { name: 'Pas przedni D', size: '2660 × 200 × 40', pieces: ['P09_D_Post-Front-R'], text: 'Frez LED przez całą długość, końce pod półkami sekcji D. Ścięcia 45° na obu końcach.' },
+  { name: 'Bok lewy', size: '2650 × 530 × 40', pieces: ['P14_B_Side-L'], text: 'Bok szafy B. Frez LED 18 × 7,5 mm od 580 do 2630 mm, końce chowają się pod deskami regału A. Ścięcie 45° od frontu.' },
+  { name: 'Pas przedni D', size: '2650 × 200 × 40', pieces: ['P09_D_Post-Front-R'], text: 'Frez LED przez całą długość, końce pod półkami sekcji D. Ścięcia 45° na obu końcach.' },
   { name: 'Wieniec górny', size: '2280 × 200 × 40', pieces: ['P07_B_Rail-Top-Front'], text: 'Przód górnego wieńca. Ścięcia 45° tam, gdzie spotyka boki.' },
   { name: 'Wieniec dolny', size: '2280 × 200 × 40', pieces: ['P08_B_Rail-Bottom-Front'], text: 'Przód dolnego wieńca, stoi na podłodze. Ścięcia 45° na narożnikach.' },
-  { name: 'Boki wnęki C', size: '2 × 1310 × 530 × 40', pieces: ['P03_C_Side-L', 'P05_C_Side-R'], text: 'Dwa boki wnęki, każdy z frezem LED od środka i jednym ścięciem 45°.' },
+  { name: 'Boki wnęki C', size: '2 × 1300 × 530 × 40', pieces: ['P03_C_Side-L', 'P05_C_Side-R'], text: 'Dwa boki wnęki, każdy z frezem LED od środka i jednym ścięciem 45°.' },
   { name: 'Dno i wieniec C', size: '530 × 360 × 40, 330 × 360 × 40', pieces: ['P04_C_Bottom', 'P06_C_Top'], text: 'Zamykają wnękę od dołu i od góry. Dno ma dwa ścięcia 45°.' },
-  { name: 'Półka C', size: '419 × 280 × 40', pieces: ['P15_C_Shelf'], text: 'Dzieli wnękę C na wysokości 2021 mm. Cofnięta o 111 mm od frontu, sięga do tylnej ściany.' },
+  { name: 'Półka C', size: '422 × 280 × 40', pieces: ['P15_C_Shelf'], text: 'Dzieli wnękę C na wysokości 2021 mm. Cofnięta o 108 mm od frontu, równo z frezem LED, sięga do tylnej ściany.' },
   { name: 'Listwy tylne', size: '2200, 1195, 645 × 40 × 40', pieces: ['P02_B_Rail-Bottom-Rear', 'P13_B_Rail-Top-Rear', 'P10_D_Rail-Top-Rear'], text: 'Trzy listwy 40 × 40 mm z tyłu ramy: dolna, górna B i górna D.' },
-  { name: 'Słupek tylny D', size: '2660 × 40 × 40', pieces: ['P01_D_Post-Rear-R'], text: 'Tylny narożnik szafy D, od podłogi do sufitu.' },
+  { name: 'Słupek tylny D', size: '2650 × 40 × 40', pieces: ['P01_D_Post-Rear-R'], text: 'Tylny narożnik szafy D, od podłogi do sufitu.' },
   { name: 'Poprzeczki D', size: '2 × 290 × 40 × 40', pieces: ['P12_D_Crossbar-Top-R', 'P11_D_Crossbar-Bottom-R'], text: 'Łączą pas przedni ze słupkiem tylnym. Mają tę samą siatkę, są wymienne.' },
 ];
 
