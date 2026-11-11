@@ -1,9 +1,9 @@
 // Figures the copy quotes, in millimetres. `parts` is every board, front, handle and LED strip, without hardware and wiring.
-// `depthOverall` runs from the front of the handles to the back of the 2 mm back panel.
+// `depthOverall` runs from the front of the handles to the back of the frame; the HDF backs sit inside it.
 // tests/site.test.ts counts and measures them again in the exported models.
-export const SIZE = { width: 2688, height: 2660, depth: 530, depthOverall: 562 };
+export const SIZE = { width: 2688, height: 2660, depth: 530, depthOverall: 560 };
 export const SIZE_TEXT = `${SIZE.width} × ${SIZE.height} × ${SIZE.depth} mm`;
-export const COUNTS = { parts: 88, sections: 4, framePieces: 14, boards: 3, drawers: 8, hinges: 17, hingedDoors: 7 };
+export const COUNTS = { parts: 98, sections: 4, framePieces: 15, boards: 3, drawers: 6, hinges: 17, hingedDoors: 7 };
 
 export const SITE_URL = 'https://drygiel.github.io/wardrobe/';
 export const REPO_URL = 'https://github.com/drygiel/wardrobe';
@@ -28,9 +28,9 @@ export const PAGES = [
   {
     href: '/rama',
     label: 'Rama',
-    blurb: '14 formatek z trzech dębowych płyt.',
+    blurb: '15 formatek z trzech dębowych płyt.',
     title: 'Rama – Szafa 2025',
-    description: 'Dębowa rama szafy: 14 formatek z trzech płyt 3000 × 620 × 40 mm, rozkrój, lista formatek z frezami pod LED i wymiary.',
+    description: 'Dębowa rama szafy: 15 formatek z trzech płyt 3000 × 620 × 40 mm, rozkrój, lista formatek z frezami pod LED i wymiary.',
   },
   {
     href: '/elektryka',

@@ -9,7 +9,7 @@ export type PlanRow = { view: PlanView; name: string; value: string; text: strin
 
 const ROWS: PlanRow[] = [
   { view: 'front', name: 'Widok z przodu', value: '2688 × 2660 mm', text: 'Bez frontów. Podział na regał A, szafę B, wnękę C i szafę D. Paski LED w kolorze.' },
-  { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami i plecami 2 mm razem ${SIZE.depthOverall} mm.` },
+  { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami razem ${SIZE.depthOverall} mm.` },
   { view: 'top', name: 'Widok z góry', value: `${SIZE.width} × ${SIZE.depthOverall} mm`, text: 'Wieńce, regał A i linia frontów z uchwytami.' },
   { view: 'A', name: 'Regał A', value: '408 mm', text: 'Otwarte półki i zamykana szafka na dole.' },
   { view: 'B', name: 'Szafa B', value: '1226 mm', text: 'Półki górne i siedem szuflad pod nimi.' },

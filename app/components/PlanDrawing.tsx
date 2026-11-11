@@ -65,7 +65,7 @@ export function PlanDrawing({ view }: { view: PlanView }) {
 
     const cls = (name: string, z: number) => {
       if (isLed(name)) return 'led';
-      // The 2 mm back and the side panel count in the overall depth; drawn faint so they hide nothing
+      // The back panels and the side panel are drawn faint so they hide nothing
       if (isBack(name)) return 'dim';
       if (view in SECTIONS) {
         const [a, b] = SECTIONS[view as keyof typeof SECTIONS];

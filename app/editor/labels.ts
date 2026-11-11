@@ -41,7 +41,6 @@ const ELECTRIC: Record<string, string> = {
   Switch: 'Włącznik',
   Socket: 'Gniazdo',
   Wire: 'Przewód gniazda',
-  Unused_BackPanel: 'Plecy szafy',
   Unused_SidePanel: 'Panel boczny',
 };
 
@@ -69,6 +68,7 @@ export function partLabel(name: string): string {
   if ((match = /^(H\d\d)_F\d\d_(Arm|Cup|Plate)$/.exec(name))) return `${HINGE_PARTS[match[2]]} zawiasu ${match[1]}`;
   if ((match = /^MB(\d)_/.exec(name))) return `Klocek montażowy ${match[1]}`;
   if ((match = /^(F\d\d)_Handle$/.exec(name))) return `Uchwyt drzwi ${match[1]}`;
+  if ((match = /^([BCD]\d)_BackPanel$/.exec(name))) return `Plecy ${match[1]}`;
 
   match = /^(?:P\d\d|F\d\d|IN|DR|A)_(?:[ABCD]_)?(.+)$/.exec(name);
   const [head, ...rest] = match ? match[1].split('-') : [];
@@ -87,6 +87,7 @@ export function treePath(name: string, group: string, columns: string[]): string
       if (name.includes('Side')) return ['Boki'];
       if (name.includes('Rail')) return ['Belki'];
       if (name.includes('Crossbar')) return ['Poprzeczki'];
+      if (name.includes('Shelf')) return ['Półki'];
       return ['Dno i wieniec'];
     case 'interior':
       if (name.includes('Shelf')) return [column, 'Półki'];

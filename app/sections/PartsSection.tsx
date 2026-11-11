@@ -16,6 +16,7 @@ const GROUPS: Group[] = [
   { name: 'Wieniec dolny', size: '2280 × 200 × 40', pieces: ['P08_B_Rail-Bottom-Front'], text: 'Przód dolnego wieńca, stoi na podłodze. Ścięcia 45° na narożnikach.' },
   { name: 'Boki wnęki C', size: '2 × 1310 × 530 × 40', pieces: ['P03_C_Side-L', 'P05_C_Side-R'], text: 'Dwa boki wnęki, każdy z frezem LED od środka i jednym ścięciem 45°.' },
   { name: 'Dno i wieniec C', size: '530 × 360 × 40, 330 × 360 × 40', pieces: ['P04_C_Bottom', 'P06_C_Top'], text: 'Zamykają wnękę od dołu i od góry. Dno ma dwa ścięcia 45°.' },
+  { name: 'Półka C', size: '419 × 280 × 40', pieces: ['P15_C_Shelf'], text: 'Dzieli wnękę C na wysokości 2021 mm. Cofnięta o 111 mm od frontu, sięga do tylnej ściany.' },
   { name: 'Listwy tylne', size: '2200, 1195, 645 × 40 × 40', pieces: ['P02_B_Rail-Bottom-Rear', 'P13_B_Rail-Top-Rear', 'P10_D_Rail-Top-Rear'], text: 'Trzy listwy 40 × 40 mm z tyłu ramy: dolna, górna B i górna D.' },
   { name: 'Słupek tylny D', size: '2660 × 40 × 40', pieces: ['P01_D_Post-Rear-R'], text: 'Tylny narożnik szafy D, od podłogi do sufitu.' },
   { name: 'Poprzeczki D', size: '2 × 290 × 40 × 40', pieces: ['P12_D_Crossbar-Top-R', 'P11_D_Crossbar-Bottom-R'], text: 'Łączą pas przedni ze słupkiem tylnym. Mają tę samą siatkę, są wymienne.' },

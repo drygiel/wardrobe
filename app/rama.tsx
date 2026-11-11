@@ -54,9 +54,9 @@ export default function RamaPage() {
         <PlanSection
           title="Rozkrój i wymiary"
           rows={[
-            { view: 'cut', name: 'Rozkrój na płyty', value: '3 × 3000 × 620 mm', text: '14 formatek ułożonych tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz.' },
+            { view: 'cut', name: 'Rozkrój na płyty', value: '3 × 3000 × 620 mm', text: `${COUNTS.framePieces} formatek ułożonych tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz.` },
             { view: 'front', name: 'Widok z przodu', value: '2688 × 2660 mm', text: 'Cała szafa bez frontów, rama razem z wnętrzem.' },
-            { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami i plecami 2 mm razem ${SIZE.depthOverall} mm.` },
+            { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami razem ${SIZE.depthOverall} mm.` },
           ]}
         />
         <NextPage after="/rama" />

@@ -29,6 +29,15 @@ scene = bpy.context.scene
 view_layer = bpy.context.view_layer
 view_layer.layer_collection.children['CutPlan'].exclude = True  # the boards laid out for cutting would shade the wardrobe
 
+
+def include(layer):
+    layer.exclude = False
+    for child in layer.children:
+        include(child)
+
+
+include(view_layer.layer_collection.children['Wardrobe'])  # a collection excluded while editing (2_Fronts) must still bake; never saved
+
 prefs = bpy.context.preferences.addons['cycles'].preferences
 prefs.compute_device_type = 'OPTIX'
 prefs.get_devices()

@@ -30,7 +30,7 @@ type Piece = {
   delay: number;
 };
 
-// The bare frame for /rama: the 14 pieces travel between their place in the frame and their place on the boards
+// The bare frame for /rama: the pieces travel between their place in the frame and their place on the boards
 export function FrameShowcase({ progress }: { progress: RefObject<ShowcaseProgress> }) {
   const { nodes } = useGLTF(FRAME_GLB) as unknown as Result;
   const invalidate = useThree(s => s.invalidate);

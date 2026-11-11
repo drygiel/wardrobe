@@ -23,8 +23,17 @@ electric = list(bpy.data.collections['Electric'].objects)
 hardware = [o for name in ('1a_Dowels', '3_Hinges') for o in bpy.data.collections[name].all_objects if o.type == 'MESH']
 
 cut = view_layer.layer_collection.children['CutPlan']
-excluded = cut.exclude
-cut.exclude = False  # its objects must be in the view layer to be selected
+
+
+def layers(layer):
+    return [layer] + [c for child in layer.children for c in layers(child)]
+
+
+# Every exported collection must be in the view layer to be selected, also one excluded while editing (2_Fronts)
+included = [cut] + layers(view_layer.layer_collection.children['Wardrobe'])
+excluded = {layer.name: layer.exclude for layer in included}
+for layer in included:
+    layer.exclude = False
 selection = [o.name for o in bpy.context.selected_objects]
 active = view_layer.objects.active
 hidden = [o for o in parts + pieces + plan + electric + hardware if o.hide_get()]
@@ -91,7 +100,7 @@ def grain_of(o):
         faces[GLTF_AXIS[normal]] = GLTF_AXIS[max(votes, key=votes.get)] if settled else '?'
     if size[thin] < 0.5 * size[middle]:
         faces.setdefault(GLTF_AXIS[thin], '?')  # the board's face has collapsed UVs
-    # Every shelf runs along the wardrobe's width. The UVMap of IN_C_Shelf-* is rotated 90 degrees and IN_B_Shelf-06/09
+    # Every shelf runs along the wardrobe's width. The UVMap of IN_C_Shelf-* is rotated 90 degrees and IN_B_Shelf-07/13
     # are split, so for shelves this rule wins over the UVs.
     if re.match(r'(IN_._|A_)Shelf', o.name):
         faces[GLTF_AXIS[2]] = GLTF_AXIS[1]
@@ -114,4 +123,5 @@ finally:
     for o in view_layer.objects:
         o.select_set(o.name in selection)
     view_layer.objects.active = active
-    cut.exclude = excluded
+    for layer in included:
+        layer.exclude = excluded[layer.name]

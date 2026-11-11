@@ -212,7 +212,7 @@ function DrawerSection() {
         <div className={styles.text}>
           <h2 id="szuflady-h">Szuflady</h2>
           <p>
-            Siedem szuflad w szafie B i jedna we wnęce C, razem {COUNTS.drawers}. Wszystkie mają
+            Pięć szuflad w szafie B i jedna we wnęce C, razem {COUNTS.drawers}. Wszystkie mają
             głębokość {DEPTH} mm.
           </p>
           <p className={styles.readout}>

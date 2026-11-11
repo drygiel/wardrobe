@@ -16,7 +16,7 @@ const FACTS = [
 
 const FILES = [
   { href: WARDROBE_GLB, name: 'Szafa', note: 'Wnętrze, szuflady i fronty' },
-  { href: FRAME_GLB, name: 'Rama', note: '14 formatek i ich rozkrój na płytach' },
+  { href: FRAME_GLB, name: 'Rama', note: '15 formatek i ich rozkrój na płytach' },
   { href: HARDWARE_GLB, name: 'Okucia', note: 'Zawiasy, kołki i klocki montażowe' },
   { href: ELECTRIC_GLB, name: 'Elektryka', note: 'Kable, ściemniacze i kontaktrony' },
 ];
@@ -60,7 +60,7 @@ export default function About() {
           <li>
             <Link to="/rama#plan">
               <b>Rozkrój ramy</b>
-              <span>Układ 14 formatek na trzech płytach</span>
+              <span>Układ 15 formatek na trzech płytach</span>
               <i>Rysunek</i>
             </Link>
           </li>

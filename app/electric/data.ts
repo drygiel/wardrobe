@@ -19,12 +19,12 @@ export type Led = {
 export const LEDS: Led[] = [
   { id: 'L1', dimmer: 'Ś1', strip: 'C_Side-R-Lower', wire: 'LED_Wire_C_Side-R-Lower', place: 'Dół wnęki C', metres: 0.934, wireMetres: 0.602, doors: ['F05'] },
   { id: 'L2', dimmer: 'Ś2', strip: 'P09', wire: 'LED_Wire_P09', place: 'Szafa D', metres: 2.587, wireMetres: 1.202, doors: ['F06', 'F07'] },
-  { id: 'L3', dimmer: 'Ś3', strip: 'B_Shelf-02', wire: 'LED_Wire_B_Shelf-02', place: 'Pod półką szafy B', metres: 0.513, wireMetres: 0.771, doors: ['F02', 'F04'] },
-  { id: 'L4', dimmer: 'Ś4', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.389, wireMetres: 0.751, doors: ['F02', 'F04'] },
-  { id: 'L5', dimmer: 'Ś5', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.389, wireMetres: 1.931, doors: ['F01', 'F03'] },
+  { id: 'L3', dimmer: 'Ś3', strip: 'B_Shelf-02', wire: 'LED_Wire_B_Shelf-02', place: 'Pod półką szafy B', metres: 0.513, wireMetres: 0.829, doors: ['F02', 'F04'] },
+  { id: 'L4', dimmer: 'Ś4', strip: 'B_Side-R', wire: 'LED_Wire_B_Side-R', place: 'Szafa B, prawy bok', metres: 1.612, wireMetres: 0.805, doors: ['F02', 'F04'] },
+  { id: 'L5', dimmer: 'Ś5', strip: 'B_Side-L', wire: 'LED_Wire_B_Side-L', place: 'Szafa B, lewy bok', metres: 1.612, wireMetres: 1.921, doors: ['F01', 'F03'] },
   { id: 'L6', dimmer: 'Ś6', strip: 'P05', wire: 'LED_Wire_P05', place: 'Wnęka C, prawy bok', metres: 1.27, wireMetres: 0.87, doors: null },
   { id: 'L7', dimmer: 'Ś7', strip: 'P03', wire: 'LED_Wire_P03', place: 'Wnęka C, lewy bok', metres: 1.27, wireMetres: 0.706, doors: null },
-  { id: 'L8', dimmer: 'Ś8', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.06, wireMetres: 2.447, doors: null },
+  { id: 'L8', dimmer: 'Ś8', strip: 'P14', wire: 'LED_Wire', place: 'Regał A', metres: 2.06, wireMetres: 2.227, doors: null },
 ];
 
 export const WATT_PER_METRE = 10; // assumed strip, 24 V
@@ -32,7 +32,7 @@ export const PSU_WATT = 150;
 export const VOLT = 24;
 export const LED_METRES = LEDS.reduce((sum, led) => sum + led.metres, 0);
 export const FULL_WATT = LED_METRES * WATT_PER_METRE;
-export const CABLE_METRES = 20.06;
+export const CABLE_METRES = 20.44;
 
 export const contact = (door: DoorId) => `K${Number(door.slice(1))}`;
 export const stripWatt = (led: Led) => led.metres * WATT_PER_METRE;
@@ -47,20 +47,23 @@ export type Route = { id: string; kind: RouteKind; led?: LedId; doors?: DoorId[]
 const X = -0.0075;
 const Z1 = 1.11;
 const CEIL = 1.2815;
-const LANE = -0.0205;
 const UNDER = 1.7328;
 const TOP = 2.2848;
+const RISE = 1.118; // over the dimmers, then down through IN_C_Shelf-03
+const UNDER_B = 0.98; // LED cables under IN_B_Shelf-02
+const UNDER_B_SIGNAL = 0.983; // contact loops under IN_B_Shelf-02
+const DIP = 0.965; // contact loops cross under the LED cables, over the drawers
 
 export const ROUTES: Route[] = [
   { id: 'Mains_Cord', kind: 'mains', runs: [[[-0.055, 0.8, 0.31], [-0.066, 0.8, 0.31], [-0.066, 0.876, 0.31]]] },
   { id: 'Feed_24V', kind: 'power', runs: [[[-0.03, 0.876, 0.32], [-0.03, 0.8525, 0.32], [X, 0.8525, 0.32], [X, 0.8525, 1.035]]] },
   { id: 'Switch_Wire', kind: 'switch', runs: [[[-0.015, 0.913, 1.04], [-0.034, 0.913, 1.04], [-0.034, 0.913, CEIL], [-0.431, 0.913, CEIL]]] },
-  { id: 'LED_Wire', kind: 'power', led: 'L8', runs: [[[-0.0096, 0.998, Z1], [-0.0096, 0.998, 1.231], [-0.0096, 1.1048, 1.231], [-0.0162, 2.222, 1.231], [-0.0223, 2.2154, 0.604], [-0.2311, 2.2154, 0.604], [-0.44, 2.2154, 0.604], [-0.44, 2.273, 0.604]]] },
+  { id: 'LED_Wire', kind: 'power', led: 'L8', runs: [[[-0.01, 0.998, Z1], [-0.01, 0.998, RISE], [-0.03, 0.998, RISE], [-0.03, 0.998, UNDER_B], [-0.03, 2.215, UNDER_B], [-0.03, 2.215, 0.604], [-0.44, 2.215, 0.604], [-0.44, 2.273, 0.604]]] },
   { id: 'LED_Wire_C_Side-R-Lower', kind: 'power', led: 'L1', runs: [[[X, 0.76, Z1], [X, 0.76, 1.122], [X, 0.7085, 1.122], [X, 0.7085, 1.0085], [-0.4325, 0.7085, 1.0085]]] },
   { id: 'LED_Wire_P09', kind: 'power', led: 'L2', runs: [[[X, 0.794, Z1], [X, 0.794, 1.139], [X, 0.045, 1.139], [-0.431, 0.045, 1.139]]] },
-  { id: 'LED_Wire_B_Shelf-02', kind: 'power', led: 'L3', runs: [[[X, 0.828, Z1], [X, 0.828, 1.2025], [LANE, 0.828, 1.2025], [LANE, 1.0395, 1.2025], [-0.4313, 1.0395, 1.2025], [-0.4313, 1.0825, 1.2025]]] },
-  { id: 'LED_Wire_B_Side-R', kind: 'power', led: 'L4', runs: [[[X, 0.862, Z1], [X, 0.862, 1.236], [LANE, 0.862, 1.236], [LANE, 1.0395, 1.236], [-0.4325, 1.0395, 1.236], [-0.4325, 1.0625, 1.236]]] },
-  { id: 'LED_Wire_B_Side-L', kind: 'power', led: 'L5', runs: [[[X, 0.896, Z1], [X, 0.896, 1.2525], [LANE, 0.896, 1.2525], [LANE, 1.02, 1.2525], [-0.0096, 1.02, 1.2525], [-0.0096, 1.02, 1.241], [-0.0096, 2.2165, 1.241], [-0.05, 2.2165, 1.241], [-0.05, 2.2165, 1.2315], [-0.4325, 2.2165, 1.2315]]] },
+  { id: 'LED_Wire_B_Shelf-02', kind: 'power', led: 'L3', runs: [[[X, 0.828, Z1], [X, 0.828, RISE], [-0.066, 0.828, RISE], [-0.066, 0.828, UNDER_B], [-0.066, 1.087, UNDER_B], [-0.431, 1.087, UNDER_B]]] },
+  { id: 'LED_Wire_B_Side-R', kind: 'power', led: 'L4', runs: [[[X, 0.862, Z1], [X, 0.862, RISE], [-0.078, 0.862, RISE], [-0.078, 0.862, UNDER_B], [-0.078, 1.04, UNDER_B], [-0.433, 1.04, UNDER_B], [-0.433, 1.04, 1.013], [-0.433, 1.062, 1.013]]] },
+  { id: 'LED_Wire_B_Side-L', kind: 'power', led: 'L5', runs: [[[X, 0.896, Z1], [X, 0.896, RISE], [-0.042, 0.896, RISE], [-0.042, 0.896, UNDER_B], [-0.042, 2.216, UNDER_B], [-0.433, 2.216, UNDER_B], [-0.433, 2.216, 1.009]]] },
   { id: 'LED_Wire_P05', kind: 'power', led: 'L6', runs: [[[X, 0.93, Z1], [X, 0.93, CEIL], [X, 0.7205, CEIL], [-0.431, 0.7205, CEIL], [-0.431, 0.7205, 1.3475]]] },
   { id: 'LED_Wire_P03', kind: 'power', led: 'L7', runs: [[[X, 0.964, Z1], [X, 0.964, CEIL], [X, 1.0095, CEIL], [-0.431, 1.0095, CEIL], [-0.431, 1.0095, 1.3475]]] },
   { id: 'Door_Wire_C', kind: 'signal', doors: ['F05'], runs: [[[-0.015, 0.76, 1.0735], [-0.02, 0.76, 1.0735], [-0.02, 0.76, 1.0052], [-0.02, 1.03, 1.0052], [-0.46, 1.03, 1.0052], [-0.46, 1.03, 0.994], [-0.467, 1.03, 0.994]]] },
@@ -78,8 +81,9 @@ export const ROUTES: Route[] = [
     kind: 'signal',
     doors: ['F02', 'F04'],
     runs: [
-      [[-0.015, 0.862, 1.0725], [-0.02, 0.862, 1.0725], [-0.02, 1.0285, 1.0725], [-0.036, 1.0285, 1.0725], [-0.036, 1.0285, 1.2545], [-0.0096, 1.0285, 1.2545], [-0.0096, 1.62, 1.2545], [-0.06, 1.62, 1.2545], [-0.06, 1.62, 1.2282], [-0.46, 1.62, 1.2282], [-0.46, 1.62, 1.217]],
-      [[-0.0096, 1.62, 1.2545], [-0.0096, 1.62, TOP], [-0.46, 1.62, TOP], [-0.46, 1.62, 2.296]],
+      [[-0.015, 0.862, 1.0725], [-0.02, 0.862, 1.0725], [-0.02, 1.035, 1.0725], [-0.02, 1.035, UNDER_B_SIGNAL], [-0.01, 1.035, UNDER_B_SIGNAL], [-0.01, 1.585, UNDER_B_SIGNAL], [-0.01, 1.585, DIP], [-0.462, 1.585, DIP], [-0.462, 1.585, UNDER_B_SIGNAL], [-0.462, 1.62, UNDER_B_SIGNAL], [-0.462, 1.62, 0.994], [-0.467, 1.62, 0.994]],
+      [[-0.015, 0.828, 1.0725], [-0.02, 0.828, 1.0725], [-0.02, 0.862, 1.0725]],
+      [[-0.01, 1.585, UNDER_B_SIGNAL], [-0.01, 1.62, UNDER_B_SIGNAL], [-0.01, 1.62, TOP], [-0.46, 1.62, TOP], [-0.46, 1.62, 2.296]],
     ],
   },
   {
@@ -87,18 +91,18 @@ export const ROUTES: Route[] = [
     kind: 'signal',
     doors: ['F01', 'F03'],
     runs: [
-      [[-0.015, 0.896, 1.0785], [-0.02, 0.896, 1.0785], [-0.02, 1.0285, 1.0785], [-0.0305, 1.0285, 1.0785], [-0.0305, 1.0285, 1.249], [-0.0096, 1.0285, 1.249], [-0.0096, 1.66, 1.249], [-0.06, 1.66, 1.249], [-0.06, 1.66, 1.2282], [-0.46, 1.66, 1.2282], [-0.46, 1.66, 1.217]],
-      [[-0.0096, 1.66, 1.249], [-0.0096, 1.66, TOP], [-0.46, 1.66, TOP], [-0.46, 1.66, 2.296]],
+      [[-0.015, 0.896, 1.0785], [-0.02, 0.896, 1.0785], [-0.02, 1.041, 1.0785], [-0.02, 1.041, UNDER_B_SIGNAL], [-0.016, 1.041, UNDER_B_SIGNAL], [-0.016, 1.579, UNDER_B_SIGNAL], [-0.016, 1.579, DIP], [-0.454, 1.579, DIP], [-0.454, 1.579, UNDER_B_SIGNAL], [-0.454, 1.66, UNDER_B_SIGNAL], [-0.454, 1.66, 0.994], [-0.467, 1.66, 0.994]],
+      [[-0.016, 1.579, UNDER_B_SIGNAL], [-0.016, 1.66, UNDER_B_SIGNAL], [-0.01, 1.66, UNDER_B_SIGNAL], [-0.01, 1.66, TOP], [-0.46, 1.66, TOP], [-0.46, 1.66, 2.296]],
     ],
   },
 ];
 
 // Reed contacts, Blender world millimetres
 export const CONTACTS: Record<DoorId, { y: number; z: number; shelf: string; from: string }> = {
-  F01: { y: 1660, z: 1217, shelf: 'IN_B_Shelf-02', from: 'z góry' },
-  F02: { y: 1620, z: 1217, shelf: 'IN_B_Shelf-02', from: 'z góry' },
-  F03: { y: 1660, z: 2296, shelf: 'IN_B_Shelf-11', from: 'od spodu' },
-  F04: { y: 1620, z: 2296, shelf: 'IN_B_Shelf-12', from: 'od spodu' },
+  F01: { y: 1660, z: 994, shelf: 'IN_B_Shelf-02', from: 'od spodu' },
+  F02: { y: 1620, z: 994, shelf: 'IN_B_Shelf-02', from: 'od spodu' },
+  F03: { y: 1660, z: 2296, shelf: 'IN_B_Shelf-15', from: 'od spodu' },
+  F04: { y: 1620, z: 2296, shelf: 'IN_B_Shelf-16', from: 'od spodu' },
   F05: { y: 1030, z: 994, shelf: 'IN_C_Shelf-03', from: 'z góry' },
   F06: { y: 668, z: 1744, shelf: 'IN_D_Shelf-06', from: 'od spodu' },
   F07: { y: 668, z: 2296, shelf: 'IN_D_Shelf-08', from: 'od spodu' },
@@ -132,25 +136,27 @@ export type Board = {
 };
 
 export const BOARDS: Record<string, Board> = {
-  'IN_B_Side-R': { label: 'Bok prawy szafy B', group: 'Szafa B', form: 'side', x: [-492, 0], y: [1045, 1063], z: [35, 2615] },
-  'IN_B_Side-R-Lower': { label: 'Bok prawy dolny B', group: 'Szafa B', form: 'side', x: [-492, 0], y: [1063, 1081], z: [35, 1208] },
-  'IN_B_Side-L': { label: 'Bok lewy szafy B', group: 'Szafa B', form: 'side', x: [-492, 0], y: [2222, 2240], z: [35, 2615] },
+  'IN_B_Side-R': { label: 'Bok prawy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1045, 1063], z: [35, 2615] },
+  'IN_B_Side-R-Lower': { label: 'Bok prawy dolny B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1063, 1081], z: [35, 985] },
+  'IN_B_Divider-02': { label: 'Przegroda przy suszarce', group: 'Szafa B', form: 'side', x: [-492, -3], y: [1594, 1612], z: [130, 985] },
+  'IN_B_Side-L': { label: 'Bok lewy szafy B', group: 'Szafa B', form: 'side', x: [-492, -3], y: [2222, 2240], z: [35, 2615] },
   'P14_B_Side-L': { label: 'Bok zewnętrzny P14', group: 'Szafa B', form: 'side', x: [-530, 0], y: [2240, 2280], z: [-5, 2655] },
-  'IN_B_Shelf-02': { label: 'Półka nad szufladami', group: 'Szafa B', form: 'shelf', x: [-492, 0], y: [1063, 2222], z: [1208, 1226] },
-  'IN_B_Shelf-05': { label: 'Półka środkowa 05', group: 'Szafa B', form: 'shelf', x: [-443.4, 0], y: [1463, 1821], z: [1639, 1657] },
-  'IN_B_Shelf-08': { label: 'Półka środkowa 08', group: 'Szafa B', form: 'shelf', x: [-443.4, 0], y: [1463, 1821], z: [1839, 1857] },
-  'IN_B_Shelf-10': { label: 'Półka 10', group: 'Szafa B', form: 'shelf', x: [-492, 0], y: [1063, 2222], z: [2009, 2027] },
-  'IN_B_Shelf-11': { label: 'Półka górna lewa', group: 'Szafa B', form: 'shelf', x: [-492, 0], y: [1651.5, 2221.5], z: [2287, 2305] },
-  'IN_B_Shelf-12': { label: 'Półka górna prawa', group: 'Szafa B', form: 'shelf', x: [-492, 0], y: [1063, 1633], z: [2287, 2305] },
-  'IN_C_Shelf-01': { label: 'Półka nad szufladą', group: 'Wnęka C', form: 'shelf', x: [-492, 0], y: [703, 1045], z: [335, 353] },
-  'IN_C_Shelf-02': { label: 'Półka 02', group: 'Wnęka C', form: 'shelf', x: [-492, 0], y: [703, 1045], z: [685, 703] },
-  'IN_C_Shelf-03': { label: 'Półka pod rozdzielnią', group: 'Wnęka C', form: 'shelf', x: [-492, 0], y: [703, 1045], z: [985, 1003] },
-  'IN_C_Shelf-04': { label: 'Półka nad rozdzielnią', group: 'Wnęka C', form: 'shelf', x: [-492, 0], y: [703, 1045], z: [1287, 1305] },
+  'IN_B_Shelf-02': { label: 'Blat nad szufladami', group: 'Szafa B', form: 'shelf', x: [-492, -3], y: [1063, 2222], z: [985, 1003] },
+  'IN_B_Shelf-06': { label: 'Półka środkowa 06', group: 'Szafa B', form: 'shelf', x: [-425, -3], y: [1463, 1821], z: [1459, 1477] },
+  'IN_B_Shelf-09': { label: 'Półka środkowa 09', group: 'Szafa B', form: 'shelf', x: [-425, -3], y: [1463, 1821], z: [1639, 1657] },
+  'IN_B_Shelf-12': { label: 'Półka środkowa 12', group: 'Szafa B', form: 'shelf', x: [-425, -3], y: [1463, 1821], z: [1839, 1857] },
+  'IN_B_Shelf-14': { label: 'Półka 14', group: 'Szafa B', form: 'shelf', x: [-492, -3], y: [1063, 2222], z: [2009, 2027] },
+  'IN_B_Shelf-15': { label: 'Półka górna lewa', group: 'Szafa B', form: 'shelf', x: [-492, -3], y: [1651.5, 2221.5], z: [2287, 2305] },
+  'IN_B_Shelf-16': { label: 'Półka górna prawa', group: 'Szafa B', form: 'shelf', x: [-492, -3], y: [1063, 1633], z: [2287, 2305] },
+  'IN_C_Shelf-01': { label: 'Półka nad szufladą', group: 'Wnęka C', form: 'shelf', x: [-492, -3], y: [703, 1045], z: [335, 353] },
+  'IN_C_Shelf-02': { label: 'Półka 02', group: 'Wnęka C', form: 'shelf', x: [-492, -3], y: [703, 1045], z: [685, 703] },
+  'IN_C_Shelf-03': { label: 'Półka pod rozdzielnią', group: 'Wnęka C', form: 'shelf', x: [-492, -3], y: [703, 1045], z: [985, 1003] },
+  'IN_C_Shelf-04': { label: 'Półka nad rozdzielnią', group: 'Wnęka C', form: 'shelf', x: [-492, -3], y: [703, 1045], z: [1287, 1305] },
   'P04_C_Bottom': { label: 'Dno wnęki P04', group: 'Wnęka C', form: 'shelf', x: [-530, 0], y: [685, 1045], z: [1305, 1345] },
-  'IN_C_Side-R': { label: 'Bok prawy wnęki C', group: 'Wnęka C', form: 'side', x: [-492, 0], y: [685, 703], z: [35, 1305] },
-  'IN_D_Shelf-06': { label: 'Półka 06', group: 'Szafa D', form: 'shelf', x: [-492, 0], y: [40, 685], z: [1735, 1753] },
-  'IN_D_Shelf-07': { label: 'Półka 07', group: 'Szafa D', form: 'shelf', x: [-492, 0], y: [40, 685], z: [2009, 2027] },
-  'IN_D_Shelf-08': { label: 'Półka 08', group: 'Szafa D', form: 'shelf', x: [-492, 0], y: [40, 685], z: [2287, 2305] },
+  'IN_C_Side-R': { label: 'Bok prawy wnęki C', group: 'Wnęka C', form: 'side', x: [-492, -3], y: [685, 703], z: [35, 1305] },
+  'IN_D_Shelf-06': { label: 'Półka 06', group: 'Szafa D', form: 'shelf', x: [-492, -3], y: [40, 685], z: [1735, 1753] },
+  'IN_D_Shelf-07': { label: 'Półka 07', group: 'Szafa D', form: 'shelf', x: [-492, -3], y: [40, 685], z: [2009, 2027] },
+  'IN_D_Shelf-08': { label: 'Półka 08', group: 'Szafa D', form: 'shelf', x: [-492, -3], y: [40, 685], z: [2287, 2305] },
   F01: { label: 'Drzwi F01', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1644, 2237], z: [38, 2019], free: 'min' },
   F02: { label: 'Drzwi F02', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1048, 1641], z: [38, 2019], free: 'max' },
   F03: { label: 'Drzwi F03', group: 'Drzwi', form: 'door', x: [-510, -492], y: [1644, 2237], z: [2022, 2612], free: 'min' },
@@ -172,29 +178,42 @@ export type Drill = {
 const notch = (board: string, at: Drill['at'], size: [number, number], note: string): Drill => ({ board, kind: 'notch', at, size, note });
 const hole = (board: string, at: Drill['at'], d: number, note: string): Drill => ({ board, kind: 'hole', at, d, note });
 
+// Interior boards end 3 mm short of the back (x = -3): the HDF backs slide in behind them
 export const DRILLS: Drill[] = [
-  notch('IN_C_Shelf-01', [-7.75, 800, 344], [80, 15.5], 'Gniazdko 230 V'),
-  notch('IN_C_Shelf-01', [-6.5, 852.5, 344], [10, 13], 'Zasilanie 24 V'),
-  notch('IN_C_Shelf-02', [-6.5, 852.5, 694], [10, 13], 'Zasilanie 24 V'),
-  notch('IN_C_Shelf-03', [-6.5, 852.5, 994], [10, 13], 'Zasilanie 24 V'),
+  notch('IN_C_Shelf-01', [-9.25, 800, 344], [80, 12.5], 'Gniazdko 230 V'),
+  notch('IN_C_Shelf-01', [-8, 852.5, 344], [10, 10], 'Zasilanie 24 V'),
+  notch('IN_C_Shelf-02', [-8, 852.5, 694], [10, 10], 'Zasilanie 24 V'),
+  notch('IN_C_Shelf-03', [-8, 852.5, 994], [10, 10], 'Zasilanie 24 V'),
+  hole('IN_C_Shelf-03', [-66, 828, 994], 8, 'Kabel do L3, w dół pod blat B'),
+  hole('IN_C_Shelf-03', [-78, 862, 994], 8, 'Kabel do L4, w dół'),
+  hole('IN_C_Shelf-03', [-42, 896, 994], 8, 'Kabel do L5, w dół pod blat B'),
+  hole('IN_C_Shelf-03', [-30, 998, 994], 8, 'Kabel do L8, w dół pod blat B'),
+  hole('IN_C_Shelf-03', [-20, 1038, 994], 8, 'Pętle K1, K3 i K2, K4, w dół'),
+  hole('IN_C_Shelf-03', [-433, 1040, 994], 8, 'Kabel do L4, w górę przy boku'),
   hole('IN_C_Shelf-04', [-431, 720.5, 1296], 8, 'Kabel do L6, na wylot'),
   hole('IN_C_Shelf-04', [-431, 1009.5, 1296], 8, 'Kabel do L7, na wylot'),
   hole('P04_C_Bottom', [-431, 720.5, 1325], 8, 'Kabel do L6, wychodzi we frezie LED'),
   hole('P04_C_Bottom', [-431, 1009.5, 1325], 8, 'Kabel do L7, wychodzi we frezie LED'),
-  notch('IN_C_Side-R', [-6.5, 694, 1144], [20, 13], 'Kabel L2 i pętla K6, K7'),
-  notch('IN_B_Side-R', [-7.5, 1054, 1242], [32, 15], 'Kable L8, L5 i pętle kontaktronów B'),
-  hole('IN_B_Side-R', [-432.5, 1054, 1236], 8, 'Kabel do L4, wychodzi pod paskiem'),
-  hole('IN_B_Side-R', [-431.3, 1054, 1202.5], 8, 'Kabel do L3'),
-  hole('IN_B_Side-R-Lower', [-431.3, 1072, 1202.5], 8, 'Kabel do L3'),
+  notch('IN_C_Side-R', [-8, 694, 1144], [20, 10], 'Kabel L2 i pętla K6, K7'),
+  hole('IN_B_Side-R', [-10, 1054, 983], 5, 'Pętla K2, K4'),
+  hole('IN_B_Side-R', [-16, 1054, 983], 5, 'Pętla K1, K3'),
+  hole('IN_B_Side-R', [-30, 1054, 980], 8, 'Kabel do L8'),
+  hole('IN_B_Side-R', [-42, 1054, 980], 8, 'Kabel do L5'),
+  hole('IN_B_Side-R', [-66, 1054, 980], 8, 'Kabel do L3'),
+  hole('IN_B_Side-R', [-433, 1054, 1013], 8, 'Kabel do L4, wychodzi pod paskiem'),
+  notch('IN_B_Side-R-Lower', [-37, 1072, 979], [12, 68], 'Kable L8, L5, L3 i pętle K1 do K4, pod blatem'),
+  notch('IN_B_Divider-02', [-25.5, 1603, 979], [12, 45], 'Kable L8, L5 i pętle K1 do K4, pod blatem'),
+  hole('IN_B_Divider-02', [-454, 1603, 981], 5, 'Pętla K1, tuż pod blatem'),
+  hole('IN_B_Divider-02', [-462, 1603, 981], 5, 'Pętla K2, tuż pod blatem'),
+  hole('IN_B_Shelf-02', [-10, 1620, 994], 5, 'Pętla K4, w górę'),
+  hole('IN_B_Shelf-02', [-10, 1660, 994], 5, 'Pętla K3, w górę'),
+  hole('IN_B_Shelf-02', [-433, 2216, 994], 8, 'Kabel do L5, wychodzi pod paskiem'),
   hole('IN_B_Side-L', [-440, 2231, 604], 8, 'Kabel do L8'),
   hole('P14_B_Side-L', [-440, 2260, 604], 8, 'Kabel do L8, wychodzi we frezie LED'),
-  notch('IN_B_Shelf-02', [-16, 2217, 1217], [10, 10], 'Kabel do L8, w narożniku'),
-  hole('IN_B_Shelf-05', [-9.6, 1620, 1648], 5, 'Pętla K4'),
-  hole('IN_B_Shelf-05', [-9.6, 1660, 1648], 5, 'Pętla K3'),
-  hole('IN_B_Shelf-08', [-9.6, 1620, 1848], 5, 'Pętla K4'),
-  hole('IN_B_Shelf-08', [-9.6, 1660, 1848], 5, 'Pętla K3'),
-  hole('IN_B_Shelf-10', [-9.6, 1620, 2018], 5, 'Pętla K4'),
-  hole('IN_B_Shelf-10', [-9.6, 1660, 2018], 5, 'Pętla K3'),
+  ...['IN_B_Shelf-06', 'IN_B_Shelf-09', 'IN_B_Shelf-12', 'IN_B_Shelf-14'].flatMap(board => {
+    const z = BOARDS[board].z[0] + 9;
+    return [hole(board, [-10, 1620, z], 5, 'Pętla K4'), hole(board, [-10, 1660, z], 5, 'Pętla K3')];
+  }),
   hole('IN_D_Shelf-06', [-7.5, 668, 1744], 5, 'Pętla K7'),
   hole('IN_D_Shelf-07', [-7.5, 668, 2018], 5, 'Pętla K7'),
   ...DOOR_IDS.map((door): Drill => {
@@ -234,7 +253,7 @@ export const BOM: { name: string; amount: string; note: string }[] = [
   { name: 'Szyna rozdzielcza 24 V', amount: '2 szt.', note: 'Stała i za włącznikiem.' },
   { name: 'Przewód 2 × 1,5 mm²', amount: '1 m', note: 'Z zasilacza do rozdzielni.' },
   { name: 'Przewód 2 × 0,5 mm²', amount: '11 m', note: 'Do pasków i do S1, z zapasem.' },
-  { name: 'Przewód 2 × 0,22 mm²', amount: '10 m', note: 'Pętle kontaktronów, z zapasem.' },
+  { name: 'Przewód 2 × 0,22 mm²', amount: '11 m', note: 'Pętle kontaktronów, z zapasem.' },
 ];
 
 export const STEPS: { title: string; text: string }[] = [

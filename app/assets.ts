@@ -15,7 +15,7 @@ export const renderSmall = (n: number) => `${base}images/s/${n}.webp`;
 export const renderLarge = (n: number) => `${base}images/l/${n}.webp`;
 export const picture = (name: string) => `${base}images/frame/${name}.webp`;
 
-// Frame pieces exported from Szafa4.blend (1_Frame); their copies laid on the boards (CutPlan) are Plan_P01..Plan_P14
+// Frame pieces exported from Szafa4.blend (1_Frame); their copies laid on the boards (CutPlan) are Plan_P01..Plan_P15
 export const FRAME_PIECES = [
   'P01_D_Post-Rear-R',
   'P02_B_Rail-Bottom-Rear',
@@ -31,6 +31,7 @@ export const FRAME_PIECES = [
   'P12_D_Crossbar-Top-R',
   'P13_B_Rail-Top-Rear',
   'P14_B_Side-L',
+  'P15_C_Shelf',
 ] as const;
 
 export const FRAME_BOARDS = ['Plan_Sheet-BG1', 'Plan_Sheet-BG2', 'Plan_Sheet-BG3'] as const;

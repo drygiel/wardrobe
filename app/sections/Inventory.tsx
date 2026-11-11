@@ -46,7 +46,7 @@ export default function Inventory() {
     const list = [
       { name: 'Formatki ramy', count: framePieces.length, size: thickness(framePieces), note: 'Lity dąb, z trzech płyt 3000 × 620 × 40 mm', to: '/rama', label: 'Rama' },
       { name: 'Półki i przegrody', count: interior.length, size: thickness(interior), note: 'Wnętrze sekcji A, B, C i D', to: measure('interior'), label: 'Pomiar' },
-      { name: 'Szuflady', count: of(name => kindOf(name) === 'drawer').length, size: 'gł. 487 mm', note: 'Siedem w szafie B, jedna we wnęce C', to: '/okucia#szuflady', label: 'Okucia' },
+      { name: 'Szuflady', count: of(name => kindOf(name) === 'drawer').length, size: 'gł. 487 mm', note: 'Pięć w szafie B, jedna we wnęce C', to: '/okucia#szuflady', label: 'Okucia' },
       { name: 'Fronty', count: fronts.length, size: thickness(fronts), note: 'Drzwi, front regału A i maskownica', to: measure('fronts'), label: 'Pomiar' },
       { name: 'Uchwyty', count: of(name => kindOf(name) === 'handle').length, size: '–', note: 'Na drzwiach dolnych', to: measure('fronts'), label: 'Pomiar' },
       { name: 'Plecy i panel boczny', count: back.length, size: thickness(back), note: 'Zamykają szafę od tyłu i od boku', to: measure('back'), label: 'Pomiar' },
