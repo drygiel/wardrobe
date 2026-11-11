@@ -1,24 +1,20 @@
 import HomeStage from '@/home/HomeStage';
+import About from '@/sections/About';
 import Gallery from '@/sections/Gallery';
 import Footer from '@/sections/Footer';
+import Meta from '@/sections/Meta';
+import NextPage from '@/sections/NextPage';
+import { pageAt } from '@/site';
 
 export default function SzafaPage() {
   return (
     <>
-      <title>Szafa 2025</title>
-      <meta name="theme-color" content="#161412" />
-      <HomeStage
-        nav={[
-          { href: '/pomiar', label: 'Pomiar' },
-          { href: '/plan', label: 'Plan' },
-          { href: '/okucia', label: 'Okucia' },
-          { href: '/galeria', label: 'Galeria' },
-          { href: '/rama', label: 'Rama' },
-          { href: '/elektryka', label: 'Elektryka' },
-        ]}
-      />
+      <Meta page={pageAt('/')} />
       <main>
+        <HomeStage />
         <Gallery />
+        <About />
+        <NextPage after="/" />
       </main>
       <Footer />
     </>

@@ -172,7 +172,15 @@ export function Mesh({ overlay, ...props }: ThreeElements['mesh'] & { overlay?: 
         visible={visible}
         renderOrder={overlay ? 10 : 1}
         layers={0}
-        userData={{ overlay: !!overlay, highlight: (on: boolean) => materials.xray.emissive.set(on ? '#5e4a2c' : '#000000'), focus, lines }}
+        userData={{
+          overlay: !!overlay,
+          highlight: (on: boolean) => materials.xray.emissive.set(on ? '#5e4a2c' : '#000000'),
+          // A glow at a strength from 0 (plain) up, for a highlight that breathes. Amber, not the brown of the steady
+          // highlight: on a part that is already light, more brightness clips to white and only a change of hue shows.
+          pulse: (strength: number) => materials.xray.emissive.set('#c47a14').multiplyScalar(strength),
+          focus,
+          lines,
+        }}
         material={
           wireframe
             ? materials.xray // new THREE.MeshBasicMaterial({ visible: false })

@@ -1,6 +1,7 @@
 // One outline style for the whole toolbar: 16 px grid, square corners like the controls around them
 const PATHS = {
   render: 'M1.5 8S3.9 3.5 8 3.5 14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8ZM10 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z',
+  hidden: 'M1.5 8S3.9 3.5 8 3.5 14.5 8 14.5 8 12.1 12.5 8 12.5 1.5 8 1.5 8ZM2.5 2.5l11 11',
   measure: 'M1.5 5.5h13v5h-13ZM4 5.5v2M6.5 5.5v3M9 5.5v2M11.5 5.5v3',
   perspective: 'M8 1.75 13.5 4.9v6.2L8 14.25 2.5 11.1V4.9ZM2.5 4.9 8 8l5.5-3.1M8 8v6.25',
   front: 'M2.5 2h11v12h-11ZM8 2v12M6.25 7.25v1.5M9.75 7.25v1.5',

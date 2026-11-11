@@ -5,10 +5,13 @@
     --control: #2a2622;
     --side-w: 280px;
     --insp-w: 360px;
+    --bar-h: 30px;
 
     position: relative;
     display: grid;
-    grid-template: 'side view insp' 100svh / var(--side-w) minmax(0, 1fr) var(--insp-w);
+    grid-template:
+        'side view insp' calc(100svh - var(--bar-h))
+        'bar bar bar' var(--bar-h) / var(--side-w) minmax(0, 1fr) var(--insp-w);
     background: var(--bg);
     font-size: 0.8125rem;
     line-height: 1.4;
@@ -66,7 +69,7 @@
 // Straddles the panel's 1px border, so the line it lights up covers that border
 .resizer {
     position: absolute;
-    inset-block: 0;
+    inset-block: 0 var(--bar-h);
     z-index: 2;
     width: 9px;
     cursor: col-resize;
@@ -169,10 +172,33 @@
     margin: 0 -8px;
     scrollbar-color: var(--line) transparent;
     scrollbar-width: thin;
+    scrollbar-gutter: stable; // the rows keep their width when the list grows past the panel
 
     &,
     ul {
         list-style: none;
+    }
+
+    // An open top-level group ends with some air before the next one
+    > li:has(> ul) {
+        padding-bottom: 12px;
+    }
+
+    // An open branch hangs from a faint line under its folder's chevron
+    ul {
+        position: relative;
+
+        &::before {
+            content: '';
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            bottom: 6px;
+            left: var(--guide);
+            width: 1px;
+            background: #49433a; // a shade over --line, which disappears on the panel
+            pointer-events: none;
+        }
     }
 }
 
@@ -185,7 +211,8 @@
     padding-right: 8px;
     transition: background-color 120ms;
 
-    &:hover {
+    &:hover,
+    &.hot {
         background: var(--control);
     }
 
@@ -198,52 +225,64 @@
         }
     }
 
-    // Quiet outline, the mark takes the row's text colour so it also works on a pinned row
-    input {
-        appearance: none;
-        flex: none;
-        display: grid;
-        place-content: center;
-        width: 13px;
-        height: 13px;
-        border: 1px solid #6b645a;
-        background: transparent;
-        color: inherit;
-        cursor: pointer;
-        transition: border-color 120ms;
-
-        &:hover {
-            border-color: var(--muted);
-        }
-
-        &::before {
-            content: '';
-            width: 9px;
-            height: 9px;
-            background: currentColor;
-            opacity: 0;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.8 5.3 4.1 7.6 8.2 2.8' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
-        }
-
-        &:checked::before,
-        &:indeterminate::before {
-            opacity: 0.7;
-        }
-
-        &:indeterminate::before {
-            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 5H7.5' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E");
-        }
+    // An open top-level group reads as the heading of the rows under it
+    .tree > li > &:has(.chevron[aria-expanded='true']) .rowLabel {
+        font-weight: 600;
     }
 
+    // Hidden rows step back: grey name, struck-out eye
+    &.off .rowLabel {
+        color: var(--muted);
+    }
+
+    // The group's colour: a dot right after its name
     i {
-        flex: none;
-        width: 8px;
-        height: 8px;
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        margin-left: 7px;
+        border-radius: 50%;
+        vertical-align: middle;
     }
 
     &:hover .count,
     &:focus-within .count {
         visibility: hidden;
+    }
+}
+
+// Shows or hides the row's parts; takes the row's text colour so it also works on a pinned row
+.eye {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 24px;
+    border: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0; // shown with the row under the cursor; only a hidden row keeps its struck-out eye
+    transition: opacity 120ms, color 120ms;
+
+    .row:hover &,
+    &:focus-visible {
+        opacity: 0.8;
+    }
+
+    .row:hover &.partly {
+        opacity: 0.45;
+    }
+
+    &[aria-pressed='false'] {
+        color: var(--muted);
+        opacity: 0.7;
+    }
+
+    .row &:hover {
+        opacity: 1;
+        color: var(--accent);
     }
 }
 
@@ -255,7 +294,7 @@
     height: 24px;
     border: 0;
     background: none;
-    color: var(--muted);
+    color: #6b645a; // quieter than the names beside it
 
     svg {
         transition: transform 120ms;
@@ -299,20 +338,26 @@
 
 .solo {
     position: absolute;
-    right: 8px;
+    right: 34px; // the eye keeps the end of the row
     top: 50%;
     transform: translateY(-50%);
     border: 0;
     background: none;
     color: inherit;
+    display: grid;
+    place-items: center;
+    padding: 4px;
     font-size: 0.75rem;
-    text-decoration: underline;
-    text-underline-offset: 2px;
     opacity: 0;
+    transition: color 120ms;
 
     .row:hover &,
     &:focus-visible {
         opacity: 1;
+    }
+
+    &:hover {
+        color: var(--accent);
     }
 }
 
@@ -322,12 +367,12 @@
     background: var(--accent);
     color: var(--bg);
     font-weight: 600;
-    text-decoration: none;
     opacity: 1;
     transition: background-color 120ms;
 
     &:hover {
         background: #f7c98a;
+        color: var(--bg);
     }
 }
 
@@ -420,6 +465,29 @@
 }
 
 // The same call to action as .soloOn in the list
+// A key in the button's corner, out of the flow so the button keeps its size
+.seg .key {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    font-size: 0.5625rem;
+    line-height: 1;
+    opacity: 0.55;
+}
+
+// The key that does the same as the button it sits on
+.seg kbd {
+    margin-left: auto;
+    padding: 1px 5px;
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    font: 500 0.6875rem / 1.3 var(--font-text);
+    opacity: 0.65;
+}
+
 .seg .exitIsolation {
     background: var(--accent);
     color: var(--bg);
@@ -437,6 +505,8 @@
     grid-auto-columns: 1fr; // every option in a group gets the width of the longest one
     gap: 1px;
     border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden; // the buttons inside stay square and are clipped to the group's corners
     background: var(--line);
     pointer-events: auto;
 
@@ -444,16 +514,20 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 7px;
-        height: 32px;
-        padding: 0 11px;
+        position: relative;
+        gap: 5px;
+        height: 26px;
+        padding: 0 8px;
         border: 0;
+        font-size: 0.75rem;
         background: var(--panel);
         white-space: nowrap;
         transition: background-color 120ms, color 120ms;
 
         svg {
             flex: none;
+            width: 14px;
+            height: 14px;
         }
 
         // Sits over the model, so it needs more contrast than the panel controls
@@ -473,7 +547,7 @@
     }
 }
 
-// One stack, so the buttons ride above the status line however many rows it wraps to; `right` keeps clear of the gizmo
+// `right` keeps clear of the gizmo
 .corner {
     position: absolute;
     left: 16px;
@@ -486,17 +560,63 @@
     pointer-events: none;
 }
 
-.status {
+// Status bar along the bottom of the window, like a desktop application's
+.bar {
+    grid-area: bar;
+    z-index: 3;
     display: flex;
-    flex-wrap: wrap;
-    gap: 4px 20px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 0;
+    padding: 0 12px;
+    border-top: 1px solid var(--line);
+    background: var(--panel);
     color: var(--muted);
-    pointer-events: none;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+.status {
+    flex: none;
+    min-width: 9em;
 
     b {
         color: var(--ink);
         font-weight: 600;
         font-variant-numeric: tabular-nums;
+    }
+}
+
+.keys {
+    display: flex;
+    gap: 16px;
+    min-width: 0;
+    overflow: hidden;
+    list-style: none;
+
+    li {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    // A key cap
+    kbd {
+        min-width: 18px;
+        padding: 1px 5px;
+        border: 1px solid #6b645a;
+        border-bottom-width: 2px;
+        border-radius: 3px;
+        background: var(--control);
+        color: var(--ink);
+        font: 500 0.6875rem / 1.3 var(--font-text);
+        text-align: center;
+    }
+
+    kbd:last-of-type {
+        margin-right: 2px;
     }
 }
 
@@ -659,7 +779,14 @@
 
         grid-template:
             'view insp' 76svh
-            'side insp' auto / minmax(0, 1fr) var(--insp-w);
+            'side insp' auto
+            'bar bar' var(--bar-h) / minmax(0, 1fr) var(--insp-w);
+    }
+
+    // The page scrolls here; the bar stays at the bottom of the window
+    .bar {
+        position: sticky;
+        bottom: 0;
     }
 
     .resizerSide {
@@ -693,7 +820,8 @@
         grid-template:
             'view' 58svh
             'insp' auto
-            'side' auto / minmax(0, 1fr);
+            'side' auto
+            'bar' var(--bar-h) / minmax(0, 1fr);
     }
 
     .resizer {
@@ -746,30 +874,35 @@
     }
 }
 
+// Touch sizes and always-on row icons. Some desktops report no hover although a mouse is in use
+// (the app's preview pane does); Editor marks the shell once a mouse actually moves, and these rules step aside.
 @media (hover: none) {
-    .solo {
-        opacity: 1;
-    }
-
-    // A finger needs a wider target than a cursor
-    .resizer {
-        width: 21px;
-        margin-inline: -6px;
-
-        &::after {
-            left: 9px;
+    .shell:not([data-mouse]) {
+        .solo,
+        .eye {
+            opacity: 1;
         }
-    }
 
-    .count,
-    .rowLabel small {
-        visibility: hidden;
-    }
+        // A finger needs a wider target than a cursor
+        .resizer {
+            width: 21px;
+            margin-inline: -6px;
 
-    .seg button,
-    .columns button,
-    .tool,
-    .row {
-        min-height: 44px;
+            &::after {
+                left: 9px;
+            }
+        }
+
+        .count,
+        .rowLabel small {
+            visibility: hidden;
+        }
+
+        .seg button,
+        .columns button,
+        .tool,
+        .row {
+            min-height: 44px;
+        }
     }
 }

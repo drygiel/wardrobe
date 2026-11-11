@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { FRAME_GLB, WARDROBE_GLB } from '@/assets';
+import { PAGES, REPO_URL } from '@/site';
 import styles from './Footer.module.scss';
 
 // A low band lit from above by an LED strip, like the wardrobe's own shelves
@@ -14,27 +15,11 @@ export default function Footer() {
       </div>
       <nav className={styles.links} aria-label="Stopka">
         <ul>
-          <li>
-            <Link to="/">Szafa</Link>
-          </li>
-          <li>
-            <Link to="/rama">Rama</Link>
-          </li>
-          <li>
-            <Link to="/elektryka">Elektryka</Link>
-          </li>
-          <li>
-            <Link to="/pomiar">Edytor pomiarów</Link>
-          </li>
-          <li>
-            <Link to="/plan">Rysunek techniczny</Link>
-          </li>
-          <li>
-            <Link to="/okucia">Szuflady i zawiasy</Link>
-          </li>
-          <li>
-            <Link to="/galeria">Galeria</Link>
-          </li>
+          {PAGES.map(page => (
+            <li key={page.href}>
+              <Link to={page.href}>{page.label}</Link>
+            </li>
+          ))}
         </ul>
         <ul className={styles.files}>
           <li>
@@ -48,7 +33,7 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <a href="https://github.com/drygiel/wardrobe">Kod na GitHubie</a>
+            <a href={REPO_URL}>Kod na GitHubie</a>
           </li>
         </ul>
       </nav>

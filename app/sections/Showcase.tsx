@@ -1,12 +1,14 @@
 import { type ReactNode, type RefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Link } from 'react-router';
 import cn from 'classnames';
 import type { ShowcaseProgress } from '@/components/schematic';
+import type { PagePath } from '@/site';
+import Ready from '@/components/Ready';
+import SiteNav from './SiteNav';
 import styles from './Showcase.module.scss';
 
 type Props = {
-  nav: { href: string; label: string; current?: boolean }[];
+  current: PagePath;
   heading: string;
   facts: string;
   hint: string;
@@ -22,7 +24,7 @@ type Props = {
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 // Hero and scroll-driven steps share one fixed canvas, so the model moves on without a cut
-export default function Showcase({ nav, heading, facts, hint, actions, id, title, steps, photos, scene }: Props) {
+export default function Showcase({ current, heading, facts, hint, actions, id, title, steps, photos, scene }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null!);
   const heroRef = useRef<HTMLElement>(null!);
   const sectionRef = useRef<HTMLElement>(null!);
@@ -31,6 +33,7 @@ export default function Showcase({ nav, heading, facts, hint, actions, id, title
   const progress = useRef<ShowcaseProgress>({ T: 0, yaw: 0 });
   const invalidate = useRef<() => void>(() => {});
   const [visible, setVisible] = useState(true);
+  const [ready, setReady] = useState(false);
   const count = steps.length;
 
   useEffect(() => {
@@ -113,25 +116,20 @@ export default function Showcase({ nav, heading, facts, hint, actions, id, title
           eventPrefix="client"
           onCreated={state => (invalidate.current = state.invalidate)}
         >
-          <Suspense fallback={null}>{scene(progress)}</Suspense>
+          <Suspense fallback={null}>
+            {scene(progress)}
+            <Ready onReady={setReady} />
+          </Suspense>
         </Canvas>
       </div>
 
       <header ref={heroRef} className={styles.hero}>
-        <Link className={styles.wordmark} to="/">
-          Szafa 2025
-        </Link>
-        <nav className={styles.nav} aria-label="Nawigacja">
-          <ul>
-            {nav.map(item => (
-              <li key={item.href}>
-                <Link to={item.href} aria-current={item.current ? 'page' : undefined}>
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <SiteNav current={current} halo />
+        {!ready && (
+          <p className="loading" role="status">
+            Ładuję model 3D
+          </p>
+        )}
 
         <div className={styles.intro}>
           <h1>{heading}</h1>

@@ -52,32 +52,10 @@ $line: rgba(241, 239, 228, 0.32);
     transition: background 1s;
 }
 
+// Room for the shared menu, which sits in the hero's top corners
 .topnav {
     grid-column: 1 / -1;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 24px;
-
-    ul {
-        display: flex;
-        gap: 24px;
-        list-style: none;
-    }
-
-    a {
-        text-decoration: none;
-    }
-
-    a:hover {
-        color: var(--accent);
-    }
-}
-
-.wordmark {
-    font-family: var(--font-display);
-    font-size: var(--step-lead);
-    white-space: nowrap;
+    height: 64px;
 }
 
 .intro {
@@ -1308,15 +1286,6 @@ $line: rgba(241, 239, 228, 0.32);
 @media (max-width: 599px) {
     .facts {
         grid-template-columns: repeat(2, auto);
-    }
-
-    .topnav ul {
-        gap: 14px;
-        font-size: var(--step-small);
-    }
-
-    .topnav li:first-child {
-        display: none; // the wordmark links there too
     }
 
     .switchRow {

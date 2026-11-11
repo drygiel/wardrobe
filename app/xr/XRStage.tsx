@@ -1,17 +1,20 @@
 import * as THREE from 'three';
 import { type ReactNode, type RefObject, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { type ThreeEvent, useFrame } from '@react-three/fiber';
+import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { type XRControllerState, useXR, useXRStore, XROrigin } from '@react-three/xr';
 import type { LineData } from '@/components/Mesh';
 import { useApp } from '@/contexts/AppContext';
 import { inUnit } from '@/editor/labels';
 import { selection, useSelection } from '@/editor/selection';
-import { type Footprint, nearestEdge, placementMatrix, type Pose, snapToWalls, type SnapStatus, type Wall, wallFromPolygon, wrapAngle, yawFacing } from './placement';
+import { carry, type Footprint, nearestEdge, placementMatrix, type Pose, snapToWalls, type SnapStatus, type Wall, wallFromPolygon, wrapAngle, yawFacing } from './placement';
 import { XRPanel } from './XRPanel';
 
 const START_DISTANCE = 2; // metres in front of the viewer
 const STICK_SPEED = 1; // metres per second at full tilt
+const TURN_SPEED = Math.PI / 2; // radians per second at full tilt
+const NIGHT_DIM = 0.3; // exposure factor of the night mode
 const DEAD_ZONE = 0.2;
+const MIN_HAND_SPAN = 0.1; // metres; closer hands give a jittery angle
 const noRaycast = () => null;
 
 // The carcass only: doors and drawers swing out, and hidden parts still count for standing against a wall
@@ -56,13 +59,15 @@ function headingOf({ orientation: q }: XRRigidTransform) {
 
 const deadZone = (value = 0) => (Math.abs(value) < DEAD_ZONE ? 0 : value);
 
-type Grab = { input: XRControllerState; x: number; z: number; heading: number; raw: Pose };
+// The handle of the last frame: the gripping hand, or the point between two, and the angle of the line joining them
+type Grab = { count: number; x: number; z: number; angle: number | null };
 
 // Everything the headset needs and the desktop must not pay for: moving the wardrobe, the wrist menu, the measuring ray
 function XRRig({ placed }: { placed: RefObject<THREE.Group> }) {
   const store = useXRStore();
   const pose = useRef<Pose | null>(null);
   const grab = useRef<Grab | null>(null);
+  const raw = useRef<Pose | null>(null); // before snapping, while a hand or a stick is on it
   const foot = useRef<Footprint | null>(null);
   const floor = useRef(0);
   const statusRef = useRef<SnapStatus>('free');
@@ -70,6 +75,17 @@ function XRRig({ placed }: { placed: RefObject<THREE.Group> }) {
   const [snap, setSnap] = useState(true);
   const [status, setStatus] = useState<SnapStatus>('free');
   const [wallCount, setWallCount] = useState(0);
+  const [brightness, setBrightness] = useState(1);
+  const [night, setNight] = useState(false);
+  const gl = useThree(state => state.gl);
+
+  // In passthrough a lit model glows against a dark room. Exposure dims every tone-mapped material at once; the menu is not one
+  useEffect(() => {
+    gl.toneMappingExposure = brightness * (night ? NIGHT_DIM : 1);
+    return () => {
+      gl.toneMappingExposure = 1;
+    };
+  }, [gl, brightness, night]);
 
   const show = (next: Pose) => {
     pose.current = next;
@@ -109,37 +125,47 @@ function XRRig({ placed }: { placed: RefObject<THREE.Group> }) {
       show({ x, z, yaw: yawFacing(head.x - x, head.z - z) });
     }
 
-    const pressed = (input: XRControllerState) => input.gamepad['xr-standard-squeeze']?.state === 'pressed' && !!input.inputSource.gripSpace;
     const controllers = inputSourceStates.filter((input): input is XRControllerState => input.type === 'controller');
-    const input = controllers.find(c => c === grab.current?.input && pressed(c)) ?? controllers.find(pressed);
-    const grip = input && frame.getPose(input.inputSource.gripSpace!, reference);
-    shadow.current.visible = !!grip;
+    const stickOf = (hand: XRHandedness) => controllers.find(c => c.inputSource.handedness === hand)?.gamepad['xr-standard-thumbstick'];
 
-    if (!input || !grip) {
+    // Left stick moves, right stick turns: no grip needed, and a full turn without twisting a wrist
+    const right = deadZone(stickOf('left')?.xAxis) * STICK_SPEED * delta;
+    const away = -deadZone(stickOf('left')?.yAxis) * STICK_SPEED * delta;
+    const spin = -deadZone(stickOf('right')?.xAxis) * TURN_SPEED * delta;
+
+    const hands = controllers
+      .filter(c => c.gamepad['xr-standard-squeeze']?.state === 'pressed' && c.inputSource.gripSpace)
+      .sort((p, q) => (p.inputSource.handedness < q.inputSource.handedness ? -1 : 1))
+      .flatMap(c => frame.getPose(c.inputSource.gripSpace!, reference)?.transform.position ?? []);
+
+    const active = hands.length > 0 || right !== 0 || away !== 0 || spin !== 0;
+    shadow.current.visible = active;
+    if (!active) {
       grab.current = null;
+      raw.current = null;
       return;
     }
+    const next = (raw.current ??= { ...pose.current! });
 
-    const { x, z } = grip.transform.position;
-    const gripHeading = headingOf(grip.transform) ?? grab.current?.heading ?? 0;
-    if (grab.current?.input !== input) grab.current = { input, x, z, heading: gripHeading, raw: { ...pose.current! } };
-    const held = grab.current;
+    // One grip carries it one to one; two grips also turn it, like a steering wheel, around the point between the hands
+    const [a, b] = hands;
+    if (a) {
+      const x = b ? (a.x + b.x) / 2 : a.x;
+      const z = b ? (a.z + b.z) / 2 : a.z;
+      const angle = b && Math.hypot(b.x - a.x, b.z - a.z) > MIN_HAND_SPAN ? yawFacing(b.x - a.x, b.z - a.z) : null;
+      const held = grab.current?.count === hands.length ? grab.current : { x, z, angle };
+      carry(next, held, { x, z }, angle !== null && held.angle !== null ? wrapAngle(angle - held.angle) : 0);
+      grab.current = { count: hands.length, x, z, angle };
+    } else grab.current = null;
 
-    // The hand moves it one to one and the wrist turns it on the spot; the stick is for rooms longer than an arm
-    const stick = input.gamepad['xr-standard-thumbstick'];
-    const right = deadZone(stick?.xAxis) * STICK_SPEED * delta;
-    const away = -deadZone(stick?.yAxis) * STICK_SPEED * delta;
-    held.raw.x += x - held.x + Math.cos(heading) * right - Math.sin(heading) * away;
-    held.raw.z += z - held.z - Math.sin(heading) * right - Math.cos(heading) * away;
-    held.raw.yaw += wrapAngle(gripHeading - held.heading);
-    held.x = x;
-    held.z = z;
-    held.heading = gripHeading;
+    next.x += Math.cos(heading) * right - Math.sin(heading) * away;
+    next.z += -Math.sin(heading) * right - Math.cos(heading) * away;
+    next.yaw += spin;
 
-    const snapped = snap ? snapToWalls(held.raw, foot.current, room.walls, head) : { pose: held.raw, status: 'free' as const };
+    const snapped = snap ? snapToWalls(next, foot.current, room.walls, head) : { pose: next, status: 'free' as const };
     show({ ...snapped.pose });
     if (snapped.status !== statusRef.current) {
-      if (snapped.status !== 'free') input.inputSource.gamepad?.hapticActuators?.[0]?.pulse?.(0.6, 40);
+      if (snapped.status !== 'free') for (const c of controllers) c.inputSource.gamepad?.hapticActuators?.[0]?.pulse?.(0.6, 40);
       statusRef.current = snapped.status;
       setStatus(snapped.status);
     }
@@ -147,6 +173,7 @@ function XRRig({ placed }: { placed: RefObject<THREE.Group> }) {
 
   const reset = () => {
     grab.current = null;
+    raw.current = null;
     pose.current = null;
     statusRef.current = 'free';
     setStatus('free');
@@ -160,7 +187,18 @@ function XRRig({ placed }: { placed: RefObject<THREE.Group> }) {
       </mesh>
       <EdgeLabel />
       <Suspense fallback={null}>
-        <XRPanel snap={snap} setSnap={setSnap} status={status} wallCount={wallCount} reset={reset} />
+        <XRPanel
+          snap={snap}
+          setSnap={setSnap}
+          status={status}
+          wallCount={wallCount}
+          reset={reset}
+          night={night}
+          setNight={setNight}
+          brightness={brightness}
+          // Steps of a fifth, so a few presses span the range and one press is a fine correction
+          stepBrightness={steps => setBrightness(value => THREE.MathUtils.clamp(value * 1.2 ** steps, 0.1, 1.5))}
+        />
       </Suspense>
     </>
   );

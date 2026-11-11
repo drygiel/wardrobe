@@ -226,15 +226,15 @@ export const axes = (board: Board) =>
 
 export const BOM: { name: string; amount: string; note: string }[] = [
   { name: 'Zasilacz LED 24 V, 150 W', amount: '1 szt.', note: 'Z dopuszczeniem do mebli, z wtyczką. Z1.' },
-  { name: 'Taśma LED 24 V, do 10 W/m', amount: `${num(LED_METRES, 2)} m`, note: 'Osiem odcinków, L1 do L8.' },
+  { name: 'Pasek LED 24 V (taśma z rolki), do 10 W/m', amount: `${num(LED_METRES, 2)} m`, note: 'Osiem odcinków, L1 do L8.' },
   { name: 'Ściemniacz 24 V z wejściem na styk', amount: '5 szt.', note: 'Świeci przy rozwartym styku. Ś1 do Ś5.' },
   { name: 'Ściemniacz 24 V z pokrętłem', amount: '3 szt.', note: 'Ś6 do Ś8.' },
-  { name: 'Włącznik kołyskowy 24 V, min. 3 A', amount: '1 szt.', note: 'S1, pod półką IN_C_Shelf-04.' },
+  { name: 'Włącznik kołyskowy 24 V, min. 3 A', amount: '1 szt.', note: 'S1, pod półką nad rozdzielnią.' },
   { name: 'Kontaktron wpuszczany Ø8 z magnesem', amount: '7 kpl.', note: 'Styk zwarty przy zamkniętych drzwiach. K1 do K7.' },
   { name: 'Szyna rozdzielcza 24 V', amount: '2 szt.', note: 'Stała i za włącznikiem.' },
   { name: 'Przewód 2 × 1,5 mm²', amount: '1 m', note: 'Z zasilacza do rozdzielni.' },
-  { name: 'Przewód 2 × 0,5 mm²', amount: '11 m', note: 'Do pasków i do S1.' },
-  { name: 'Przewód 2 × 0,22 mm²', amount: '10 m', note: 'Pętle kontaktronów.' },
+  { name: 'Przewód 2 × 0,5 mm²', amount: '11 m', note: 'Do pasków i do S1, z zapasem.' },
+  { name: 'Przewód 2 × 0,22 mm²', amount: '10 m', note: 'Pętle kontaktronów, z zapasem.' },
 ];
 
 export const STEPS: { title: string; text: string }[] = [

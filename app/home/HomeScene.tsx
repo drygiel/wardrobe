@@ -25,6 +25,7 @@ import {
   stripped,
 } from './chapters';
 import hintStyles from '@/components/LineHint.module.scss';
+import { light } from '@/theme';
 import { DRAFT_LABELS, FLOOR_SEGMENTS, WALL_SEGMENTS } from './draft';
 import { LAYERS, layerIndex, layerOfKind } from './layers';
 
@@ -46,12 +47,13 @@ type Result = GLTF & { nodes: Record<string, THREE.Object3D> };
 
 // Model space: front faces -X, the back sits at x = 0, section A at -Z, up is +Y
 const CENTER = new THREE.Vector3(-0.265, 1.33, -1.344);
-const INK = '#e0ddd6';
-const FAINT = '#7d766b';
-const LED = '#f0b35a';
+// Pens follow the theme, as --ink, --muted and --accent do in global.scss
+const INK = light ? '#1b1815' : '#e0ddd6';
+const FAINT = light ? '#9a9286' : '#7d766b';
+const LED = light ? '#c47a14' : '#f0b35a';
 const DOWEL = '#d9b27a'; // as hardwareColor() in components/Hardware.tsx, without pulling the editor's mesh code in
 const DOWEL_CLEARANCE = 0.008; // m between a dowel's end and the mouth of its hole in the spread frame
-const GROUND = new THREE.Vector3(0x16, 0x14, 0x12).divideScalar(255); // --bg, written after colour conversion so ink surfaces vanish into the page
+const GROUND = (light ? new THREE.Vector3(0xeb, 0xe7, 0xdf) : new THREE.Vector3(0x16, 0x14, 0x12)).divideScalar(255); // --bg, written after colour conversion so ink surfaces vanish into the page
 
 const B_DOORS = Object.keys(DOORS).filter(name => name.includes('_B_Door'));
 
@@ -176,7 +178,7 @@ const gridMaterial = new THREE.ShaderMaterial({
     }
     void main() {
       float fade = 1.0 - smoothstep(1.6, 5.5, distance(vP, vec2(-1.344, 1.33)));
-      gl_FragColor = vec4(0.88, 0.87, 0.84, (grid(0.1) * 0.05 + grid(0.5) * 0.13) * fade * uAlpha);
+      gl_FragColor = vec4(${light ? '0.11, 0.09, 0.08' : '0.88, 0.87, 0.84'},(grid(0.1) * 0.05 + grid(0.5) * 0.13) * fade * uAlpha);
     }`,
 });
 
@@ -612,7 +614,7 @@ export function HomeScene({ progress, labels, finalText, callouts, hint, onCount
       LAYERS.map((layer, i) => {
         if (layer.id === 'hinges') return hinges.size;
         if (layer.id === 'dowels') return fixings;
-        return parts.filter(p => p.layer === i && p.kind !== 'handle').length;
+        return parts.filter(p => p.layer === i).reduce((sum, p) => sum + 1 + p.handles.length, 0);
       }),
     );
   }, [parts, hardware, onCounts]);

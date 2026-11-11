@@ -15,7 +15,7 @@ const GROUPS: Group[] = [
   { name: 'Wieniec górny', size: '2280 × 200 × 40', pieces: ['P07_B_Rail-Top-Front'], text: 'Przód górnego wieńca. Ścięcia 45° tam, gdzie spotyka boki.' },
   { name: 'Wieniec dolny', size: '2280 × 200 × 40', pieces: ['P08_B_Rail-Bottom-Front'], text: 'Przód dolnego wieńca, stoi na podłodze. Ścięcia 45° na narożnikach.' },
   { name: 'Boki wnęki C', size: '2 × 1310 × 530 × 40', pieces: ['P03_C_Side-L', 'P05_C_Side-R'], text: 'Dwa boki wnęki, każdy z frezem LED od środka i jednym ścięciem 45°.' },
-  { name: 'Dno i wieniec C', size: '530 × 360, 330 × 360', pieces: ['P04_C_Bottom', 'P06_C_Top'], text: 'Zamykają wnękę od dołu i od góry. Dno ma dwa ścięcia 45°.' },
+  { name: 'Dno i wieniec C', size: '530 × 360 × 40, 330 × 360 × 40', pieces: ['P04_C_Bottom', 'P06_C_Top'], text: 'Zamykają wnękę od dołu i od góry. Dno ma dwa ścięcia 45°.' },
   { name: 'Listwy tylne', size: '2200, 1195, 645 × 40 × 40', pieces: ['P02_B_Rail-Bottom-Rear', 'P13_B_Rail-Top-Rear', 'P10_D_Rail-Top-Rear'], text: 'Trzy listwy 40 × 40 mm z tyłu ramy: dolna, górna B i górna D.' },
   { name: 'Słupek tylny D', size: '2660 × 40 × 40', pieces: ['P01_D_Post-Rear-R'], text: 'Tylny narożnik szafy D, od podłogi do sufitu.' },
   { name: 'Poprzeczki D', size: '2 × 290 × 40 × 40', pieces: ['P12_D_Crossbar-Top-R', 'P11_D_Crossbar-Bottom-R'], text: 'Łączą pas przedni ze słupkiem tylnym. Mają tę samą siatkę, są wymienne.' },
@@ -55,9 +55,9 @@ export default function PartsSection() {
         <ul>
           {GROUPS.map((g, i) => (
             <li key={g.name} className={cn({ [styles.on]: i === index })}>
-              <button onMouseEnter={() => setIndex(i)} onFocus={() => setIndex(i)} onClick={() => setIndex(i)}>
+              <button aria-pressed={i === index} onMouseEnter={() => setIndex(i)} onFocus={() => setIndex(i)} onClick={() => setIndex(i)}>
                 <span className={styles.big}>{g.name}</span>
-                <span className={styles.meta}>{g.size}</span>
+                <span className={styles.meta}>{g.size} mm</span>
               </button>
             </li>
           ))}
@@ -65,7 +65,7 @@ export default function PartsSection() {
       </div>
 
       <figure className={styles.preview}>
-        <div className={styles.view}>
+        <div className={styles.view} aria-hidden="true">
           <Canvas frameloop="demand" dpr={[1, 1.75]} camera={{ fov: 30, position: [-5.2, 2.4, -3.6], near: 0.1, far: 50 }} onCreated={s => s.camera.lookAt(0, 0, 0)}>
             <ambientLight intensity={1.6} />
             <directionalLight position={[-4, 6, -3]} intensity={2.4} />

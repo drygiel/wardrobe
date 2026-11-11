@@ -69,36 +69,12 @@
     }
 }
 
-.wordmark {
+.shade {
     position: absolute;
-    top: 36px;
-    left: var(--m);
-    font-family: var(--font-display);
-    font-size: var(--step-lead);
-    text-decoration: none;
-    text-shadow: 0 0 14px var(--bg); // stays legible when the camera moves in behind it
-}
-
-.nav {
-    position: absolute;
-    top: 40px;
-    right: var(--m);
-    text-shadow: 0 0 14px var(--bg);
-
-    ul {
-        display: flex;
-        gap: 28px;
-        list-style: none;
-    }
-
-    a {
-        text-decoration: none;
-        transition: color 160ms;
-
-        &:hover {
-            color: var(--accent);
-        }
-    }
+    inset: 0 0 auto;
+    height: 190px;
+    background: linear-gradient(var(--bg) 30%, color-mix(in srgb, var(--bg) 60%, transparent) 62%, transparent);
+    pointer-events: none;
 }
 
 .sheet {
@@ -118,6 +94,13 @@
         gap: 12px;
         margin-top: 20px;
         color: var(--muted);
+    }
+
+    // What the page is, in one sentence, before the invitation to scroll
+    .lede {
+        display: block;
+        max-width: 26rem;
+        color: var(--ink);
     }
 }
 
@@ -254,6 +237,20 @@
     }
 }
 
+// A touch screen has no cursor to point with
+@media (hover: none) {
+    .hoverOnly {
+        display: none;
+    }
+}
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+}
+
 // Anatomy: label columns tied to the model by lines that HomeScene writes every frame
 .callouts {
     position: absolute;
@@ -356,26 +353,15 @@
     }
 }
 
+// A low window has room for the opening sentence or the title block, not both
+@media (max-height: 719px) {
+    .titleBlock {
+        display: none;
+    }
+}
+
 // Same test as `narrow` in HomeScene
 @media (max-width: 767px), (max-aspect-ratio: 9/10) {
-    .wordmark {
-        top: 18px;
-        left: 20px;
-    }
-
-    .nav {
-        top: 22px;
-        right: 20px;
-
-        ul {
-            gap: 16px;
-        }
-
-        li:nth-child(n + 3) {
-            display: none;
-        }
-    }
-
     .sheet {
         top: auto;
         bottom: 28px;

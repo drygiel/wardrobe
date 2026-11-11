@@ -2,3 +2,53 @@
     position: relative;
     height: 104px;
 }
+
+// Opening of a plain page: its name and one sentence on what it holds
+.intro {
+    padding: clamp(32px, 6vw, 80px) var(--m) 0;
+
+    h1 {
+        font-size: clamp(2.75rem, 1.2rem + 4.4vw, 6rem);
+    }
+
+    p {
+        margin-top: 20px;
+        max-width: 34rem;
+        color: var(--muted);
+    }
+}
+
+@media (max-width: 767px) {
+    .top {
+        height: 68px;
+    }
+}
+
+// The list of pages on the "not found" page
+.pages {
+    margin: 40px var(--m) 0;
+    max-width: 44rem;
+    list-style: none;
+
+    a {
+        display: grid;
+        grid-template-columns: 8em 1fr;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+        text-decoration: none;
+
+        &:hover b {
+            color: var(--accent);
+        }
+    }
+
+    b {
+        font-weight: 500;
+        transition: color 160ms;
+    }
+
+    span {
+        color: var(--muted);
+    }
+}

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import type { LineData } from '../app/components/Mesh';
-import { nearestEdge, placementMatrix, snapToWalls, wallFromPolygon, yawFacing, type Footprint, type Wall } from '../app/xr/placement';
+import { carry, nearestEdge, placementMatrix, snapToWalls, wallFromPolygon, yawFacing, type Footprint, type Wall } from '../app/xr/placement';
 
 const near = (actual: number, expected: number, what: string) => assert.ok(Math.abs(actual - expected) < 1e-6, `${what}: ${actual} != ${expected}`);
 
@@ -60,3 +60,14 @@ assert.equal(nearestEdge(edges, new THREE.Vector3(0.5, 0.01, 0)), edges[0]);
 assert.equal(nearestEdge(edges, new THREE.Vector3(0.01, 0.5, 0)), edges[1]);
 assert.equal(nearestEdge(edges, new THREE.Vector3(0.5, 0.5, 0)), null, 'mid-board is no edge');
 assert.equal(nearestEdge(null, new THREE.Vector3()), null, 'a part without drawn edges');
+
+// Two hands turn a quarter around the point between them: the wardrobe 1 m to the +x side swings to -z
+const carried = { x: 1, z: 0, yaw: 0 };
+carry(carried, { x: 0, z: 0 }, { x: 0, z: 0 }, Math.PI / 2);
+near(carried.x, 0, 'swings around the handle, x');
+near(carried.z, -1, 'swings around the handle, z');
+near(carried.yaw, Math.PI / 2, 'turns with the hands');
+// One hand, no turn: follows it one to one
+carry(carried, { x: 0, z: 0 }, { x: 0.3, z: 0.2 }, 0);
+near(carried.x, 0.3, 'follows the hand, x');
+near(carried.z, -0.8, 'follows the hand, z');

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import cn from 'classnames';
 import { useApp } from '@/contexts/AppContext';
 import { COLUMN_NAMES, COLUMNS, type GroupId, GROUPS, HIDDEN_GROUPS } from '@/components/parts';
 import { type Part, rootOf, useCatalog } from './catalog';
+import { Icon } from './icons';
 import { selection, useSelection } from './selection';
 import styles from './Editor.module.scss';
 
@@ -48,10 +50,25 @@ const ancestors = (part: Part) => {
 export function Sidebar() {
   const app = useApp();
   const catalog = useCatalog();
-  const { pinned } = useSelection();
+  const { pinned, hover } = useSelection();
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
   const treeRef = useRef<HTMLUListElement>(null);
+  // The whole row is the hover target, and leaving one waits a moment for the next: between two rows
+  // the scene must not flash back to its plain state
+  const leaving = useRef(0);
+  const hoverRow = (node: TreeNode) => {
+    clearTimeout(leaving.current);
+    selection.hover(node.part ? selection.find(node.key) : null);
+    selection.hoverGroup(node.names);
+  };
+  const leaveRow = () => {
+    clearTimeout(leaving.current);
+    leaving.current = window.setTimeout(() => {
+      selection.hover(null);
+      selection.hoverGroup([]);
+    }, 60);
+  };
 
   const q = query.trim().toLowerCase();
   const tree = useMemo(
@@ -69,7 +86,7 @@ export function Sidebar() {
     const part = pinned && catalog.byName.get(pinned.name);
     if (!part) return;
     setExpanded(current => new Set([...current, ...ancestors(part)]));
-    requestAnimationFrame(() => treeRef.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest' }));
+    requestAnimationFrame(() => treeRef.current?.querySelector(`.${styles.rowLabel}[aria-pressed="true"]`)?.scrollIntoView({ block: 'nearest' }));
   }, [pinned, catalog]);
 
   // A filter can remove the row under the cursor, and then no leave event comes
@@ -125,7 +142,9 @@ export function Sidebar() {
 
     return (
       <li key={node.key}>
-        <div className={styles.row} style={{ paddingLeft: depth * 14 + 4 }}>
+        <div
+          // `hot`: the part under the cursor in the model, when its row happens to be open; the list never scrolls to it
+          className={cn(styles.row, onCount === 0 && styles.off, node.part && hover?.name === node.key && styles.hot)} style={{ paddingLeft: depth * 14 + 4 }} onMouseEnter={() => hoverRow(node)} onMouseLeave={leaveRow}>
           {folder ? (
             <button className={styles.chevron} aria-expanded={open} aria-label={`${open ? 'Zwiń' : 'Rozwiń'}: ${node.label}`} onClick={() => toggleFolder(node.key)}>
               <svg viewBox="0 0 10 10" width="10" height="10" aria-hidden="true">
@@ -135,35 +154,25 @@ export function Sidebar() {
           ) : (
             <span className={styles.chevron} />
           )}
-          <input
-            type="checkbox"
-            aria-label={`Widoczność: ${node.label}`}
-            checked={onCount > 0}
-            ref={el => {
-              if (el) el.indeterminate = onCount > 0 && !all;
-            }}
-            onChange={() => setVisible(node.names, !all)}
-          />
-          {depth === 0 && <i style={{ background: SWATCH[node.group] }} />}
           {folder ? (
             <button
               className={styles.rowLabel}
-              onMouseEnter={() => selection.hoverGroup(node.names)}
-              onMouseLeave={() => selection.hoverGroup([])}
-              onFocus={() => selection.hoverGroup(node.names)}
-              onBlur={() => selection.hoverGroup([])}
+              onFocus={() => hoverRow(node)}
+              onBlur={leaveRow}
               onClick={() => toggleFolder(node.key)}
             >
-              <span>{node.label}</span>
+              <span>
+                {node.label}
+                {depth === 0 && <i style={{ background: SWATCH[node.group] }} />}
+              </span>
             </button>
           ) : (
             <button
               className={styles.rowLabel}
               aria-pressed={pinned?.name === node.key}
               title={node.key}
-              onMouseEnter={() => selection.hover(selection.find(node.key))}
-              onMouseLeave={() => selection.hover(null)}
-              onFocus={() => selection.hover(selection.find(node.key))}
+              onFocus={() => hoverRow(node)}
+              onBlur={leaveRow}
               onClick={() => {
                 const mesh = selection.find(node.key);
                 const selecting = mesh !== pinned;
@@ -181,12 +190,29 @@ export function Sidebar() {
               Cofnij
             </button>
           ) : (
-            <button className={styles.solo} aria-label={`Pokaż tylko: ${node.label}`} onClick={() => solo(node)}>
-              tylko
+            <button className={styles.solo} aria-label={`Pokaż tylko: ${node.label}`} title={`Pokaż tylko: ${node.label}`}
+              // No preview of its own: the row under the cursor already shows this row's parts alone
+              onClick={() => solo(node)}
+            >
+              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.3" aria-hidden="true">
+                {/* A funnel: the chevron it replaced read as "expand", like the one at the start of the row */}
+                <path d="M2.5 3.5h11L9.5 8.6v3.6l-3 1.3V8.6Z" strokeLinejoin="round" />
+              </svg>
             </button>
           )}
+          {/* Open eye: something of this row is shown (fainter when only part of it); struck out: all of it is hidden */}
+          <button
+            className={cn(styles.eye, onCount > 0 && !all && styles.partly)}
+            aria-pressed={onCount > 0}
+            aria-label={`Widoczność: ${node.label}`}
+            title={all ? 'Ukryj' : 'Pokaż'}
+            onClick={() => setVisible(node.names, !all)}
+          >
+            <Icon name={onCount > 0 ? 'render' : 'hidden'} />
+          </button>
         </div>
-        {folder && open && <ul>{node.children.map(child => row(child, depth + 1))}</ul>}
+        {/* --guide: under this row's chevron, where the line leading down its open branch runs */}
+        {folder && open && <ul style={{ '--guide': `${depth * 14 + 12}px` } as React.CSSProperties}>{node.children.map(child => row(child, depth + 1))}</ul>}
       </li>
     );
   };

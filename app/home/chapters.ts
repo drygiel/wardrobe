@@ -28,7 +28,6 @@ export const stateAt = (p: number) => ({
     [
       [0.06, 0],
       [0.42, 40],
-      [0.68, 26],
       [1, 32],
       [1.55, 64],
       [2.05, 64],
@@ -63,7 +62,7 @@ export const stateAt = (p: number) => ({
     [
       [0.06, 1],
       [0.42, 1.16],
-      [0.68, 1],
+      [0.97, 1],
       [2.2, 1],
       [2.6, 0.56],
       [3.02, 0.56],
@@ -78,8 +77,8 @@ export const stateAt = (p: number) => ({
     [
       [0.06, 0.14],
       [0.42, 0.11],
-      [0.84, 0.11],
-      [0.94, 0],
+      [0.8, 0.11],
+      [0.97, 0],
       [1.1, 0],
       [1.55, 0.06],
       [2.05, 0.06],
@@ -140,11 +139,12 @@ export const stateAt = (p: number) => ({
     ],
     p,
   ),
-  // From the drawing's framing to the band above the closing copy, and back at the end
+  // From the drawing's framing to the band above the closing copy, and back at the end.
+  // Spread over a third of the hero: a short ramp here reads as the camera jumping back.
   settle: track(
     [
-      [0.84, 0],
-      [0.94, 1],
+      [0.62, 0],
+      [0.97, 1],
       [5.05, 1],
       [5.7, 0],
     ],

@@ -3,8 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Szafa 2025 – projekt szafy na wymiar z modelem 3D</title>
+    <meta name="description" content="Projekt szafy na wymiar w dębowej ramie, od podłogi do sufitu, 2688 × 2660 × 530 mm: model 3D, rysunki techniczne, rozkrój ramy, okucia i elektryka LED." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:site_name" content="Szafa 2025" />
+    <meta property="og:title" content="Szafa 2025 – projekt szafy na wymiar z modelem 3D" />
+    <meta property="og:description" content="Projekt szafy na wymiar w dębowej ramie, od podłogi do sufitu, 2688 × 2660 × 530 mm: model 3D, rysunki techniczne, rozkrój ramy, okucia i elektryka LED." />
+    <meta property="og:url" content="https://drygiel.github.io/wardrobe/" />
+    <link rel="canonical" href="https://drygiel.github.io/wardrobe/" />
+    <meta property="og:image" content="https://drygiel.github.io/wardrobe/images/25.jpg" />
+    <meta property="og:image:alt" content="Szafa w dębowej ramie z białymi frontami, w pokoju, w dziennym świetle" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="preload" href="/fonts/switzer-400.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // The light theme before first paint; app/theme.ts holds the same test and keeps it right on page changes
+      try {
+        if (localStorage.getItem('wardrobe.theme') === 'light' && !/\/(pomiar|elektryka)\/?$/.test(location.pathname))
+          document.documentElement.dataset.theme = 'light';
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

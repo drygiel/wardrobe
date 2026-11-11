@@ -9,7 +9,7 @@ import { useSelection } from '@/editor/selection';
 import type { SnapStatus } from './placement';
 
 const WIDTH = 1024;
-const HEIGHT = 700;
+const HEIGHT = 800;
 const METRES_WIDE = 0.34;
 const GUTTER = 32;
 const ROW = 84;
@@ -65,13 +65,24 @@ function draw(context: CanvasRenderingContext2D, buttons: Laid[], hovered: strin
   context.textAlign = 'left';
   context.fillStyle = MUTED;
   context.font = '400 26px Switzer, sans-serif';
-  context.fillText('Grip: przesuń ręką, obróć nadgarstkiem. Gałka przy gripie: dalej, bliżej, w bok.', GUTTER, HEIGHT - 66, WIDTH - GUTTER * 2);
+  context.fillText('Lewa gałka: przesuwa szafę. Prawa gałka: obraca.', GUTTER, HEIGHT - 102, WIDTH - GUTTER * 2);
+  context.fillText('Grip: przesuń ręką. Oba gripy: obróć jak kierownicą.', GUTTER, HEIGHT - 66, WIDTH - GUTTER * 2);
   context.fillText('Spust: przyciski, drzwi i szuflady. W pomiarze wskaż krawędź, spust przypina.', GUTTER, HEIGHT - 30, WIDTH - GUTTER * 2);
 }
 
 const STATUS: Record<SnapStatus, string> = { free: '', wall: 'Przy ścianie', corner: 'W narożniku' };
 
-type Props = { snap: boolean; setSnap: (on: boolean) => void; status: SnapStatus; wallCount: number; reset: () => void };
+type Props = {
+  snap: boolean;
+  setSnap: (on: boolean) => void;
+  status: SnapStatus;
+  wallCount: number;
+  reset: () => void;
+  night: boolean;
+  setNight: (on: boolean) => void;
+  brightness: number;
+  stepBrightness: (steps: number) => void;
+};
 
 // One canvas on one quad: the menu costs a single draw call, and it can use the site's fonts and Polish glyphs as they are
 export function XRPanel(props: Props) {
@@ -87,7 +98,7 @@ export function XRPanel(props: Props) {
   ) : null;
 }
 
-function Panel({ snap, setSnap, status, wallCount, reset }: Props) {
+function Panel({ snap, setSnap, status, wallCount, reset, night, setNight, brightness, stepBrightness }: Props) {
   const app = useApp();
   const catalog = useCatalog();
   const session = useXR(xr => xr.session);
@@ -130,6 +141,11 @@ function Panel({ snap, setSnap, status, wallCount, reset }: Props) {
     [
       { id: 'snap', label: 'Przyciągaj do ścian', on: snap, action: () => setSnap(!snap) },
       { id: 'reset', label: 'Ustaw przede mną', action: reset },
+    ],
+    [
+      { id: 'night', label: 'Tryb nocny', on: night, action: () => setNight(!night) },
+      { id: 'darker', label: 'Ciemniej', action: () => stepBrightness(-1) },
+      { id: 'brighter', label: `Jaśniej (${Math.round(brightness * 100)}%)`, action: () => stepBrightness(1) },
     ],
     [
       { id: 'unit', label: `Jednostka: ${app.unit}`, action: () => app.setUnit(app.unit === 'mm' ? 'cm' : 'mm') },

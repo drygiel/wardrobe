@@ -1,0 +1,52 @@
+.inventory {
+    position: relative;
+    z-index: 1;
+    padding: var(--section) var(--m) 0;
+    background: var(--bg);
+
+    header {
+        margin-bottom: 32px;
+    }
+
+    h2 {
+        font-size: var(--step-head);
+    }
+
+    header p {
+        margin-top: 18px;
+        max-width: 38rem;
+        color: var(--muted);
+    }
+}
+
+// A phone scrolls the table sideways instead of squeezing five columns
+.scroll {
+    overflow-x: auto;
+    // Shadows that show only while more of the table waits beyond an edge
+    background:
+        linear-gradient(90deg, var(--bg) 30%, transparent) left / 40px 100% no-repeat local,
+        linear-gradient(270deg, var(--bg) 30%, transparent) right / 40px 100% no-repeat local,
+        linear-gradient(90deg, color-mix(in srgb, var(--ink) 22%, transparent), transparent) left / 16px 100% no-repeat scroll,
+        linear-gradient(270deg, color-mix(in srgb, var(--ink) 22%, transparent), transparent) right / 16px 100% no-repeat scroll;
+
+    table {
+        min-width: 640px;
+    }
+}
+
+tfoot th,
+tfoot td {
+    border-top-color: var(--muted);
+    font-weight: 500;
+}
+
+.after {
+    margin-top: 20px;
+    max-width: 44rem;
+    color: var(--muted);
+    font-size: var(--step-small);
+}
+
+.note {
+    color: var(--muted);
+}

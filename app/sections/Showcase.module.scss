@@ -27,42 +27,11 @@
     }
 }
 
-.wordmark {
-    position: absolute;
-    top: 36px;
-    left: var(--m);
-    font-family: var(--font-display);
-    font-size: var(--step-lead);
-    text-decoration: none;
-}
-
-.nav {
-    position: absolute;
-    top: 40px;
-    right: var(--m);
-
-    ul {
-        display: flex;
-        gap: 28px;
-        list-style: none;
-    }
-
-    a {
-        text-decoration: none;
-        transition: color 160ms;
-
-        &:hover,
-        &[aria-current] {
-            color: var(--accent);
-        }
-    }
-}
-
 .intro {
     position: absolute;
     left: var(--m);
     bottom: 44px;
-    max-width: 30rem;
+    max-width: min(30rem, 28vw);
 
     h1 {
         font-family: var(--font-text);
@@ -169,28 +138,18 @@
     }
 }
 
+// Between the copy and the buttons there is no room left for the hint
+@media (max-width: 1439px) {
+    .hint {
+        display: none;
+    }
+}
+
 @media (max-width: 767px) {
-    .wordmark {
-        top: 18px;
-        left: 20px;
-    }
-
-    .nav {
-        top: 22px;
-        right: 20px;
-
-        ul {
-            gap: 16px;
-        }
-
-        li:nth-child(n + 3) {
-            display: none;
-        }
-    }
-
     .intro {
         left: 20px;
         right: 20px;
+        max-width: none;
         bottom: 96px;
     }
 

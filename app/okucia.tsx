@@ -9,6 +9,9 @@ import { partLabel } from '@/editor/labels';
 import { A, CUP, D, DOOR, FRAME, hingeOpened, PLATE, SIDE } from '@/okucia/hinge';
 import Footer from '@/sections/Footer';
 import PageHeader from '@/sections/PageHeader';
+import Meta from '@/sections/Meta';
+import NextPage from '@/sections/NextPage';
+import { COUNTS, pageAt } from '@/site';
 import styles from '@/okucia/Okucia.module.scss';
 
 const DEPTH = 487; // drawer depth in Szafa4.blend
@@ -44,10 +47,22 @@ function useScrub<T extends HTMLElement>(apply: (t: number) => void) {
 }
 
 type Rect = { x0: number; x1: number; y0: number; y1: number };
-const rect = (r: Rect, className: string) => <rect className={className} x={r.x0} y={r.y0} width={r.x1 - r.x0} height={r.y1 - r.y0} />;
+const rect = (r: Rect, className: string) => (
+  <rect className={className} x={r.x0} y={r.y0} width={r.x1 - r.x0} height={r.y1 - r.y0} />
+);
 
 // A label with a leader to a point of the drawing; the drawing is y-up, so its points are flipped here
-function Label({ at, to, text, end }: { at: [number, number]; to: [number, number]; text: string; end?: boolean }) {
+function Label({
+  at,
+  to,
+  text,
+  end,
+}: {
+  at: [number, number];
+  to: [number, number];
+  text: string;
+  end?: boolean;
+}) {
   return (
     <g className={styles.label}>
       <polyline points={`${at[0]},${-at[1]} ${to[0]},${-to[1]}`} />
@@ -88,16 +103,34 @@ function HingeSection() {
       <div className={styles.sticky}>
         <div className={styles.text}>
           <h2 id="zawiasy-h">Zawiasy</h2>
-          <p>Drzwi stoją 20 mm w głębi ramy. Zawias chowa się w środku: puszka w drzwiach, prowadnik na boku wnętrza.</p>
+          <p>
+            Drzwi stoją 20 mm w głębi ramy. Zawias chowa się w środku: puszka w drzwiach, prowadnik
+            na boku wnętrza.
+          </p>
           <p className={styles.readout}>
             <span>Otwarcie</span>
             <b ref={readout}>0°</b>
           </p>
-          <p className={styles.note}>Przekrój z góry, wymiary z modelu. Przeguby ramienia to schemat dobrany tak, by drzwi otworzyły się na 95° jak w modelu i nie dotknęły ramy.</p>
+          <p className={styles.note}>
+            Przekrój z góry, wymiary z modelu. Przeguby ramienia to schemat dobrany tak, by drzwi
+            otworzyły się na 95°, jak drzwi sekcji B i C w modelu, i nie dotknęły ramy. Drzwi sekcji
+            D otwierają się na 90°.
+          </p>
         </div>
-        <svg className={styles.drawing} viewBox="-80 -140 250 210" role="img" aria-label="Przekrój zawiasu z góry: drzwi otwierają się wraz z przewijaniem">
+        <svg
+          className={styles.drawing}
+          viewBox="-80 -140 284 210"
+          role="img"
+          aria-label="Przekrój zawiasu z góry: drzwi otwierają się wraz z przewijaniem"
+        >
           <defs>
-            <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <pattern
+              id="hatch"
+              width="4"
+              height="4"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
               <line x1="0" y1="0" x2="0" y2="4" />
             </pattern>
           </defs>
@@ -111,13 +144,26 @@ function HingeSection() {
               {rect(CUP, styles.part)}
             </g>
             {[A, D].map((ground, i) => (
-              <line key={i} ref={el => void (el && (links.current[i] = el))} className={styles.link} x1={ground[0]} y1={ground[1]} x2={ground[0]} y2={ground[1]} />
+              <line
+                key={i}
+                ref={el => void (el && (links.current[i] = el))}
+                className={styles.link}
+                x1={ground[0]}
+                y1={ground[1]}
+                x2={ground[0]}
+                y2={ground[1]}
+              />
             ))}
             {[A, D].map((ground, i) => (
               <circle key={i} className={styles.pin} cx={ground[0]} cy={ground[1]} r="1.4" />
             ))}
             {[0, 1].map(i => (
-              <circle key={i} ref={el => void (el && (pins.current[i] = el))} className={styles.pin} r="1.4" />
+              <circle
+                key={i}
+                ref={el => void (el && (pins.current[i] = el))}
+                className={styles.pin}
+                r="1.4"
+              />
             ))}
           </g>
           <Label at={[-74, 70]} to={[-40, 30]} text="Rama 40 mm" />
@@ -165,7 +211,10 @@ function DrawerSection() {
       <div className={styles.sticky}>
         <div className={styles.text}>
           <h2 id="szuflady-h">Szuflady</h2>
-          <p>Siedem szuflad w szafie B i jedna we wnęce C, wszystkie o głębokości {DEPTH} mm.</p>
+          <p>
+            Siedem szuflad w szafie B i jedna we wnęce C, razem {COUNTS.drawers}. Wszystkie mają
+            głębokość {DEPTH} mm.
+          </p>
           <p className={styles.readout}>
             <span>Wysuw</span>
             <b ref={readout}>0 mm</b>
@@ -174,7 +223,12 @@ function DrawerSection() {
             Widok z boku. W modelu szuflada wysuwa się na 70% głębokości, {SLIDE} mm.
           </p>
         </div>
-        <svg className={cn(styles.drawing, styles.large)} viewBox="-380 -320 940 400" role="img" aria-label="Szuflada z boku: wysuwa się wraz z przewijaniem">
+        <svg
+          className={cn(styles.drawing, styles.large)}
+          viewBox="-380 -320 940 400"
+          role="img"
+          aria-label="Szuflada z boku: wysuwa się wraz z przewijaniem"
+        >
           <g transform="scale(1 -1)">
             <rect className={styles.cut} x={-20} y={-20} width={20} height={270} />
             <line className={styles.part} x1={0} y1={0} x2={530} y2={0} />
@@ -222,11 +276,20 @@ function Tables() {
 
   const { drawers, doors } = useMemo(() => {
     const all = boxes(wardrobe.scene);
-    const size = (b: (typeof all)[number]) => ({ w: mm(b.max.z - b.min.z), h: mm(b.max.y - b.min.y), d: mm(b.max.x - b.min.x) });
+    const size = (b: (typeof all)[number]) => ({
+      w: mm(b.max.z - b.min.z),
+      h: mm(b.max.y - b.min.y),
+      d: mm(b.max.x - b.min.x),
+    });
     const drawers = all
       .filter(b => kindOf(b.name) === 'drawer')
       .sort((a, b) => sectionOf(a.name).localeCompare(sectionOf(b.name)) || b.max.y - a.max.y)
-      .map(b => ({ name: b.name, label: partLabel(b.name), section: sectionOf(b.name), ...size(b) }));
+      .map(b => ({
+        name: b.name,
+        label: partLabel(b.name),
+        section: sectionOf(b.name),
+        ...size(b),
+      }));
     const hinges = new Map<string, number>();
     hardware.scene.traverse(node => {
       const match = /^H\d\d_(F\d\d)_Cup$/.exec(node.name);
@@ -234,59 +297,70 @@ function Tables() {
     });
     const doors = all
       .filter(b => kindOf(b.name) === 'front' && hinges.has(b.name.slice(0, 3)))
-      .map(b => ({ name: b.name, label: partLabel(b.name), section: sectionOf(b.name), ...size(b), hinges: hinges.get(b.name.slice(0, 3))!, angle: clipAngle(wardrobe.animations, DOORS[b.name]) }))
+      .map(b => ({
+        name: b.name,
+        label: partLabel(b.name),
+        section: sectionOf(b.name),
+        ...size(b),
+        hinges: hinges.get(b.name.slice(0, 3))!,
+        angle: clipAngle(wardrobe.animations, DOORS[b.name]),
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
     return { drawers, doors };
   }, [wardrobe, hardware]);
 
   return (
     <div className={styles.tables}>
-      <table className={styles.table}>
-        <caption>Drzwi i zawiasy</caption>
-        <thead>
-          <tr>
-            <th scope="col">Drzwi</th>
-            <th scope="col">Sekcja</th>
-            <th scope="col">Szer. × wys., mm</th>
-            <th scope="col">Zawiasy</th>
-            <th scope="col">Otwarcie</th>
-          </tr>
-        </thead>
-        <tbody>
-          {doors.map(door => (
-            <tr key={door.name}>
-              <th scope="row">{door.label}</th>
-              <td>{door.section}</td>
-              <td>
-                {door.w} × {door.h}
-              </td>
-              <td>{door.hinges}</td>
-              <td>{door.angle === null ? '–' : `${door.angle}°`}</td>
+      <div className={styles.scroll}>
+        <table className={styles.table}>
+          <caption>Drzwi i zawiasy</caption>
+          <thead>
+            <tr>
+              <th scope="col">Drzwi</th>
+              <th scope="col">Sekcja</th>
+              <th scope="col">Szer. × wys., mm</th>
+              <th scope="col">Zawiasy</th>
+              <th scope="col">Otwarcie</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <table className={styles.table}>
-        <caption>Szuflady</caption>
-        <thead>
-          <tr>
-            <th scope="col">Szuflada</th>
-            <th scope="col">Sekcja</th>
-            <th scope="col">Szer. × wys. × gł., mm</th>
-          </tr>
-        </thead>
-        <tbody>
-          {drawers.map(drawer => (
-            <tr key={drawer.name}>
-              <th scope="row">{drawer.label}</th>
-              <td>{drawer.section}</td>
-              <td>
-                {drawer.w} × {drawer.h} × {drawer.d}
-              </td>
+          </thead>
+          <tbody>
+            {doors.map(door => (
+              <tr key={door.name}>
+                <th scope="row">{door.label}</th>
+                <td>{door.section}</td>
+                <td>
+                  {door.w} × {door.h}
+                </td>
+                <td>{door.hinges}</td>
+                <td>{door.angle === null ? '–' : `${door.angle}°`}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className={styles.scroll}>
+        <table className={styles.table}>
+          <caption>Szuflady</caption>
+          <thead>
+            <tr>
+              <th scope="col">Szuflada</th>
+              <th scope="col">Sekcja</th>
+              <th scope="col">Szer. × wys. × gł., mm</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {drawers.map(drawer => (
+              <tr key={drawer.name}>
+                <th scope="row">{drawer.label}</th>
+                <td>{drawer.section}</td>
+                <td>
+                  {drawer.w} × {drawer.h} × {drawer.d}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -294,19 +368,55 @@ function Tables() {
 export default function OkuciaPage() {
   return (
     <>
-      <title>Szuflady i zawiasy – Szafa 2025</title>
-      <meta name="theme-color" content="#161412" />
+      <Meta page={pageAt('/okucia')} />
       <PageHeader current="/okucia" />
       <main className={styles.page}>
         <header className={styles.intro}>
-          <h1>Szuflady i zawiasy</h1>
-          <p>Osiem szuflad i 17 zawiasów na siedmiu drzwiach. Wszystkie wymiary pochodzą z modelu 3D szafy.</p>
+          <h1>Okucia</h1>
+          <p>
+            Szuflady i zawiasy: {COUNTS.drawers} szuflad i {COUNTS.hinges} zawiasów na{' '}
+            {COUNTS.hingedDoors} drzwiach. Wszystkie wymiary pochodzą z modelu 3D szafy.
+          </p>
         </header>
         <HingeSection />
         <DrawerSection />
-        <Suspense fallback={null}>
+        <Suspense
+          fallback={
+            <p className="loading-row" role="status">
+              Ładuję dane z modelu 3D
+            </p>
+          }
+        >
           <Tables />
         </Suspense>
+        <section className={styles.buy} aria-labelledby="dobor-h">
+          <h2 id="dobor-h">Dobór okuć</h2>
+          <ul>
+            <li>
+              <b>Zawias</b>
+              <span>
+                Puszkowy do drzwi wpuszczanych: puszka Ø35 × 12 mm, prowadnik 38 × 12 mm, otwarcie
+                co najmniej 95° (w modelu 95° w sekcjach B i C, 90° w sekcji D). Drzwi 18 mm stoją
+                20 mm w głębi ramy.
+              </span>
+            </li>
+            <li>
+              <b>Prowadnice szuflad</b>
+              <span>
+                Model ich nie zawiera. Trzeba je dobrać do szuflady głębokości {DEPTH} mm i wysuwu{' '}
+                {SLIDE} mm.
+              </span>
+            </li>
+            <li>
+              <b>Producent</b>
+              <span>
+                Model nie wskazuje producenta ani numerów katalogowych. Przed zamówieniem sprawdź
+                wymiary w karcie wybranego okucia.
+              </span>
+            </li>
+          </ul>
+        </section>
+        <NextPage after="/okucia" />
       </main>
       <Footer />
     </>

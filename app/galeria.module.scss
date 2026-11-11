@@ -1,19 +1,27 @@
-// Holds the wordmark and the menu, which sit absolutely like on the other pages' heroes
-.top {
-    position: relative;
-    height: 104px;
-}
+.group {
+    padding: clamp(56px, 8vw, 112px) var(--m) 0;
 
-.page {
-    padding: clamp(32px, 6vw, 80px) var(--m) 0; // the footer's margin spaces the end
-
-    h1 {
-        font-size: var(--step-head);
+    header {
+        display: grid;
+        grid-template-columns: 5fr 7fr;
+        align-items: end;
+        gap: 8px var(--gap);
+        margin-bottom: 24px;
     }
 
-    > p {
-        margin: 12px 0 40px;
+    h2 {
+        font-size: clamp(1.75rem, 1.4rem + 1.6vw, 3rem);
+    }
+
+    p {
+        max-width: 34rem;
         color: var(--muted);
+    }
+}
+
+@media (max-width: 767px) {
+    .group header {
+        grid-template-columns: 1fr;
     }
 }
 

@@ -1,0 +1,137 @@
+.about {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: clamp(48px, 7vw, 96px) var(--gap);
+    padding: var(--section) var(--m) 0;
+    background: var(--bg);
+}
+
+.text {
+    grid-column: 1 / 7;
+
+    h2 {
+        font-size: var(--step-head);
+        margin-bottom: 28px;
+    }
+
+    p {
+        max-width: 34rem;
+        color: var(--muted);
+    }
+
+    p + p {
+        margin-top: 14px;
+    }
+}
+
+// The figures as a title block, like the one on the opening drawing
+.facts {
+    grid-column: 8 / -1;
+    align-self: end;
+    border: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+
+    div {
+        display: grid;
+        grid-template-columns: 7em 1fr;
+        gap: 12px;
+        padding: 10px 16px;
+    }
+
+    div + div {
+        border-top: 1px solid var(--line);
+    }
+
+    dt {
+        color: var(--muted);
+    }
+}
+
+.files {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    row-gap: 12px;
+    align-content: start;
+
+    h3 {
+        grid-column: 1 / 5;
+        font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
+    }
+
+    p {
+        grid-column: 1 / 5;
+        grid-row: 2;
+        max-width: 26rem;
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+
+    ul {
+        grid-column: 5 / -1;
+        grid-row: 1 / 4;
+        list-style: none;
+    }
+
+    a {
+        display: grid;
+        grid-template-columns: 9em 1fr auto;
+        align-items: baseline;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+        text-decoration: none;
+        transition: color 160ms;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--strong);
+
+            i {
+                color: var(--accent);
+            }
+        }
+    }
+
+    li:last-child a {
+        border-bottom: 1px solid var(--line);
+    }
+
+    b {
+        font-weight: 500;
+    }
+
+    span {
+        color: var(--muted);
+    }
+
+    i {
+        color: var(--muted);
+        font-size: var(--step-small);
+        font-style: normal;
+        transition: color 160ms;
+    }
+}
+
+@media (max-width: 899px) {
+    .text,
+    .facts,
+    .files h3,
+    .files p,
+    .files ul {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .files a {
+        grid-template-columns: 1fr auto;
+
+        span {
+            grid-column: 1;
+            grid-row: 2;
+            font-size: var(--step-small);
+        }
+    }
+}

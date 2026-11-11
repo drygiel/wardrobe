@@ -8,6 +8,9 @@ import { LiveCircuit } from '@/electric/LiveCircuit';
 import { Xray } from '@/electric/Xray';
 import { DrillSheet } from '@/electric/DrillSheet';
 import Footer from '@/sections/Footer';
+import { pageAt } from '@/site';
+import Meta from '@/sections/Meta';
+import NextPage from '@/sections/NextPage';
 import styles from '@/electric/Elektryka.module.scss';
 
 // Solder mask palette for this page; the shared footer and controls read the same tokens
@@ -91,16 +94,16 @@ function Assembly() {
 export default function ElektrykaPage() {
   return (
     <CircuitProvider>
-      <title>Elektryka – Szafa 2025</title>
-      <meta name="theme-color" content="#0b3327" />
+      <Meta page={pageAt('/elektryka')} color="#0b3327" />
       <style>{PALETTE}</style>
-      <Rail />
       <Hero />
+      <Rail />
       <main>
         <LiveCircuit />
         <Xray />
         <DrillSheet />
         <Assembly />
+        <NextPage after="/elektryka" />
       </main>
       <Footer />
     </CircuitProvider>

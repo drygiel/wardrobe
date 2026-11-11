@@ -399,6 +399,7 @@ export default function Scene({
           maxDistance={6}
           minDistance={0.3}
           zoomSpeed={2}
+          rotateSpeed={0.5} // the default turned the model too far for a short drag
           enableDamping={!editorCamera}
           dampingFactor={0.05}
           // maxPolarAngle={Math.PI/2}

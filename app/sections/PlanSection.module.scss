@@ -35,12 +35,12 @@
 
             rect.dim {
                 fill: none;
-                stroke: #4d473f;
+                stroke: var(--line);
             }
 
             rect.board {
-                fill: #2a2622;
-                stroke: #4d473f;
+                fill: var(--board);
+                stroke: var(--line);
             }
 
             rect.led {
@@ -60,12 +60,62 @@
                 vector-effect: non-scaling-stroke;
             }
 
+            // Sized so the piece numbers stay near 11 px on screen at every breakpoint below
+            .piece {
+                font: 500 72px var(--font-text);
+                pointer-events: none;
+
+                path {
+                    fill: none;
+                    stroke: var(--muted);
+                    stroke-width: 1px;
+                    vector-effect: non-scaling-stroke;
+                }
+
+                circle {
+                    fill: var(--ink);
+                }
+            }
+
+            text.piece,
+            .piece text {
+                fill: var(--ink);
+                text-anchor: middle;
+                dominant-baseline: central;
+            }
+
+            .piece.out text {
+                dominant-baseline: hanging;
+            }
+
             .dim text {
                 fill: var(--muted);
                 font: 400 104px var(--font-text);
                 text-anchor: middle;
             }
         }
+    }
+
+    :global .pieces {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+        gap: 2px 16px;
+        margin-top: 12px;
+        list-style: none;
+        color: var(--muted);
+        font-size: var(--step-small);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+
+        b {
+            color: var(--ink);
+            font-weight: 500;
+        }
+    }
+
+    // The list of pieces must fit under the pinned drawing
+    &:has(:global(.pieces)) :global(svg.plan) {
+        max-height: 66vh;
     }
 }
 
@@ -139,9 +189,19 @@
     white-space: nowrap;
 }
 
+@media (max-width: 1200px) {
+    .figure :global(svg.plan .piece) {
+        font-size: 90px;
+    }
+}
+
 @media (max-width: 900px) {
     .plan {
         grid-template-columns: 1fr;
+    }
+
+    .figure :global(svg.plan .piece) {
+        font-size: 124px;
     }
 
     .figure,

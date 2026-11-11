@@ -47,7 +47,7 @@ assert.deepEqual(take(), ['a none', 'b none']);
 
 // A folder under the cursor brightens all its parts and selects nothing
 selection.hoverGroup(['a', 'b', 'missing']);
-assert.deepEqual(take(), ['a lit', 'b lit']);
+assert.deepEqual(take(), ['a lit', 'a none', 'b lit', 'b none']);
 assert.equal(selection.pinned, null);
 // The part is already lit by the folder, so the cursor reaching it must not flicker
 selection.hover(a);
@@ -55,7 +55,13 @@ assert.deepEqual(take(), []);
 selection.hover(null);
 assert.deepEqual(take(), []);
 selection.hoverGroup([]);
-assert.deepEqual(take(), ['a unlit', 'b unlit']);
+assert.deepEqual(take(), ['a none', 'a unlit', 'b none', 'b unlit']);
+
+// A row of the list under the cursor: its part stands out, every other part steps back until the cursor leaves
+selection.hoverGroup(['a']);
+assert.deepEqual(take(), ['a lit', 'a none', 'b dim']);
+selection.hoverGroup([]);
+assert.deepEqual(take(), ['a none', 'a unlit', 'b none']);
 
 // With a part selected, the folder brings the faded ones forward and leaves the selected one alone
 selection.pin(a);

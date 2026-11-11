@@ -1,7 +1,7 @@
 import { type GroupId, GROUPS, type Kind } from '@/components/parts';
 
 // The measuring page with only these groups switched on
-const measure = (...only: GroupId[]) => `/pomiar?hide=${GROUPS.map(group => group.id).filter(id => !only.includes(id)).join()}`;
+export const measure = (...only: GroupId[]) => `/pomiar?hide=${GROUPS.map(group => group.id).filter(id => !only.includes(id)).join()}`;
 
 export type LayerId = 'back' | 'dowels' | 'light' | 'frame' | 'interior' | 'drawers' | 'hinges' | 'fronts';
 

@@ -74,6 +74,12 @@ export function DrillSheet() {
               const { u, v } = place(board, drill.at);
               const on = drill === active;
               const r = Math.max((drill.d ?? 8) / 2, k * 0.75);
+              // A number sits right of its mark; with another mark in that spot it moves to the left
+              // shortcut: handles pairs only, a row of three close marks needs real label placement
+              const crowded = items.some(other => {
+                const o = place(board, other.at);
+                return o.u > u && o.u - u < k * 4 && Math.abs(o.v - v) < k * 3;
+              });
               return (
                 <g key={i} className={on ? styles.markOn : styles.mark} onPointerEnter={() => setRow(i)}>
                   {drill.kind === 'notch' && <rect x={u - drill.size![0] / 2} y={Math.min(v - drill.size![1] / 2, 0)} width={drill.size![0]} height={drill.size![1]} />}
@@ -84,7 +90,7 @@ export function DrillSheet() {
                     </>
                   )}
                   {(drill.kind === 'hole' || drill.kind === 'magnet') && <circle cx={u} cy={v} r={r} />}
-                  <text x={u + r + k * 0.8} y={Math.max(v, k * 3) + k * 1.1} style={{ fontSize: k * 2.8 }}>
+                  <text x={u + (crowded ? -1 : 1) * (r + k * 0.8)} y={Math.max(v, k * 3) + k * 1.1} textAnchor={crowded ? 'end' : 'start'} style={{ fontSize: k * 2.8 }}>
                     {i + 1}
                   </text>
                 </g>

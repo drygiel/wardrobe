@@ -16,8 +16,9 @@ const listeners = new Set<() => void>();
 // Hover brightens a part, unless it is the selected one
 const lit = ({ hover, group, pinned }: Selection) => new Set([hover, ...group].filter(mesh => mesh && mesh !== pinned));
 
+// With nothing selected, the rows under the cursor in the list stand out: every other part steps back for as long as the cursor stays
 const focusOf = (object: THREE.Object3D) => {
-  if (!state.pinned) return 'none';
+  if (!state.pinned) return !state.group.length || state.group.includes(object as THREE.Mesh) ? 'none' : 'dim';
   if (object === state.pinned) return 'selected';
   return object === state.hover || state.group.includes(object as THREE.Mesh) ? 'hover' : 'dim';
 };
@@ -31,7 +32,7 @@ const update = (next: Partial<Selection>) => {
   const litNow = lit(state);
   litBefore.forEach(mesh => litNow.has(mesh) || mesh?.userData.highlight?.(false));
   litNow.forEach(mesh => litBefore.has(mesh) || mesh?.userData.highlight?.(true));
-  if (before.pinned !== state.pinned) applyFocus();
+  if (before.pinned !== state.pinned || (!state.pinned && before.group !== state.group)) applyFocus();
   else if (state.pinned && (before.hover !== state.hover || before.group !== state.group)) {
     new Set([before.hover, state.hover, ...before.group, ...state.group]).forEach(mesh => mesh?.userData.focus?.(focusOf(mesh))); // hover must not walk the whole scene
   }
@@ -50,6 +51,10 @@ export const selection = {
   get pinned() {
     return state.pinned;
   },
+  // The parts of the list row under the cursor
+  get group() {
+    return state.group;
+  },
   find(name: string) {
     return (selection.root?.getObjectByName(name) as THREE.Mesh | undefined) ?? null;
   },
@@ -63,7 +68,7 @@ export const selection = {
   hover(mesh: THREE.Mesh | null, edge: LineData | null = null) {
     if (state.hover !== mesh || state.edge !== edge) update({ hover: mesh, edge });
   },
-  // Brightens a whole folder of the list; selects nothing and leaves the inspector alone
+  // Brightens the parts of the list row under the cursor and fades the rest; selects nothing and leaves the inspector alone
   hoverGroup(names: string[]) {
     if (names.length || state.group.length) update({ group: names.flatMap(name => selection.find(name) ?? []) });
   },

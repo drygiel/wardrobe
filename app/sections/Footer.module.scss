@@ -19,7 +19,7 @@
         left: var(--m);
         right: var(--m);
         height: 2px;
-        background: #ffd9a0;
+        background: var(--led);
         box-shadow:
             0 0 6px 1px var(--accent),
             0 2px 28px 3px rgb(240 179 90 / 45%);
@@ -46,7 +46,7 @@
         transition: color 160ms;
 
         &:hover {
-            color: #fff;
+            color: var(--strong);
             text-decoration: underline;
             text-decoration-color: var(--accent);
             text-decoration-thickness: 1px;

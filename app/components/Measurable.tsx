@@ -8,11 +8,22 @@ import { useEventListener } from '@/hooks/useEventListener';
 import { LineHint } from '@/components/LineHint';
 import { isShown } from '@/xr/placement';
 
+// One array for every render: drei rebuilds the line's geometry whenever `points` changes identity,
+// which threw away the edge set by showRedLine and left a dot at the part's origin
+const NO_POINTS = [0, 0, 0, 0, 0, 0];
+const NO_TICKS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const TICK_PX = 7; // half the length of an end tick on screen
+
 type Props = Omit<ThreeElements['group'], 'ref'> & { ref?: Ref<THREE.Group>; children: ReactNode };
 
 // Hover measuring shared by every model: raycasts edge lines on layer 1 and shows the red line with its length
 export function Measurable({ ref, children, ...props }: Props) {
+  // The measured edge: solid where it is in sight, dotted where a part covers it, with a skew tick at each end
+  const redRef = useRef<THREE.Group>(null!);
   const lineRef = useRef<ComponentRef<typeof Line>>(null!);
+  const hiddenRef = useRef<ComponentRef<typeof Line>>(null!);
+  const ticksRef = useRef<ComponentRef<typeof Line>>(null!);
+  const ends = useRef<[THREE.Vector3, THREE.Vector3] | null>(null);
   const sceneGroup = useRef<THREE.Group>(null!);
   const lineGroup = useRef<THREE.Group>(null!);
   const pointerPos = useRef<THREE.Vector2>(new THREE.Vector2());
@@ -25,7 +36,7 @@ export function Measurable({ ref, children, ...props }: Props) {
     showEdge.current = edge => {
       line.current = edge;
       if (edge) showRedLine(edge);
-      else lineRef.current.visible = false;
+      else redRef.current.visible = false;
     };
     return () => {
       showEdge.current = null;
@@ -36,7 +47,7 @@ export function Measurable({ ref, children, ...props }: Props) {
   useEventListener('pointerdown', () => (isLMBPressed.current = true));
   useEventListener('pointerup', () => (isLMBPressed.current = false));
 
-  const { pointer, raycaster, camera } = useThree();
+  const { pointer, raycaster, camera, size } = useThree();
 
   useFrame(() => {
     if (isLMBPressed.current) return;
@@ -71,7 +82,7 @@ export function Measurable({ ref, children, ...props }: Props) {
     if (!lineData) {
       const onBlur = line.current?.onBlur;
       line.current = null;
-      lineRef.current.visible = false;
+      redRef.current.visible = false;
       onBlur?.();
       return;
     }
@@ -85,9 +96,13 @@ export function Measurable({ ref, children, ...props }: Props) {
   });
 
   const showRedLine = ({ meshRef, points }: LineData) => {
-    lineRef.current.position.copy(meshRef.current.position);
-    lineRef.current.rotation.copy(meshRef.current.rotation);
-    lineRef.current.geometry.setPositions(points.map(p => [p.x, p.y, p.z]).flat());
+    redRef.current.position.copy(meshRef.current.position);
+    redRef.current.rotation.copy(meshRef.current.rotation);
+    const positions = points.map(p => [p.x, p.y, p.z]).flat();
+    lineRef.current.geometry.setPositions(positions);
+    hiddenRef.current.geometry.setPositions(positions);
+    hiddenRef.current.computeLineDistances(); // the dashes are laid out along these
+    ends.current = [points[0], points[1]];
 
     // The mesh's parent (a door's pivot, a handle's door) relative to the scene group places the line
     new THREE.Matrix4()
@@ -95,26 +110,62 @@ export function Measurable({ ref, children, ...props }: Props) {
       .invert()
       .multiply(meshRef.current.parent!.matrixWorld)
       .decompose(lineGroup.current.position, lineGroup.current.quaternion, lineGroup.current.scale);
-    lineRef.current.visible = true;
+    redRef.current.visible = true;
+    placeTicks();
   };
+
+  // Ticks like on a dimension line: 45° across each end, facing the camera and the same size on screen at any distance
+  const placeTicks = () => {
+    if (!ends.current || !redRef.current.visible) return;
+    const [from, to] = ends.current;
+    redRef.current.updateWorldMatrix(true, false);
+    const eye = redRef.current.worldToLocal(camera.getWorldPosition(new THREE.Vector3()));
+    const along = to.clone().sub(from).normalize();
+    const middle = from.clone().add(to).multiplyScalar(0.5);
+    const across = new THREE.Vector3().crossVectors(along, eye.clone().sub(middle)).normalize();
+    const ortho = camera as THREE.OrthographicCamera;
+    const perspective = camera as THREE.PerspectiveCamera;
+    const metresPerPixel = ortho.isOrthographicCamera
+      ? (ortho.top - ortho.bottom) / ortho.zoom / size.height
+      : (2 * eye.distanceTo(middle) * Math.tan(THREE.MathUtils.degToRad(perspective.fov) / 2)) / perspective.zoom / size.height;
+    const half = along.add(across).normalize().multiplyScalar(TICK_PX * metresPerPixel);
+    ticksRef.current.geometry.setPositions(
+      [from, to].flatMap(end => [end.x - half.x, end.y - half.y, end.z - half.z, end.x + half.x, end.y + half.y, end.z + half.z]),
+    );
+  };
+
+  // Runs after the hover loop above: the ticks follow the camera
+  useFrame(placeTicks);
 
   return (
     <group {...props} dispose={null}>
       <group ref={lineGroup}>
         <LineHint />
-        <Line
-          ref={lineRef}
-          visible={wireframe}
-          points={[0, 0, 0, 0, 0, 0]}
-          lineWidth={2.5}
-          raycast={cameraRaycast}
-          color="red"
-          renderOrder={1000}
-          // renderOrder sorts only within a queue, and three draws all opaque objects before transparent ones:
-          // without this the outlines and faces of transparent parts land on top of the red line
-          transparent
-          depthTest={false}
-        />
+        <group ref={redRef} visible={wireframe}>
+          {/* The part in sight. renderOrder sorts only within a queue, and three draws all opaque objects before
+              transparent ones: `transparent` keeps the outlines and faces of see-through parts from landing on top.
+              polygonOffset lifts the line off the faces its own edge lies on. */}
+          <Line ref={lineRef} points={NO_POINTS} lineWidth={2.5} raycast={cameraRaycast} color="red" renderOrder={1000} transparent polygonOffset polygonOffsetFactor={-4} polygonOffsetUnits={-4} />
+          {/* The part behind something: the same line, dotted, drawn only where the depth test fails */}
+          <Line
+            ref={hiddenRef}
+            points={NO_POINTS}
+            lineWidth={2}
+            raycast={cameraRaycast}
+            color="red"
+            renderOrder={1000}
+            transparent
+            dashed
+            dashSize={0.012}
+            gapSize={0.012}
+            depthFunc={THREE.GreaterDepth}
+            depthWrite={false}
+            polygonOffset
+            polygonOffsetFactor={-4}
+            polygonOffsetUnits={-4}
+          />
+          <Line ref={ticksRef} segments points={NO_TICKS} lineWidth={2} raycast={cameraRaycast} color="red" renderOrder={1000} transparent depthTest={false} />
+        </group>
       </group>
 
       <group

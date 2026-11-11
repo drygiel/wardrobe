@@ -1,16 +1,17 @@
 import { Component, type ReactNode, Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Link, useHref } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import hintStyles from '@/components/LineHint.module.scss';
 import { renderLarge } from '@/assets';
+import Ready from '@/components/Ready';
+import SiteNav from '@/sections/SiteNav';
+import { COUNTS, SIZE, SIZE_TEXT } from '@/site';
 import { dragTarget, measuring, progressAt, STAGE_VH, stopFor, YAW_MAX, YAW_MIN } from './chapters';
 import { DRAFT_LABELS } from './draft';
 import { type HeroProgress, HomeScene } from './HomeScene';
 import { LAYERS } from './layers';
 import cn from 'classnames';
 import styles from './Home.module.scss';
-
-type Props = { nav: { href: string; label: string }[] };
 
 // Without WebGL the scene cannot start; the page keeps its copy and links over a still of the wardrobe
 class NoWebGL extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -36,14 +37,14 @@ const CHAPTERS = [
   {
     show: '2.62 2.74 3.02 3.1',
     title: 'Szuflady i zawiasy',
-    text: 'Osiem szuflad głębokości 487 mm i 17 zawiasów z puszką 35 mm.',
+    text: `Osiem szuflad głębokości 487 mm i ${COUNTS.hinges} zawiasów z puszką 35 mm.`,
     to: '/okucia',
     label: 'Zobacz okucia',
   },
   {
     show: '3.62 3.74 4.02 4.1',
     title: 'Rama z litego dębu',
-    text: '14 formatek o grubości 40 mm, od podłogi do sufitu: 2660 mm.',
+    text: `${COUNTS.framePieces} formatek o grubości 40 mm, od podłogi do sufitu: ${SIZE.height} mm.`,
     to: '/rama',
     label: 'Zobacz ramę',
   },
@@ -57,15 +58,18 @@ const CHAPTERS = [
   {
     show: '5.62 5.74 9 10',
     title: 'Zmierz sam',
-    text: 'Najedź kursorem na krawędź, a pojawi się jej długość. Kliknij element, aby zobaczyć jego wymiary i rysunek.',
+    hover: 'Wskaż krawędź kursorem, a pojawi się jej długość.',
+    text: 'Wymiary i rysunek każdego elementu są w Pomiarze.',
     to: '/pomiar',
     label: 'Otwórz pomiary',
+    // The closing drawing is the plan's front view, so the chapter leads there as well
+    more: { to: '/plan', label: 'Rysunek techniczny' },
   },
 ];
 
 // The hero pins one canvas while the scroll turns the drawing into the wardrobe.
 // DOM copy fades by `data-show="in-from in-to out-from out-to"` in the same progress.
-export default function HomeStage({ nav }: Props) {
+export default function HomeStage() {
   const stageRef = useRef<HTMLDivElement>(null!);
   const pinRef = useRef<HTMLDivElement>(null!);
   const labels = useRef<HTMLDivElement>(null!);
@@ -82,9 +86,10 @@ export default function HomeStage({ nav }: Props) {
     hover: null,
   });
   const hint = useRef<HTMLDivElement>(null!);
-  const measureHref = useHref('/pomiar');
+  const navigate = useNavigate();
   const invalidate = useRef<() => void>(() => {});
   const [visible, setVisible] = useState(true);
+  const [ready, setReady] = useState(false);
   const [counts, setCounts] = useState<number[]>([]);
 
   const highlight = (layer: number) => {
@@ -227,7 +232,7 @@ export default function HomeStage({ nav }: Props) {
         progress.current.hover &&
         !(e.target as HTMLElement).closest('a, button')
       )
-        window.open(measureHref, '_blank', 'noopener');
+        navigate('/pomiar');
     };
     pin.addEventListener('pointermove', track);
     pin.addEventListener('pointerdown', track);
@@ -239,7 +244,7 @@ export default function HomeStage({ nav }: Props) {
       pin.removeEventListener('pointerleave', leave);
       pin.removeEventListener('click', click);
     };
-  }, [measureHref]);
+  }, [navigate]);
 
   return (
     <div ref={stageRef} className={styles.stage} style={{ height: `${STAGE_VH * 100}svh` }}>
@@ -276,6 +281,7 @@ export default function HomeStage({ nav }: Props) {
                   onCounts={setCounts}
                   onLayer={highlight}
                 />
+                <Ready onReady={setReady} />
               </Suspense>
             </Canvas>
           </NoWebGL>
@@ -298,18 +304,14 @@ export default function HomeStage({ nav }: Props) {
           ))}
         </div>
 
-        <Link className={styles.wordmark} to="/">
-          Szafa 2025
-        </Link>
-        <nav className={styles.nav} aria-label="Nawigacja">
-          <ul>
-            {nav.map(item => (
-              <li key={item.href}>
-                <Link to={item.href}>{item.label}</Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* While the camera is inside section B the model reaches the top edge: the menu keeps a clear band */}
+        <div className={styles.shade} data-show="2.25 2.55 3.05 3.4" aria-hidden="true" />
+        <SiteNav current="/" halo />
+        {!ready && (
+          <p className="loading" role="status">
+            Ładuję model 3D
+          </p>
+        )}
 
         <header className={styles.sheet} data-show="-2 -1 0.05 0.15">
           <h1>
@@ -317,6 +319,7 @@ export default function HomeStage({ nav }: Props) {
             <br />
             Potem dąb.
           </h1>
+          <p className={styles.lede}>Projekt szafy na wymiar w ramie z litego dębu, od podłogi do sufitu. Każdy wymiar na tej stronie pochodzi z modelu 3D.</p>
           <p>
             <span className={styles.scrollCue} aria-hidden="true" />
             Przewiń, a rysunek stanie się szafą.
@@ -330,35 +333,38 @@ export default function HomeStage({ nav }: Props) {
           </div>
           <div>
             <dt>Wymiary</dt>
-            <dd>268,8 × 266 × 53 cm, w milimetrach</dd>
+            <dd>{SIZE_TEXT}</dd>
           </div>
           <div>
             <dt>Elementy</dt>
-            <dd>86</dd>
+            <dd>{COUNTS.parts}, bez okuć</dd>
           </div>
         </dl>
 
         <p className={styles.caption} data-show="0.22 0.28 0.44 0.5">
           Każda linia to prawdziwy element.
         </p>
-        <p className={styles.caption} data-show="0.6 0.66 0.82 0.88">
+        <p className={styles.caption} data-show="0.6 0.66 0.8 0.86">
           Potem zapala się światło.
         </p>
 
-        {CHAPTERS.map(chapter => (
-          <section key={chapter.title} className={styles.chapter} data-show={chapter.show}>
-            <h2>{chapter.title}</h2>
-            <p>{chapter.text}</p>
-            <Link
-              className="btn"
-              to={chapter.to}
-              // The measuring page opens beside the story, so the reader keeps their place
-              {...(chapter.to === '/pomiar' && { target: '_blank', rel: 'noopener' })}
-            >
-              {chapter.label}
-            </Link>
-          </section>
-        ))}
+        {/* DOM order follows the scroll story, so a screen reader meets the headings as a reader does:
+            hero close, anatomy, then the chapters. All three are absolutely placed; the order draws nothing. */}
+        <div ref={finalText} className={styles.final} data-show="0.9 0.97 1.02 1.08">
+          <div className={styles.intro}>
+            <h2>Szafa w ramie z litego dębu, od podłogi do sufitu.</h2>
+            <p>
+              {SIZE_TEXT}. Cztery sekcje, {COUNTS.parts} elementów bez okuć.
+            </p>
+          </div>
+          <p className={styles.hint}>
+            <span className="drag-cue" aria-hidden="true" />
+            Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.
+          </p>
+          <Link className="btn" to="/pomiar">
+            Zmierz szafę
+          </Link>
+        </div>
 
         {/* Shown by HomeScene together with its lines, on their own clock */}
         <div ref={callouts} className={styles.callouts}>
@@ -397,19 +403,25 @@ export default function HomeStage({ nav }: Props) {
           ))}
         </div>
 
-        <div ref={finalText} className={styles.final} data-show="0.88 0.95 1.02 1.08">
-          <div className={styles.intro}>
-            <h2>Szafa z litego dębu, od podłogi do sufitu.</h2>
-            <p>268,8 × 266 × 53 cm. Cztery części, 86 elementów.</p>
-          </div>
-          <p className={styles.hint}>
-            <span className="drag-cue" aria-hidden="true" />
-            Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.
-          </p>
-          <Link className="btn" to="/pomiar">
-            Zmierz szafę
-          </Link>
-        </div>
+        {CHAPTERS.map(chapter => (
+          <section key={chapter.title} className={styles.chapter} data-show={chapter.show}>
+            <h2>{chapter.title}</h2>
+            <p>
+              {chapter.hover && <span className={styles.hoverOnly}>{chapter.hover} </span>}
+              {chapter.text}
+            </p>
+            <div className={styles.links}>
+              <Link className="btn" to={chapter.to}>
+                {chapter.label}
+              </Link>
+              {chapter.more && (
+                <Link className="link" to={chapter.more.to}>
+                  {chapter.more.label}
+                </Link>
+              )}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );

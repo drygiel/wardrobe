@@ -20,6 +20,15 @@ export const wrapAngle = (angle: number) => Math.atan2(Math.sin(angle), Math.cos
 // The yaw that points the doors along (x, z)
 export const yawFacing = (x: number, z: number) => Math.atan2(-z, x);
 
+// Carries the pose with a handle that went from `from` to `to` while turning by `turn` around +y
+export function carry(pose: Pose, from: { x: number; z: number }, to: { x: number; z: number }, turn: number) {
+  const dx = pose.x - from.x;
+  const dz = pose.z - from.z;
+  pose.x = to.x + dx * Math.cos(turn) + dz * Math.sin(turn);
+  pose.z = to.z - dx * Math.sin(turn) + dz * Math.cos(turn);
+  pose.yaw += turn;
+}
+
 // Half the footprint's size along a horizontal direction
 const extentAlong = (yaw: number, foot: Footprint, nx: number, nz: number) =>
   foot.halfX * Math.abs(Math.cos(yaw) * nx - Math.sin(yaw) * nz) + foot.halfZ * Math.abs(Math.sin(yaw) * nx + Math.cos(yaw) * nz);

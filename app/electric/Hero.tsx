@@ -1,10 +1,10 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { Link } from 'react-router';
 import cn from 'classnames';
 import { FRAME_GLB, FRAME_PIECES, WARDROBE_GLB } from '@/assets';
 import { boxes } from '@/components/PlanDrawing';
 import { kindOf } from '@/components/parts';
+import SiteNav from '@/sections/SiteNav';
 import { useCircuit } from './circuit';
 import { CABLE_METRES, CONTACTS, contact, DOOR_IDS, DRILLS, FULL_WATT, LED_METRES, LEDS, num, ROUTES, type Route } from './data';
 import styles from './Elektryka.module.scss';
@@ -273,25 +273,9 @@ export function Hero() {
 
   return (
     <header ref={heroRef} className={styles.hero} style={{ ['--room' as string]: glow }}>
-      <nav className={styles.topnav} aria-label="Nawigacja">
-        <Link className={styles.wordmark} to="/">
-          Szafa 2025
-        </Link>
-        <ul>
-          <li>
-            <Link to="/">Szafa</Link>
-          </li>
-          <li>
-            <Link to="/rama">Rama</Link>
-          </li>
-          <li>
-            <Link to="#wiercenie">Wiercenie</Link>
-          </li>
-          <li>
-            <Link to="#montaz">Montaż</Link>
-          </li>
-        </ul>
-      </nav>
+      <div className={styles.topnav}>
+        <SiteNav current="/elektryka" toggle={false} />
+      </div>
 
       <div className={styles.intro}>
         <h1 className={styles.sr}>Elektryka szafy</h1>
@@ -312,7 +296,7 @@ export function Hero() {
 
         <dl className={styles.facts}>
           <div>
-            <dt>Taśmy LED</dt>
+            <dt>Paski LED</dt>
             <dd>{num(LED_METRES, 2)} m</dd>
           </div>
           <div>

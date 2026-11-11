@@ -2,17 +2,18 @@ import { Suspense, useState } from 'react';
 import cn from 'classnames';
 import { PlanDrawing, type PlanView } from '@/components/PlanDrawing';
 import { useReveal } from '@/hooks/useReveal';
+import { SIZE } from '@/site';
 import styles from './PlanSection.module.scss';
 
 export type PlanRow = { view: PlanView; name: string; value: string; text: string; href?: string };
 
 const ROWS: PlanRow[] = [
   { view: 'front', name: 'Widok z przodu', value: '2688 × 2660 mm', text: 'Bez frontów. Podział na regał A, szafę B, wnękę C i szafę D. Paski LED w kolorze.' },
-  { view: 'side', name: 'Widok z boku', value: '560 × 2660 mm', text: 'Głębokość ramy 530 mm, razem z uchwytami 560 mm.' },
-  { view: 'top', name: 'Widok z góry', value: '2688 × 560 mm', text: 'Wieńce, regał A i linia frontów z uchwytami.' },
+  { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami i plecami 2 mm razem ${SIZE.depthOverall} mm.` },
+  { view: 'top', name: 'Widok z góry', value: `${SIZE.width} × ${SIZE.depthOverall} mm`, text: 'Wieńce, regał A i linia frontów z uchwytami.' },
   { view: 'A', name: 'Regał A', value: '408 mm', text: 'Otwarte półki i zamykana szafka na dole.' },
-  { view: 'B', name: 'Szafa B', value: '1226 mm', text: 'Półki górne, sześć szuflad i trzy duże kosze.' },
-  { view: 'C', name: 'Wnęka C', value: '360 mm', text: 'Cztery półki, front cargo i LED nad wnęką.' },
+  { view: 'B', name: 'Szafa B', value: '1226 mm', text: 'Półki górne i siedem szuflad pod nimi.' },
+  { view: 'C', name: 'Wnęka C', value: '360 mm', text: 'Cztery półki, drzwi dolne na zawiasach i LED nad wnęką.' },
   { view: 'D', name: 'Szafa D', value: '694 mm', text: 'Półki, małe półki boczne i LED z prawej.' },
 ];
 
@@ -37,7 +38,7 @@ export default function PlanSection({ id = 'plan', title = 'Rysunek techniczny',
         <ul>
           {rows.map(row => (
             <li key={row.view} className={cn({ [styles.on]: row.view === active })}>
-              <button onMouseEnter={() => setActive(row.view)} onFocus={() => setActive(row.view)} onClick={() => setActive(row.view)}>
+              <button aria-pressed={row.view === active} onMouseEnter={() => setActive(row.view)} onFocus={() => setActive(row.view)} onClick={() => setActive(row.view)}>
                 <span className={styles.name}>{row.name}</span>
                 <span className={styles.value}>{row.value}</span>
               </button>
