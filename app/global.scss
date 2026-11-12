@@ -44,6 +44,7 @@
     --line: #4d473f; // quiet outlines in drawings
     --board: #2a2622;
     --led: #ffd9a0; // the lit strip itself
+    --hole: #8db8dc; // dowel holes, a cool blue against the warm wood and LED
 
     --font-display: 'Erode', Georgia, serif;
     --font-text: 'Switzer', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -72,6 +73,7 @@
     --line: #b5ad9f;
     --board: #d5cfc3;
     --led: #e09a35;
+    --hole: #2f6690;
 }
 
 *,

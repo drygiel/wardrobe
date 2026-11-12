@@ -3,7 +3,6 @@ import { FrameShowcase } from '@/components/FrameShowcase';
 import { GROUPS } from '@/components/parts';
 import MeasureLink from '@/sections/MeasureLink';
 import Showcase from '@/sections/Showcase';
-import PartsSection from '@/sections/PartsSection';
 import CutList from '@/sections/CutList';
 import PlanSection from '@/sections/PlanSection';
 import Footer from '@/sections/Footer';
@@ -25,14 +24,9 @@ export default function RamaPage() {
         facts="Płyty 3000 × 620 × 40 mm. Frezy pod LED i ścięcia 45°."
         hint="Przeciągnij, aby obrócić."
         actions={
-          <>
-            <Link className="link" to="#formatki">
-              Lista formatek
-            </Link>
-            <Link className="btn" to="#rozkroj">
-              Rozłóż na płyty
-            </Link>
-          </>
+          <Link className="btn" to="#rozkroj">
+            Rozłóż na płyty
+          </Link>
         }
         id="rozkroj"
         title="Z płyty do ramy"
@@ -46,7 +40,6 @@ export default function RamaPage() {
         scene={progress => <FrameShowcase progress={progress} />}
       />
       <main>
-        <PartsSection />
         <CutList />
         <MeasureLink
           title="Zmierz ramę"

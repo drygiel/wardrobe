@@ -1,4 +1,7 @@
+import type * as THREE from 'three';
 import { useEffect, useRef, useState } from 'react';
+import { useGLTF } from '@react-three/drei';
+import { FRAME_GLB } from '@/assets';
 import { useApp } from '@/contexts/AppContext';
 import type { LineData } from '@/components/Mesh';
 import { GROUPS } from '@/components/parts';
@@ -8,6 +11,9 @@ import { Icon } from './icons';
 import { inUnit, partLabel } from './labels';
 import { PartDrawing } from './PartDrawing';
 import { selection, useSelection } from './selection';
+import { PIECES } from '@/sections/orderList';
+import { ALL_LAYERS, marksOf, PieceChips } from '@/sections/PieceChips';
+import { type Focus, focusOf, NO_FOCUS, PieceOps } from '@/sections/PieceOps';
 import styles from './Editor.module.scss';
 
 const SIZE_NAMES = ['Długość', 'Szerokość', 'Grubość'];
@@ -22,6 +28,11 @@ export function Inspector() {
   const svg = useRef<SVGSVGElement>(null);
   const [copied, setCopied] = useState(false);
   const edgeFromDrawing = useRef(false);
+  const [layers, setLayers] = useState(ALL_LAYERS);
+  // The hole or groove in focus on the drawing and in the operations list, kept with the part it belongs to
+  const [mark, setMark] = useState<{ name: string; focus: Focus } | null>(null);
+  // The frame pieces in the editor share Frame.glb's geometry, so the order list's machining lands on them as is
+  const frame = useGLTF(FRAME_GLB) as unknown as { nodes: Record<string, THREE.Mesh> };
 
   const showEdge = (line: LineData | null) => {
     edgeFromDrawing.current = !!line;
@@ -75,6 +86,9 @@ export function Inspector() {
   const [long, wide, thick] = part.size;
   const group = GROUPS.find(g => g.id === part.group)!.label;
   const grain = grainAxis(part.name, mesh.geometry);
+  const piece = PIECES.find(p => p.name === part.name);
+  const focus = mark?.name === part.name ? mark.focus : NO_FOCUS;
+  const setFocus = (next: Focus) => setMark({ name: part.name, focus: next });
 
   const copy = async () => {
     await navigator.clipboard.writeText(`${part.name}\t${partLabel(part.name)}\t${length(long)} × ${length(wide)} × ${length(thick)} ${app.unit}`);
@@ -125,9 +139,16 @@ export function Inspector() {
         </div>
       </dl>
 
+      {piece && <PieceChips piece={piece} layers={layers} onToggle={layer => setLayers(old => ({ ...old, [layer]: !old[layer] }))} />}
+
       <div className={styles.sheet}>
-        <PartDrawing ref={svg} geometry={mesh.geometry} code={part.name} unit={app.unit} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} onEdgeClick={line => app.centerOn.current?.(line.meshRef.current.localToWorld(line.midPoint.clone()))} grain={typeof grain === 'number' ? grain : undefined} />
+        <PartDrawing
+          marks={piece && { ...marksOf(piece, frame.nodes[piece.name], focus.hole, layers), activeGroove: focus.groove }}
+          onMark={piece && (m => setFocus(focusOf(m)))}
+          ref={svg} geometry={mesh.geometry} code={part.name} unit={app.unit} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} onEdgeClick={line => app.centerOn.current?.(line.meshRef.current.localToWorld(line.midPoint.clone()))} grain={typeof grain === 'number' ? grain : undefined} />
       </div>
+
+      {piece && <PieceOps piece={piece} focus={focus} onFocus={setFocus} unit={app.unit} />}
 
       <dl className={styles.facts}>
         <dt>Grupa</dt>

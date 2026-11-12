@@ -1,5 +1,4 @@
 // The frame's order list on /rama: a board map, a ticket per piece, a plain table for print
-$measured: #e01410; // the red of the active hole, the same as the measured edge in the drawings
 
 .order {
     position: relative;
@@ -105,15 +104,8 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
 // The desk: the map stays in view while the ticket scrolls beside it
 .desk {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: clamp(24px, 3vw, 56px);
     margin-top: clamp(56px, 7vw, 104px);
-    align-items: start;
-}
-
-.map {
-    position: sticky;
-    top: 12vh;
 }
 
 .mapHead {
@@ -127,29 +119,6 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     font-size: var(--step-small);
 }
 
-.progress {
-    display: inline-flex;
-    white-space: nowrap;
-    align-items: center;
-    gap: 10px;
-    font-variant-numeric: tabular-nums;
-
-    i {
-        display: block;
-        width: 72px;
-        height: 3px;
-        background: var(--line);
-        border-radius: 2px;
-        overflow: hidden;
-    }
-
-    b {
-        display: block;
-        height: 100%;
-        background: var(--ink);
-        transition: width 400ms var(--ease);
-    }
-}
 
 .placeholder {
     aspect-ratio: 3 / 2;
@@ -171,11 +140,45 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     vector-effect: non-scaling-stroke;
 }
 
+// The selected piece's sheet keeps full strength, the other sheets and their pieces stepped back
+.sheetOn {
+    .sheetName {
+        fill: var(--ink);
+    }
+}
+
+.sheetOff {
+    opacity: 0.3;
+    transition: opacity 200ms;
+}
+
+// A piece on a dimmed sheet comes forward under the pointer, so it can still be found and picked
+.cut.sheetOff:hover,
+.cut.sheetOff.cutHover {
+    opacity: 0.85;
+}
+
 .sheetName {
     fill: var(--muted);
     font-size: 96px;
     font-weight: 500;
     letter-spacing: 0.04em;
+}
+
+.sheetSize {
+    pointer-events: none;
+
+    path {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+    }
+
+    text {
+        fill: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
 }
 
 .cut {
@@ -217,9 +220,6 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     }
 }
 
-.cutDone .cutCode {
-    fill: color-mix(in srgb, var(--muted) 70%, transparent);
-}
 
 .cutOn {
     .cutFill,
@@ -258,16 +258,14 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
         cursor: pointer;
         transition: color 150ms, border-color 150ms, background 150ms;
 
-        &:hover {
+        // Hovered here, on the map or in the 3D view
+        &:hover,
+        &.codeHover {
             color: var(--ink);
             border-color: var(--muted);
         }
     }
 
-    .codeDone {
-        color: var(--ink);
-        border-style: dashed;
-    }
 
     .codeOn,
     .codeOn:hover {
@@ -289,6 +287,44 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     padding: clamp(20px, 2.4vw, 36px);
     background: var(--surface);
     border-radius: 8px;
+}
+
+// Wide: the text on the left, the drawing with the 3D frame over its corner on the right. 1000 px is CutList's ACROSS
+@media (min-width: 1000px) {
+    .ticket {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            'head views'
+            'ops views'
+            'foot foot';
+        column-gap: clamp(24px, 3vw, 56px);
+        align-items: start;
+    }
+
+    .ticketHead {
+        grid-area: head;
+    }
+
+    .ops {
+        grid-area: ops;
+    }
+
+    .ticketFoot {
+        grid-area: foot;
+    }
+
+    .ticket .views {
+        grid-area: views;
+        margin-top: 0;
+    }
+}
+
+// The card stays put so the 3D locator keeps its camera; its content rises anew for each piece
+.ticketHead,
+.paper,
+.ops {
     animation: rise 420ms var(--ease);
 
     @media (prefers-reduced-motion: reduce) {
@@ -297,9 +333,10 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
 }
 
 .ticketHead {
-    display: flex;
-    align-items: flex-start;
-    gap: clamp(18px, 2.4vw, 36px);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: last baseline; // the size sits on the code's baseline, the name above it
+    column-gap: clamp(18px, 2.4vw, 36px);
 
     h3 {
         font-size: var(--step-lead);
@@ -315,9 +352,16 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     letter-spacing: -0.04em;
 }
 
+// Beside the big code: on a phone the size shrinks with this column instead of dropping its "mm" to a line of its own
+.title {
+    container-type: inline-size;
+}
+
 .size {
     margin-top: 6px;
-    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    // the numbers run about 7.2em plus a fixed-size "mm": 11% of the column fits them down to a 320 px phone
+    font-size: min(clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem), 11cqi);
+    white-space: nowrap;
     font-weight: 500;
     letter-spacing: -0.01em;
     font-variant-numeric: tabular-nums;
@@ -329,31 +373,14 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     }
 }
 
+// Under the code and the name, across the whole column
 .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 14px;
-    list-style: none;
-
-    li {
-        padding: 3px 10px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        color: var(--muted);
-        font-size: var(--step-small);
-    }
-
-    .chipLed {
-        color: var(--accent);
-        border-color: color-mix(in srgb, var(--accent) 60%, transparent);
-    }
+    grid-column: 1 / -1;
+    margin-top: 20px;
 }
 
 .views {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    gap: 14px;
+    position: relative;
     margin-top: clamp(22px, 2.6vw, 36px);
 
     figcaption {
@@ -373,100 +400,43 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
 .locator {
     display: flex;
     flex-direction: column;
+    margin-top: 14px;
 }
 
+// The 3D frame shares the drawing's paper (PartDrawing's PAPER), no frame of its own
 .locatorView {
-    flex: 1;
-    min-height: 180px;
-    border: 1px solid var(--line);
+    height: 240px; // a definite height, or the canvas inside falls back to 300 × 150
     border-radius: 4px;
-    background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--ink) 6%, transparent), transparent 70%);
+    background: #e4e1da;
+
+    // Vertical swipes scroll the page, sideways ones turn the frame (beats the inline none OrbitControls sets)
+    * {
+        touch-action: pan-y !important;
+    }
 }
 
-// Operations, numbered like a work order
+// Wide: laid over the drawing's top right corner, in the room PartDrawing keeps free there; size set inline
+.locatorOver {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-top: 0;
+
+    .locatorView {
+        flex: 1;
+        height: auto;
+        background: none;
+    }
+
+    figcaption {
+        margin: 0 0 6px;
+        color: #5a544b; // PartDrawing's DIM, a note on the sheet
+        text-align: center;
+    }
+}
+
 .ops {
-    counter-reset: op;
     margin-top: clamp(22px, 2.6vw, 36px);
-    list-style: none;
-
-    > li {
-        counter-increment: op;
-        display: grid;
-        grid-template-columns: 34px minmax(0, 1fr);
-        column-gap: 10px;
-        padding: 14px 0;
-        border-top: 1px solid var(--line);
-
-        &::before {
-            content: counter(op, decimal-leading-zero);
-            grid-row: span 2;
-            color: var(--muted);
-            font-size: var(--step-small);
-            font-variant-numeric: tabular-nums;
-            padding-top: 2px;
-        }
-
-        b {
-            font-weight: 500;
-        }
-
-        span {
-            color: var(--muted);
-        }
-    }
-
-    table {
-        width: 100%;
-        margin-top: 10px;
-        border-collapse: collapse;
-        font-size: var(--step-small);
-        font-variant-numeric: tabular-nums;
-    }
-
-    th,
-    td {
-        padding: 7px 12px 7px 0;
-        text-align: left;
-        font-weight: 400;
-        vertical-align: top;
-    }
-
-    thead th {
-        color: var(--muted);
-        border-bottom: 1px solid var(--line);
-    }
-
-    tbody tr {
-        cursor: default;
-        box-shadow: inset 2px 0 0 transparent;
-        transition: background 150ms, box-shadow 150ms;
-
-        th {
-            padding-left: 10px;
-            font-weight: 600;
-        }
-
-        td {
-            color: var(--muted);
-        }
-
-        &:focus-visible {
-            outline: none;
-        }
-    }
-
-    .holeOn {
-        background: color-mix(in srgb, #{$measured} 12%, transparent);
-        box-shadow: inset 2px 0 0 #{$measured};
-
-        td {
-            color: var(--ink);
-        }
-    }
-}
-
-.opLed b {
-    color: var(--accent);
 }
 
 .ticketFoot {
@@ -500,20 +470,6 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
     }
 }
 
-.check {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-size: var(--step-small);
-
-    input {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--ink);
-        cursor: pointer;
-    }
-}
 
 .editor {
     display: inline-flex;
@@ -556,14 +512,6 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
             margin-top: 20px;
         }
     }
-
-    .desk {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .map {
-        position: static;
-    }
 }
 
 @media (max-width: 640px) {
@@ -575,14 +523,6 @@ $measured: #e01410; // the red of the active hole, the same as the measured edge
             padding-left: 0;
             border-left: 0;
         }
-    }
-
-    .views {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .locatorView {
-        min-height: 220px;
     }
 
     .nav:last-child {

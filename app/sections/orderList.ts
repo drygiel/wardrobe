@@ -27,9 +27,10 @@ export const size = (piece: Piece) => `${mm(piece.length)} × ${mm(piece.width)}
 const ON_FACE: Record<string, string> = { 'prawy bok': 'prawym boku', 'lewy bok': 'lewym boku', front: 'froncie', tył: 'tyle', spód: 'spodzie', góra: 'górze' };
 export const onFace = (face: string) => ON_FACE[face] ?? face;
 
-export const grooveText = (g: Groove) =>
-  `Frez LED ${mm(g.width)} × ${mm(g.depth)} na ${onFace(g.face)}, ${mm(g.offset)} ${g.offsetAlong}, od ${mm(g.from)} do ${mm(g.to)} ${g.along}`;
-export const position = (h: Hole) => h.at.map(([value, from]) => `${mm(value)} ${from}`).join(', ');
+// `length` writes millimetres in the unit on show; the order list itself is in millimetres
+export const grooveText = (g: Groove, length = mm) =>
+  `Frez LED ${length(g.width)} × ${length(g.depth)} na ${onFace(g.face)}, ${length(g.offset)} ${g.offsetAlong}, od ${length(g.from)} do ${length(g.to)} ${g.along}`;
+export const position = (h: Hole, length = mm) => h.at.map(([value, from]) => `${length(value)} ${from}`).join(', ');
 export const holeText = (h: Hole) => `${h.dowel}: ${h.face}, ${position(h)}, Ø${mm(h.d)} × ${mm(h.depth)}`;
 
 // Polish plural after a number: one, few (2-4 but not 12-14), many
@@ -53,6 +54,6 @@ export function totals(pieces = PIECES) {
 export function toCsv(pieces = PIECES) {
   const cell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
   const head = ['Kod', 'Formatka', 'Długość', 'Szerokość', 'Grubość', 'Szt.', 'Płyta', 'Ścięcia 45°', 'Frez LED', 'Otwory na kołki'];
-  const rows = pieces.map(p => [code(p), partLabel(p.name), mm(p.length), mm(p.width), mm(p.thickness), 1, p.board ?? '', p.mitres, p.grooves.map(grooveText).join('; '), p.holes.map(holeText).join('; ')]);
+  const rows = pieces.map(p => [code(p), partLabel(p.name), mm(p.length), mm(p.width), mm(p.thickness), 1, p.board ?? '', p.mitres, p.grooves.map(g => grooveText(g)).join('; '), p.holes.map(holeText).join('; ')]);
   return '﻿' + [head, ...rows].map(row => row.map(cell).join(';')).join('\r\n');
 }

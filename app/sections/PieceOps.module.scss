@@ -1,0 +1,97 @@
+// Operations, numbered like a work order
+.ops {
+    counter-reset: op;
+    list-style: none;
+
+    > li {
+        counter-increment: op;
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        column-gap: 10px;
+        row-gap: 2px;
+        padding: 10px 0;
+        border-top: 1px solid var(--line);
+        font-size: var(--step-small); // a work order to scan, not to read: kept small so the column stays short
+
+        &::before {
+            content: counter(op, decimal-leading-zero);
+            grid-row: span 2;
+            color: var(--muted);
+            font-size: var(--step-small);
+            font-variant-numeric: tabular-nums;
+            padding-top: 3px;
+        }
+
+        b {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        span {
+            color: var(--muted);
+        }
+    }
+
+    table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+        font-size: var(--step-small);
+        font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+        padding: 7px 12px 7px 0;
+        text-align: left;
+        font-weight: 400;
+        vertical-align: top;
+    }
+
+    thead th {
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+    }
+
+    tbody tr {
+        cursor: default;
+        box-shadow: inset 2px 0 0 transparent;
+        transition: background 150ms, box-shadow 150ms;
+
+        th {
+            padding-left: 10px;
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--muted);
+        }
+
+        &:focus-visible {
+            outline: none;
+        }
+    }
+
+    // A tint of the holes' blue, as on their chip and heading; the drawing rings the same hole
+    .holeOn {
+        background: color-mix(in srgb, var(--hole) 12%, transparent);
+        box-shadow: inset 2px 0 0 var(--hole);
+
+        td {
+            color: var(--ink);
+        }
+    }
+
+    .grooveOn {
+        background: color-mix(in srgb, var(--accent) 14%, transparent);
+        box-shadow: inset 2px 0 0 var(--accent);
+    }
+}
+
+.led b {
+    color: var(--accent);
+}
+
+.holes b {
+    color: var(--hole);
+}
