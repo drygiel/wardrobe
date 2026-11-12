@@ -307,6 +307,20 @@ h3 {
     }
 }
 
+// A mention in running text of something another page or section describes: brighter than the copy, a quiet underline
+.mention {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    transition: text-decoration-color 150ms;
+
+    &:hover {
+        text-decoration-color: currentColor;
+    }
+}
+
 .link {
     border: 0;
     background: none;

@@ -375,7 +375,15 @@ export default function CutList() {
         <p className={styles.kicker}>Do stolarni</p>
         <h2 id="zamowienie-h">Lista do zamówienia</h2>
         <p className={styles.lead}>
-          Każda formatka z płyty dębowej {SHEET} mm, z wymiarem po obróbce, frezem i każdym otworem na kołek, policzona z modelu. Kierunki jak przy patrzeniu na szafę od frontu.
+          Każda formatka z płyty dębowej {SHEET} mm, z wymiarem po obróbce,{' '}
+          <Link className="mention" to="#led">
+            frezem pod LED
+          </Link>{' '}
+          i każdym otworem na kołek, policzona z{' '}
+          <Link className="mention" to="/pomiar">
+            modelu 3D
+          </Link>
+          . Kierunki jak przy patrzeniu na szafę od frontu.
         </p>
         <dl className={styles.stats}>
           {stats.map(([value, label]) => (

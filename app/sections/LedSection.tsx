@@ -32,13 +32,31 @@ export default function LedSection() {
       <div className={styles.copy}>
         <p className={styles.kicker}>Światło w ramie</p>
         <h2 id="led-h">Taśmy LED schowane w dębie</h2>
+        {/* Whatever another page or section already describes is linked there */}
         <p>
-          Osiem odcinków taśmy {VOLT} V leży we frezach {num(GROOVE.width)} × {num(GROOVE.depth, 1)} mm, wyciętych w formatkach ramy i wnętrza. Taśma siedzi w
-          aluminiowym profilu z kloszem: zamiast rzędu diod widać jedną równą linię światła, a profil odprowadza ciepło od drewna.
+          <Link className="mention" to="/elektryka#obwod">
+            Osiem odcinków taśmy {VOLT} V
+          </Link>{' '}
+          leży we frezach {num(GROOVE.width)} × {num(GROOVE.depth, 1)} mm,{' '}
+          <Link className="mention" to="#zamowienie">
+            wyciętych w formatkach ramy
+          </Link>{' '}
+          i wnętrza. Taśma siedzi w aluminiowym profilu z kloszem: zamiast rzędu diod widać jedną równą linię światła, a profil odprowadza ciepło od drewna.
         </p>
         <p>
-          Środek szafy zapala się sam, gdy otworzysz którekolwiek z {DOOR_IDS.length} drzwi: kontaktrony przy drzwiach mówią o tym ściemniaczowi. Regał A i wnęka C
-          mają własne pokrętła, a całość zasila jeden zasilacz {PSU_WATT} W z zapasem.
+          Środek szafy zapala się sam, gdy otworzysz którekolwiek z {DOOR_IDS.length} drzwi:{' '}
+          <Link className="mention" to="/elektryka#obwod">
+            kontaktrony przy drzwiach
+          </Link>{' '}
+          mówią o tym ściemniaczowi.{' '}
+          <Link className="mention" to="/plan">
+            Regał A i wnęka C
+          </Link>{' '}
+          mają własne pokrętła, a całość zasila jeden{' '}
+          <Link className="mention" to="/elektryka#montaz">
+            zasilacz {PSU_WATT} W
+          </Link>{' '}
+          z zapasem.
         </p>
         <dl className={styles.facts}>
           {facts.map(([value, label]) => (

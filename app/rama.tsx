@@ -15,8 +15,24 @@ export default function RamaPage() {
       <Meta page={pageAt('/rama')} />
       <Showcase
         current="/rama"
-        heading={`Rama szafy: ${COUNTS.framePieces} formatek z trzech płyt dębowych.`}
-        facts="Płyty 3000 × 620 × 40 mm. Frezy pod LED i ścięcia 45°."
+        heading={
+          <>
+            Rama szafy:{' '}
+            <Link className="mention" to="#zamowienie">
+              {COUNTS.framePieces} formatek
+            </Link>{' '}
+            z trzech płyt dębowych.
+          </>
+        }
+        facts={
+          <>
+            Płyty 3000 × 620 × 40 mm.{' '}
+            <Link className="mention" to="#led">
+              Frezy pod LED
+            </Link>{' '}
+            i ścięcia 45°.
+          </>
+        }
         hint="Przeciągnij, aby obrócić."
         actions={
           <Link className="btn" to="#rozkroj">
@@ -29,19 +45,50 @@ export default function RamaPage() {
         chapters={[
           {
             title: 'Trzy płyty z litego dębu',
-            text: `Cała rama mieści się na trzech płytach 3000 × 620 × 40 mm. Rozbieramy ją od góry, formatka po formatce, i odkładamy każdą tam, skąd została wycięta.`,
+            text: (
+              <>
+                Cała rama mieści się na{' '}
+                <Link className="mention" to="#zamowienie">
+                  trzech płytach 3000 × 620 × 40 mm
+                </Link>
+                . Rozbieramy ją od góry, formatka po formatce, i odkładamy każdą tam, skąd została wycięta.
+              </>
+            ),
           },
           {
             title: `Rozkrój na ${COUNTS.framePieces} formatek`,
-            text: 'Formatki ułożone tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz. Każda ma swój kod, od P01 do P15.',
+            text: (
+              <>
+                Formatki ułożone tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz. Każda ma{' '}
+                <Link className="mention" to="#zamowienie">
+                  swój kod, od P01 do P15
+                </Link>
+                .
+              </>
+            ),
           },
           {
             title: 'Montaż od podłogi',
-            text: 'Najpierw wieńce dolne, potem boki i słupki, wnęka C z półką, na końcu wieńce górne. Każda formatka wchodzi na swoje miejsce z góry.',
+            text: (
+              <>
+                Najpierw wieńce dolne, potem boki i słupki,{' '}
+                <Link className="mention" to="/plan">
+                  wnęka C
+                </Link>{' '}
+                z półką, na końcu wieńce górne. Każda formatka wchodzi na swoje miejsce z góry.
+              </>
+            ),
           },
           {
             title: `Rama ${SIZE.height} mm do sufitu`,
-            text: 'Frezy pod LED i ścięcia 45° składają się w jedną ramę. Wymiary i otwory każdej formatki są niżej, w liście do stolarni.',
+            text: (
+              <>
+                <Link className="mention" to="#led">
+                  Frezy pod LED
+                </Link>{' '}
+                i ścięcia 45° składają się w jedną ramę. Wymiary i otwory każdej formatki są niżej, w liście do stolarni.
+              </>
+            ),
             link: { to: '#zamowienie', label: 'Lista do stolarni' },
           },
         ]}

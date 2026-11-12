@@ -10,8 +10,8 @@ import styles from './Showcase.module.scss';
 
 type Props = {
   current: PagePath;
-  heading: string;
-  facts: string;
+  heading: ReactNode;
+  facts: ReactNode;
   hint: string;
   actions: ReactNode;
   // Scroll section that follows the hero: one chapter per screen of scrolling, its copy beside the model
@@ -21,7 +21,7 @@ type Props = {
   scene: (progress: RefObject<ShowcaseProgress>) => ReactNode;
 };
 
-export type Chapter = { title: string; text: string; link?: { to: string; label: string } };
+export type Chapter = { title: string; text: ReactNode; link?: { to: string; label: string } };
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
