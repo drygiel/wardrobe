@@ -164,7 +164,8 @@ export function Measurable({ ref, children, ...props }: Props) {
             polygonOffsetFactor={-4}
             polygonOffsetUnits={-4}
           />
-          <Line ref={ticksRef} segments points={NO_TICKS} lineWidth={2} raycast={cameraRaycast} color="red" renderOrder={1000} transparent depthTest={false} />
+          {/* Hairline and softer than the line itself: the ticks only mark where it ends */}
+          <Line ref={ticksRef} segments points={NO_TICKS} lineWidth={1} raycast={cameraRaycast} color="red" opacity={0.7} renderOrder={1000} transparent depthTest={false} />
         </group>
       </group>
 

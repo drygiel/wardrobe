@@ -1,45 +1,12 @@
 .footer {
+    --tick: 9px;
+
     position: relative;
     z-index: 1;
     margin-top: var(--section);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px var(--gap);
-    padding: 48px var(--m) 32px;
+    padding: 0 var(--m) 32px;
     background: var(--bg);
     view-timeline-name: --footer;
-
-    // The strip in its channel
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: var(--m);
-        right: var(--m);
-        height: 2px;
-        background: var(--led);
-        box-shadow:
-            0 0 6px 1px var(--accent),
-            0 2px 28px 3px rgb(240 179 90 / 45%);
-    }
-
-    // Its light falling on the band below; the ends fade because the strip stops short of the edges
-    &::after {
-        content: '';
-        position: absolute;
-        inset: 0 0 auto;
-        height: 100%;
-        background: linear-gradient(rgb(240 179 90 / 15%), transparent 85%);
-        mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-        pointer-events: none;
-    }
-
-    > * {
-        position: relative;
-        z-index: 1;
-    }
 
     a {
         text-decoration: none;
@@ -55,22 +22,94 @@
     }
 }
 
-// The strip dims up as the page reaches its end; where this is unsupported it is simply on
-@supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-        .footer::before,
-        .footer::after {
-            animation: dim-up linear both;
-            animation-timeline: --footer;
-            animation-range: entry 0% entry 100%;
-        }
+// Overall width, drafted the architect's way: extension lines down to the block's corners, slashes at the ends
+.dim {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    border-inline: 1px solid var(--line);
+    color: var(--muted);
+    font-size: var(--step-small);
+    font-variant-numeric: tabular-nums;
+
+    // The dimension line itself
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--muted);
+    }
+
+    // Slashes where it meets the extension lines
+    &::after {
+        content: '';
+        position: absolute;
+        top: calc(50% - var(--tick) / 2);
+        left: calc(var(--tick) / -2);
+        right: calc(var(--tick) / -2);
+        height: var(--tick);
+        background:
+            linear-gradient(-45deg, transparent 46%, var(--ink) 46% 54%, transparent 54%) left / var(--tick) var(--tick) no-repeat,
+            linear-gradient(-45deg, transparent 46%, var(--ink) 46% 54%, transparent 54%) right / var(--tick) var(--tick) no-repeat;
+    }
+
+    // The figure breaks the line, as on paper
+    span {
+        position: relative;
+        z-index: 1;
+        padding: 0 12px;
+        background: var(--bg);
+        letter-spacing: 0.04em;
     }
 }
 
-@keyframes dim-up {
-    from {
-        opacity: 0.08;
+// The title block: hairline cells, each with its field name in the corner
+.block {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 3fr;
+    border: 1px solid var(--line);
+}
+
+.links {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+}
+
+.block > * + *,
+.links > * + * {
+    border-left: 1px solid var(--line);
+}
+
+.cell {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    padding: 16px 24px 22px;
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 24px;
+        list-style: none;
     }
+
+    p {
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+}
+
+.label {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .name {
@@ -78,42 +117,85 @@
     font-size: var(--step-lead);
 }
 
-.brand p {
-    margin-top: 4px;
-    color: var(--muted);
-    font-size: var(--step-small);
-}
-
-.links {
-    display: grid;
-    gap: 6px;
-    justify-items: end;
-
-    ul {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 4px 28px;
-        list-style: none;
-    }
-}
-
 .files {
     color: var(--muted);
     font-size: var(--step-small);
+
+    a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+// The line is drawn out from the figure as the page reaches its end; where unsupported it is simply there
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .dim::before {
+            animation: draw linear both;
+            animation-timeline: --footer;
+            animation-range: entry 10% entry 90%;
+        }
+
+        .dim::after {
+            animation: ink linear both;
+            animation-timeline: --footer;
+            animation-range: entry 70% entry 100%;
+        }
+    }
+}
+
+@keyframes draw {
+    from {
+        transform: scaleX(0);
+    }
+}
+
+@keyframes ink {
+    from {
+        opacity: 0;
+    }
+}
+
+@media (max-width: 1023px) {
+    .block {
+        grid-template-columns: 1fr;
+    }
+
+    .block > * + * {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+    }
 }
 
 @media (max-width: 767px) {
     .footer {
-        padding-top: 36px;
+        padding-bottom: 24px;
     }
 
     .links {
-        justify-items: start;
+        grid-template-columns: 1fr;
+    }
+
+    .links > * + * {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+    }
+
+    .cell {
+        padding: 14px 16px 18px;
 
         ul {
-            justify-content: flex-start;
             gap: 4px 20px;
         }
+    }
+
+    .files {
+        flex-direction: column;
     }
 }

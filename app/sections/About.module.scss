@@ -108,6 +108,10 @@
     }
 
     i {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        align-self: center;
         color: var(--muted);
         font-size: var(--step-small);
         font-style: normal;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import cn from 'classnames';
+import { Icon } from '@/editor/icons';
 import { PAGES, type PagePath } from '@/site';
 import ThemeToggle from './ThemeToggle';
 import styles from './SiteNav.module.scss';
@@ -45,6 +46,7 @@ export default function SiteNav({ current, halo, toggle = true }: Props) {
       </Link>
       <nav ref={navRef} className={cn(styles.nav, halo && styles.halo, open && styles.open)} aria-label="Nawigacja">
         <button ref={buttonRef} type="button" className={styles.menu} aria-expanded={open} aria-controls="site-menu" onClick={() => setOpen(!open)}>
+          <Icon name={open ? 'cross' : 'menu'} />
           Menu
         </button>
         <ul id="site-menu" onClick={() => setOpen(false)}>

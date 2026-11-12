@@ -18,6 +18,7 @@ const INK = '#161412';
 const DIM = '#5a544b';
 const MEASURED = '#e01410'; // the red of the measured edge in the model
 const FONT = 'Switzer, system-ui, sans-serif';
+const GRAIN = '#8a5a2b'; // oak brown for the grain arrow
 const GROOVE = '#f0b35a'; // the LED amber, only on the strip's groove
 const HOLE = '#2f6690'; // the site's --hole on paper: dowel holes apart from the outline
 const HOLE_ON = '#1c6fc0'; // the hole in focus, a brighter blue of the same family
@@ -313,7 +314,7 @@ export function PartDrawing({
           </g>
         )),
       )}
-      {grainArrow && <path d={grainArrow} fill="none" stroke={INK} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />}
+      {grainArrow && <path d={grainArrow} fill="none" stroke={GRAIN} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />}
       <Dimension x1={x0} y1={y0 - 11} x2={x0 + wa} y2={y0 - 11} label={labels[0]} />
       <Dimension x1={x0 - 11} y1={y0} x2={x0 - 11} y2={y0 + wb} label={labels[1]} vertical />
       <Dimension x1={xSide} y1={y0 - 11} x2={xSide + wc} y2={y0 - 11} label={labels[2]} />

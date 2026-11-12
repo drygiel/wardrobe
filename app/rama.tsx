@@ -1,7 +1,6 @@
 import { Link } from 'react-router';
+import { Icon } from '@/editor/icons';
 import { FrameShowcase } from '@/components/FrameShowcase';
-import { GROUPS } from '@/components/parts';
-import MeasureLink from '@/sections/MeasureLink';
 import Showcase from '@/sections/Showcase';
 import CutList from '@/sections/CutList';
 import PlanSection from '@/sections/PlanSection';
@@ -10,9 +9,6 @@ import Meta from '@/sections/Meta';
 import NextPage from '@/sections/NextPage';
 import { COUNTS, pageAt, SIZE } from '@/site';
 import { picture, renderSmall } from '@/assets';
-
-// The measuring page with every group but the frame switched off
-const MEASURE_FRAME = `/pomiar?hide=${GROUPS.map(group => group.id).filter(id => id !== 'frame').join()}`;
 
 export default function RamaPage() {
   return (
@@ -26,6 +22,7 @@ export default function RamaPage() {
         actions={
           <Link className="btn" to="#rozkroj">
             Rozłóż na płyty
+            <Icon name="down" />
           </Link>
         }
         id="rozkroj"
@@ -41,11 +38,6 @@ export default function RamaPage() {
       />
       <main>
         <CutList />
-        <MeasureLink
-          title="Zmierz ramę"
-          text="Pomiary otworzą się na samej ramie. Najedź na krawędź formatki, aby zobaczyć jej długość."
-          to={MEASURE_FRAME}
-        />
         <PlanSection
           title="Rozkrój i wymiary"
           rows={[

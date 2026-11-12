@@ -68,7 +68,11 @@ export default function Editor() {
     return () => window.removeEventListener('pointermove', onMove);
   }, []);
 
-  useEffect(() => selection.refocus(), [app.hidden, app.hiddenParts, app.columns, app.grain]);
+  useEffect(() => {
+    selection.shown = app.shown;
+    selection.refocus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.hidden, app.hiddenParts, app.columns, app.grain]);
 
   // Only on the switch: a link opened in the render mode may carry a selection of its own
   const wasMeasuring = useRef(app.wireframe);

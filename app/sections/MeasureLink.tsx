@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { Icon } from '@/editor/icons';
 import styles from './MeasureLink.module.scss';
 
 // Where a page used to embed the measuring scene: the scene itself lives on /pomiar
@@ -9,6 +10,7 @@ export default function MeasureLink({ title, text, to }: { title: string; text: 
       <div>
         <p>{text}</p>
         <Link className="btn" to={to}>
+          <Icon name="measure" />
           Otwórz pomiary
         </Link>
       </div>

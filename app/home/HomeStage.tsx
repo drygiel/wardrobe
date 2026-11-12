@@ -5,6 +5,7 @@ import hintStyles from '@/components/LineHint.module.scss';
 import { renderLarge } from '@/assets';
 import Ready from '@/components/Ready';
 import SiteNav from '@/sections/SiteNav';
+import { Icon } from '@/editor/icons';
 import { COUNTS, SIZE, SIZE_TEXT } from '@/site';
 import { dragTarget, measuring, progressAt, STAGE_VH, stopFor, YAW_MAX, YAW_MIN } from './chapters';
 import { DRAFT_LABELS } from './draft';
@@ -362,6 +363,7 @@ export default function HomeStage() {
             Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.
           </p>
           <Link className="btn" to="/pomiar">
+            <Icon name="measure" />
             Zmierz szafę
           </Link>
         </div>
@@ -412,7 +414,9 @@ export default function HomeStage() {
             </p>
             <div className={styles.links}>
               <Link className="btn" to={chapter.to}>
+                {chapter.to === '/pomiar' && <Icon name="measure" />}
                 {chapter.label}
+                {chapter.to !== '/pomiar' && <Icon name="arrow" />}
               </Link>
               {chapter.more && (
                 <Link className="link" to={chapter.more.to}>

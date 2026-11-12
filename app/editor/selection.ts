@@ -12,6 +12,11 @@ type Selection = {
 // Outside React context: hovering must re-render the inspector only, not the whole scene
 let state: Selection = { hover: null, group: [], pinned: null, edge: null };
 const listeners = new Set<() => void>();
+let groupNames: string[] = []; // the row under the cursor, kept to pick its shown parts again when visibility changes under it
+
+// Hidden parts stay mounted (unlike electric ones), so they are skipped: a hidden row must not fade the whole model for nothing.
+// Asks the app, not mesh.visible: the canvas commits after the page, so right after a click the meshes still show the old state.
+const shownParts = (names: string[]) => names.flatMap(name => selection.find(name) ?? []).filter(mesh => selection.shown(mesh));
 
 // Hover brightens a part, unless it is the selected one
 const lit = ({ hover, group, pinned }: Selection) => new Set([hover, ...group].filter(mesh => mesh && mesh !== pinned));
@@ -48,6 +53,7 @@ export const useSelection = () => useSyncExternalStore(subscribe, () => state);
 
 export const selection = {
   root: null as THREE.Object3D | null,
+  shown: (() => true) as (mesh: THREE.Object3D) => boolean, // the app's visibility rule, set by the editor
   get pinned() {
     return state.pinned;
   },
@@ -70,7 +76,8 @@ export const selection = {
   },
   // Brightens the parts of the list row under the cursor and fades the rest; selects nothing and leaves the inspector alone
   hoverGroup(names: string[]) {
-    if (names.length || state.group.length) update({ group: names.flatMap(name => selection.find(name) ?? []) });
+    groupNames = names;
+    if (names.length || state.group.length) update({ group: shownParts(names) });
   },
   setEdge(edge: LineData | null) {
     if (state.edge !== edge) update({ edge });
@@ -82,6 +89,9 @@ export const selection = {
   unpin() {
     update({ pinned: null });
   },
-  // For parts that mount while something is selected
-  refocus: applyFocus,
+  // For parts that mount while something is selected, and for an eye clicked on the row under the cursor
+  refocus() {
+    if (groupNames.length) update({ group: shownParts(groupNames) });
+    applyFocus();
+  },
 };

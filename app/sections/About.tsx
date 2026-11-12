@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { ELECTRIC_GLB, FRAME_GLB, HARDWARE_GLB, WARDROBE_GLB } from '@/assets';
 import { LED_METRES, num } from '@/electric/data';
+import { Icon } from '@/editor/icons';
 import { useReveal } from '@/hooks/useReveal';
 import { COUNTS, REPO_URL, SIZE_TEXT } from '@/site';
 import styles from './About.module.scss';
@@ -53,7 +54,10 @@ export default function About() {
               <a href={file.href} download>
                 <b>{file.name}</b>
                 <span>{file.note}</span>
-                <i>GLB</i>
+                <i>
+                  GLB
+                  <Icon name="download" />
+                </i>
               </a>
             </li>
           ))}
@@ -61,14 +65,20 @@ export default function About() {
             <Link to="/rama#plan">
               <b>Rozkrój ramy</b>
               <span>Układ 15 formatek na trzech płytach</span>
-              <i>Rysunek</i>
+              <i>
+                Rysunek
+                <Icon name="arrow" />
+              </i>
             </Link>
           </li>
           <li>
             <a href={REPO_URL}>
               <b>Kod strony</b>
               <span>React, Three.js i skrypty eksportu z Blendera</span>
-              <i>GitHub</i>
+              <i>
+                GitHub
+                <Icon name="external" />
+              </i>
             </a>
           </li>
         </ul>
