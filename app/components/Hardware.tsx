@@ -7,7 +7,10 @@ import { HARDWARE_GLB, WARDROBE_GLB } from '@/assets';
 import { pivotPose } from './Electric';
 import { Mesh } from './Mesh';
 
+export const PIN_GREEN = '#4fc26b';
+
 export const hardwareColor = (name: string) => {
+  if (name.startsWith('PIN_')) return PIN_GREEN;
   if (name.startsWith('J')) return '#d9b27a';
   if (name.startsWith('MB')) return '#a9825a';
   return name.endsWith('_Plate') ? '#7c8187' : '#c6cbd0';
@@ -18,7 +21,7 @@ type Props = {
   shown: (node: THREE.Object3D) => boolean;
 };
 
-// Dowels, hinges and mount blocks. Hinge cups ride on their door's pivot;
+// Dowels, hinges, mount blocks and shelf pins. Hinge cups ride on their door's pivot;
 // shortcut: hinge arms keep their closed pose when a door opens, drive them from the door angle if that ever shows
 export function Hardware({ root, shown }: Props) {
   const hardware = useGLTF(HARDWARE_GLB) as unknown as GLTF;

@@ -16,6 +16,7 @@ const SWATCH: Record<GroupId, string> = {
   led: 'var(--accent)',
   dowels: '#d9b27a',
   hinges: '#c6cbd0',
+  pins: '#4fc26b', // PIN_GREEN in components/Hardware.tsx
   blocks: '#a9825a',
   electric: '#e8352c',
 };

@@ -40,6 +40,7 @@ export default function Inventory() {
     const back = of(name => kindOf(name) === 'back');
     const dowels = fixings.filter(box => /^J\d\d_/.test(box.name));
     const blocks = fixings.filter(box => /^MB\d_/.test(box.name));
+    const pins = fixings.filter(box => box.name.startsWith('PIN_'));
     const dowel = dowels.length ? edges(dowels[0]) : [];
     const block = blocks.length ? edges(blocks[0]) : [];
 
@@ -52,6 +53,7 @@ export default function Inventory() {
       { name: 'Plecy i panel boczny', count: back.length, size: thickness(back), note: 'Zamykają szafę od tyłu i od boku', to: measure('back'), label: 'Pomiar' },
       { name: 'Paski LED', count: of(name => kindOf(name) === 'led').length, size: `${num(LED_METRES, 2)} m`, note: '24 V, w rowkach 18 × 7,5 mm', to: '/elektryka', label: 'Elektryka' },
       { name: 'Zawiasy', count: fixings.filter(box => box.name.endsWith('_Cup')).length, size: 'puszka Ø35 mm', note: 'Na siedmiu drzwiach', to: '/okucia#zawiasy', label: 'Okucia' },
+      { name: 'Podpórki półek', count: pins.length, size: 'Ø5 × 16 mm', note: `Po cztery pod ${pins.length / 4} półkami przestawnymi`, to: '/okucia#podporki', label: 'Okucia' },
       { name: 'Kołki', count: dowels.length, size: dowel.length ? `Ø${dowel[0]} × ${dowel[2]} mm` : '–', note: 'Łączą formatki ramy', to: measure('frame', 'dowels'), label: 'Pomiar' },
       { name: 'Klocki montażowe', count: blocks.length, size: block.length ? `${block.join(' × ')} mm` : '–', note: 'W szafie D', to: measure('frame', 'blocks'), label: 'Pomiar' },
     ];

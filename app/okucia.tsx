@@ -14,6 +14,7 @@ import NextPage from '@/sections/NextPage';
 import { COUNTS, pageAt } from '@/site';
 import styles from '@/okucia/Okucia.module.scss';
 
+const SHELF_PINS = 'https://allegro.pl/produkt/podporki-do-polek-bolce-kolki-pod-polki-metalowe-ocynk-fi-5-x-16-mm-paczka-393ebad9-2a0d-421f-a5d0-5937760a16c6?offerId=18171323510';
 const DEPTH = 487; // drawer depth in Szafa4.blend
 const SLIDE = Math.round(DEPTH * 0.7); // how far the site and the bake slide a drawer out (parts.ts, scripts/bake.py)
 
@@ -374,8 +375,9 @@ export default function OkuciaPage() {
         <header className={styles.intro}>
           <h1>Okucia</h1>
           <p>
-            Szuflady i zawiasy: {COUNTS.drawers} szuflad i {COUNTS.hinges} zawiasów na{' '}
-            {COUNTS.hingedDoors} drzwiach. Wszystkie wymiary pochodzą z modelu 3D szafy.
+            Szuflady, zawiasy i podpórki półek: {COUNTS.drawers} szuflad, {COUNTS.hinges} zawiasów na{' '}
+            {COUNTS.hingedDoors} drzwiach i {COUNTS.shelfPins} podpórek pod {COUNTS.adjustableShelves}{' '}
+            półkami przestawnymi. Wszystkie wymiary pochodzą z modelu 3D szafy.
           </p>
         </header>
         <HingeSection />
@@ -405,6 +407,18 @@ export default function OkuciaPage() {
               <span>
                 Model ich nie zawiera. Trzeba je dobrać do szuflady głębokości {DEPTH} mm i wysuwu{' '}
                 {SLIDE} mm.
+              </span>
+            </li>
+            <li id="podporki">
+              <b>Podpórki półek</b>
+              <span>
+                Metalowe, ocynkowane, Ø5 × 16 mm z kołnierzem. {COUNTS.shelfPins} sztuk, po cztery pod
+                każdą z {COUNTS.adjustableShelves} półek przestawnych. Otwory Ø5 mm, głębokie na 8 mm, są
+                w bokach i przegrodach pod półką, około 50 mm od jej przedniej i tylnej krawędzi. Półkę
+                przestawia się razem z podpórkami i otworami. W pomiarze podpórki są zielone.{' '}
+                <a href={SHELF_PINS} target="_blank" rel="noopener noreferrer" title="Allegro, otwiera się w nowej karcie">
+                  Podpórki Ø5 × 16 mm na Allegro
+                </a>
               </span>
             </li>
             <li>

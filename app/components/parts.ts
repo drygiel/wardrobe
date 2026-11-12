@@ -31,6 +31,7 @@ export const GROUPS = [
   { id: 'led', label: 'Taśmy LED' },
   { id: 'dowels', label: 'Kołki' },
   { id: 'hinges', label: 'Zawiasy' },
+  { id: 'pins', label: 'Podpórki półek' },
   { id: 'blocks', label: 'Klocki montażowe' },
   { id: 'electric', label: 'Elektryka' },
 ] as const;
@@ -44,6 +45,7 @@ export const groupOf = (name: string): GroupId => {
   if (/^(LED_Wire|Dimmer|Bus_|PSU|Plug|Switch|Mains|Feed|Door_|Socket$|Wire$)/.test(name)) return 'electric';
   if (/^J\d\d_/.test(name)) return 'dowels';
   if (/^H\d\d_/.test(name)) return 'hinges';
+  if (name.startsWith('PIN_')) return 'pins';
   if (/^MB\d_/.test(name)) return 'blocks';
   const kind = kindOf(name);
   if (kind === 'front' || kind === 'handle') return 'fronts';
@@ -64,7 +66,7 @@ const columnCache = new WeakMap<THREE.Object3D, Column[]>();
 export function columnsOf(node: THREE.Object3D): Column[] {
   const cached = columnCache.get(node);
   if (cached) return cached;
-  const tag = /^(?:[PF]\d\d|IN|DR|LED|MB\d)_([ABCD])_/.exec(node.name)?.[1] ?? (node.name.startsWith('A_') ? 'A' : undefined);
+  const tag = /^(?:[PF]\d\d|IN|DR|LED|MB\d|PIN)_([ABCD])_/.exec(node.name)?.[1] ?? (node.name.startsWith('A_') ? 'A' : undefined);
   const door = DOOR_COLUMN[/F\d\d/.exec(node.name)?.[0] ?? ''];
   let columns: Column[];
   if (tag) columns = [tag as Column];

@@ -73,7 +73,7 @@ export function Model(props: Omit<ThreeElements['group'], 'ref'>) {
           <Electric root={sceneGroup} shown={shown} />
         </Suspense>
       )}
-      {!(hidden.has('dowels') && hidden.has('hinges') && hidden.has('blocks')) && (
+      {!(hidden.has('dowels') && hidden.has('hinges') && hidden.has('blocks') && hidden.has('pins')) && (
         <Suspense fallback={null}>
           <Hardware root={sceneGroup} shown={shown} />
         </Suspense>

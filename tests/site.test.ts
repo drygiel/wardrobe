@@ -20,6 +20,8 @@ assert.equal(wardrobe.length + frame.length, COUNTS.parts, 'parts');
 assert.equal(wardrobe.filter(name => name.startsWith('DR_')).length, COUNTS.drawers, 'drawers');
 assert.equal(hardware.filter(name => name.endsWith('_Cup')).length, COUNTS.hinges, 'hinges');
 assert.equal(new Set(hardware.filter(name => name.endsWith('_Cup')).map(name => name.slice(4, 7))).size, COUNTS.hingedDoors, 'hinged doors');
+assert.equal(hardware.filter(name => name.startsWith('PIN_')).length, COUNTS.shelfPins, 'shelf pins');
+assert.equal(COUNTS.shelfPins, COUNTS.adjustableShelves * 4, 'four pins a shelf');
 
 // Depth of everything in Wardrobe.glb, from the POSITION bounds of each mesh in world space
 type Node = { mesh?: number; children?: number[]; translation?: number[]; rotation?: number[]; scale?: number[] };

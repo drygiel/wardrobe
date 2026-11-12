@@ -474,7 +474,7 @@ export function HomeScene({ progress, labels, finalText, callouts, hint, onCount
     hardware.scene.updateMatrixWorld(true);
     hardware.scene.traverse(node => {
       const mesh = node as THREE.Mesh;
-      if (!mesh.isMesh) return;
+      if (!mesh.isMesh || mesh.name.startsWith('PIN_')) return; // shelf pins live on /okucia, not in the anatomy
       const target = collected[mesh.name.startsWith('H') ? 0 : 1];
       const outline =
         edges.get(mesh.geometry) ??
@@ -606,7 +606,7 @@ export function HomeScene({ progress, labels, finalText, callouts, hint, onCount
     const hinges = new Set<string>();
     let fixings = 0;
     hardware.scene.traverse(node => {
-      if (!(node as THREE.Mesh).isMesh) return;
+      if (!(node as THREE.Mesh).isMesh || node.name.startsWith('PIN_')) return;
       if (node.name.startsWith('H')) hinges.add(node.name.slice(0, 3));
       else fixings++;
     });
