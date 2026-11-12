@@ -34,6 +34,15 @@ export function marksOf(piece: Piece, mesh: THREE.Mesh, active: number | null, l
   };
 }
 
+// Under a drawing of a long part: draws it as a broken view, its plain middle left out
+export function BreakToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+  return (
+    <button className={cn(styles.chip, styles.toggle)} aria-pressed={on} onClick={onToggle} title="Pomija gładki środek długiej formatki; końce, otwory i wymiary bez zmian">
+      Widok skrócony
+    </button>
+  );
+}
+
 export function PieceChips({ piece, layers, onToggle, className }: { piece: Piece; layers: Layers; onToggle: (layer: keyof Layers) => void; className?: string }) {
   const chip = (layer: keyof Layers, label: string, colour?: string) => (
     <li>

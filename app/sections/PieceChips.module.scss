@@ -16,6 +16,11 @@
     font-size: var(--step-small);
 }
 
+// A switch for the drawing, not a layer of it: it sits under the sheet
+.toggle {
+    margin-top: 10px;
+}
+
 button.chip {
     color: var(--ink);
     border-color: color-mix(in srgb, var(--ink) 40%, transparent);

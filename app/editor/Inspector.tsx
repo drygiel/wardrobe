@@ -9,10 +9,10 @@ import { grainAxis, sizeOf } from '@/components/grain';
 import { rootOf, useCatalog } from './catalog';
 import { Icon } from './icons';
 import { inUnit, partLabel } from './labels';
-import { PartDrawing } from './PartDrawing';
+import { keptSpans, PartDrawing } from './PartDrawing';
 import { selection, useSelection } from './selection';
 import { PIECES } from '@/sections/orderList';
-import { ALL_LAYERS, marksOf, PieceChips } from '@/sections/PieceChips';
+import { ALL_LAYERS, BreakToggle, marksOf, PieceChips } from '@/sections/PieceChips';
 import { type Focus, focusOf, NO_FOCUS, PieceOps } from '@/sections/PieceOps';
 import styles from './Editor.module.scss';
 
@@ -29,6 +29,7 @@ export function Inspector() {
   const [copied, setCopied] = useState(false);
   const edgeFromDrawing = useRef(false);
   const [layers, setLayers] = useState(ALL_LAYERS);
+  const [broken, setBroken] = useState(false);
   // The hole or groove in focus on the drawing and in the operations list, kept with the part it belongs to
   const [mark, setMark] = useState<{ name: string; focus: Focus } | null>(null);
   // The frame pieces in the editor share Frame.glb's geometry, so the order list's machining lands on them as is
@@ -88,6 +89,8 @@ export function Inspector() {
   const grain = grainAxis(part.name, mesh.geometry);
   const piece = PIECES.find(p => p.name === part.name);
   const focus = mark?.name === part.name ? mark.focus : NO_FOCUS;
+  const marks = piece && { ...marksOf(piece, frame.nodes[piece.name], focus.hole, layers), activeGroove: focus.groove };
+  const shortens = keptSpans(mesh.geometry, typeof grain === 'number' ? grain : undefined, marks?.holes).length > 1;
   const setFocus = (next: Focus) => setMark({ name: part.name, focus: next });
 
   const copy = async () => {
@@ -143,9 +146,11 @@ export function Inspector() {
 
       <div className={styles.sheet}>
         <PartDrawing
-          marks={piece && { ...marksOf(piece, frame.nodes[piece.name], focus.hole, layers), activeGroove: focus.groove }}
+          marks={marks}
+          broken={broken && shortens}
           onMark={piece && (m => setFocus(focusOf(m)))}
           ref={svg} geometry={mesh.geometry} code={part.name} unit={app.unit} edge={edge?.meshRef.current === mesh ? edge.points : null} lines={app.wireframe ? (selection.find(`line_${part.name}`)?.userData.lines as LineData[] | undefined) : undefined} onEdge={showEdge} onEdgeClick={line => app.centerOn.current?.(line.meshRef.current.localToWorld(line.midPoint.clone()))} grain={typeof grain === 'number' ? grain : undefined} />
+        {shortens && <BreakToggle on={broken} onToggle={() => setBroken(!broken)} />}
       </div>
 
       {piece && <PieceOps piece={piece} focus={focus} onFocus={setFocus} unit={app.unit} />}

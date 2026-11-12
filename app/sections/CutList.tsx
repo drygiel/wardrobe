@@ -8,9 +8,9 @@ import { FRAME_BOARDS, FRAME_GLB, FRAME_PIECES, flatPiece } from '@/assets';
 import { grainAxis } from '@/components/grain';
 import { GROUPS } from '@/components/parts';
 import { Icon } from '@/editor/icons';
-import { type MarkHover, PartDrawing } from '@/editor/PartDrawing';
+import { keptSpans, type MarkHover, PartDrawing } from '@/editor/PartDrawing';
 import { mm, partLabel } from '@/editor/labels';
-import { ALL_LAYERS, type Layers, marksOf, PieceChips } from './PieceChips';
+import { ALL_LAYERS, BreakToggle, type Layers, marksOf, PieceChips } from './PieceChips';
 import { focusOf, NO_FOCUS, PieceOps } from './PieceOps';
 import { code, grooveText, PIECES, type Piece, plural, position, SHEET, size, toCsv, totals } from './orderList';
 import styles from './CutList.module.scss';
@@ -201,20 +201,32 @@ function Drawing({
   groove,
   layers,
   wide,
+  broken,
   onMark,
+  onBroken,
 }: {
   piece: Piece;
   active: number | null;
   groove: number | null;
   layers: Layers;
   wide: boolean;
+  broken: boolean;
   onMark: (mark: MarkHover) => void;
+  onBroken: () => void;
 }) {
   const { nodes } = useGLTF(FRAME_GLB) as unknown as FrameResult;
   const mesh = nodes[piece.name];
   const marks = useMemo(() => ({ ...marksOf(piece, mesh, active, layers), activeGroove: groove }), [piece, mesh, active, groove, layers]);
-  const grain = grainAxis(piece.name, mesh.geometry);
-  return <PartDrawing geometry={mesh.geometry} code={`${code(piece)} · ${partLabel(piece.name)}`} unit="mm" grain={typeof grain === 'number' ? grain : undefined} marks={marks} onMark={onMark} snap={0.5} {...(wide ? SHEET_WIDE : {})} />;
+  const axis = grainAxis(piece.name, mesh.geometry);
+  const grain = typeof axis === 'number' ? axis : undefined;
+  // Only a part long enough to have a plain middle offers the shortened view
+  const long = keptSpans(mesh.geometry, grain, marks.holes).length > 1;
+  return (
+    <>
+      <PartDrawing geometry={mesh.geometry} code={`${code(piece)} · ${partLabel(piece.name)}`} unit="mm" grain={grain} marks={marks} onMark={onMark} snap={0.5} broken={broken && long} {...(wide ? SHEET_WIDE : {})} />
+      {long && <BreakToggle on={broken} onToggle={onBroken} />}
+    </>
+  );
 }
 
 // The frame orbiting slowly, the piece lit. The camera keeps the whole frame in shot from any angle: far enough for
@@ -330,6 +342,7 @@ export default function CutList() {
   const [focus, setFocus] = useState(NO_FOCUS);
   const [hover, setHover] = useState<string | null>(null);
   const [layers, setLayers] = useState(ALL_LAYERS);
+  const [broken, setBroken] = useState(false);
   const across = useMatches(ACROSS);
   const piece = PIECES[index];
 
@@ -437,7 +450,9 @@ export default function CutList() {
                   groove={focus.groove}
                   layers={layers}
                   wide={across}
+                  broken={broken}
                   onMark={mark => setFocus(focusOf(mark))}
+                  onBroken={() => setBroken(!broken)}
                 />
               </Suspense>
               <figcaption>Trzy rzuty z modelu. Otwory na kołki przerywaną linią, frez LED na bursztynowo.</figcaption>
