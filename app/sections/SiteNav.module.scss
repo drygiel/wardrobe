@@ -4,9 +4,34 @@
     top: 36px;
     left: var(--m);
     font-family: var(--font-display);
+    display: flex;
+    align-items: baseline;
+    gap: 0.45em;
     font-size: var(--step-lead);
     text-decoration: none;
     white-space: nowrap;
+
+    // Rules for the mark and the logotype live in Mark.tsx
+    .mark {
+        align-self: center;
+        width: 1.2em;
+        height: 1.2em;
+        flex: none;
+    }
+
+    &.halo .mark {
+        filter: drop-shadow(0 0 6px var(--bg));
+    }
+}
+
+.year {
+    margin-left: -0.05em;
+    color: var(--muted);
+    font-family: var(--font-text);
+    font-size: 0.62em;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
 }
 
 .nav {

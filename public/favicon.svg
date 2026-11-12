@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The mark from app/sections/Mark.tsx, in the light and dark theme's ink and amber -->
+  <style>
+    .frame { fill: #1b1815 }
+    .led { fill: #9c5a0e }
+    @media (prefers-color-scheme: dark) {
+      .frame { fill: #e0ddd6 }
+      .led { fill: #f0b35a }
+    }
+  </style>
+  <path class="frame" d="M3 2h26l-6 6h-1V6H10v2H9zM2 3l6 6v14l-6 6zM30 3v26l-6-6V9zM3 30l6-6h14l6 6z" />
+  <rect class="led" x="10" y="6" width="12" height="2" />
+</svg>

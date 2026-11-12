@@ -6,6 +6,7 @@ import { type SceneView, useApp } from '@/contexts/AppContext';
 import { useEventListener } from '@/hooks/useEventListener';
 import Scene from '@/components/Scene';
 import { Model as Wardrobe } from '@/components/Wardrobe';
+import Mark from '@/sections/Mark';
 import { HoverPulse } from './HoverPulse';
 import { Icon, type IconName } from './icons';
 import { Inspector } from './Inspector';
@@ -115,7 +116,10 @@ export default function Editor() {
   return (
     <div ref={shell} className={styles.shell}>
       <aside className={styles.side} aria-label="Grupy i elementy">
-        <Link className={styles.brand} to="/">Szafa 2025</Link>
+        <Link className={styles.brand} to="/">
+          <Mark />
+          Szafa 2025
+        </Link>
         <Suspense fallback={<p className={styles.note}>Wczytywanie modelu…</p>}>
           <Sidebar />
         </Suspense>

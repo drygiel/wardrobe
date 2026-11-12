@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { FRAME_GLB, WARDROBE_GLB } from '@/assets';
 import { Icon } from '@/editor/icons';
 import { PAGES, REPO_URL, SIZE } from '@/site';
+import Mark from './Mark';
 import styles from './Footer.module.scss';
 
 // The site signs off like a workshop drawing: a dimension line at the wardrobe's real width over a title block
@@ -17,6 +18,7 @@ export default function Footer() {
             Tytuł
           </span>
           <Link className={styles.name} to="/">
+            <Mark className={styles.mark} />
             Szafa 2025
           </Link>
           <p>Projekt, model i rendery: Blender.</p>

@@ -113,8 +113,17 @@
 }
 
 .name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    justify-self: start;
     font-family: var(--font-display);
     font-size: var(--step-lead);
+
+    .mark {
+        width: 1.2em;
+        height: 1.2em;
+    }
 }
 
 .files {
