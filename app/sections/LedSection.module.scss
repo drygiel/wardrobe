@@ -1,0 +1,260 @@
+// Light along the frame: copy on the left, the groove in section and the eight strips on the right
+.led {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: center;
+    padding: calc(var(--section) / 2) var(--m) 0;
+    background: var(--bg);
+}
+
+.kicker {
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: var(--step-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.copy {
+    h2 {
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1;
+    }
+
+    > p:not(.kicker) {
+        margin-top: 16px;
+        max-width: 52ch;
+        color: var(--muted);
+    }
+}
+
+// The totals as a drawing's title block, as on the order list above
+.facts {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+
+    div {
+        display: flex;
+        flex: 1 0 auto;
+        flex-direction: column-reverse;
+        gap: 2px;
+        padding: 8px 14px;
+    }
+
+    div + div {
+        border-left: 1px solid var(--line);
+    }
+
+    dd {
+        font-family: var(--font-display);
+        font-size: 1.375rem;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    dt {
+        color: var(--muted);
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-top: 28px;
+}
+
+.shop {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--ink);
+    font-size: var(--step-small);
+    text-decoration: none;
+    transition: border-color 150ms;
+
+    &:hover {
+        border-color: var(--ink);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    svg {
+        flex: none;
+    }
+}
+
+// The section: drawn in the site's ink; the light comes on once it is in view, then breathes like a dimmer turned slowly
+.section {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.oak {
+    stroke: var(--ink);
+    stroke-width: 2;
+}
+
+.hatch {
+    stroke: color-mix(in srgb, var(--muted) 35%, transparent);
+    stroke-width: 1.5;
+}
+
+.profile {
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 3;
+}
+
+.strip {
+    fill: var(--line);
+}
+
+.chip {
+    fill: var(--muted);
+    transition: fill 600ms var(--ease) 500ms;
+}
+
+.diffuser {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-opacity: 0.5;
+    transition: stroke 600ms var(--ease) 500ms;
+}
+
+.light {
+    opacity: 0;
+    transition: opacity 900ms var(--ease) 500ms;
+}
+
+.dims {
+    fill: var(--muted);
+    stroke: var(--muted);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+
+    path {
+        fill: none;
+        stroke-width: 1;
+    }
+
+    text {
+        stroke: none;
+    }
+
+    .note {
+        fill: var(--ink);
+        font-size: 14px;
+    }
+}
+
+:global(.in) {
+    .chip {
+        fill: var(--led);
+    }
+
+    .diffuser {
+        stroke: var(--led);
+        stroke-opacity: 1;
+    }
+
+    .light {
+        opacity: 1;
+        animation: breathe 5s ease-in-out 1.6s infinite;
+    }
+}
+
+@keyframes breathe {
+    50% {
+        opacity: 0.55;
+    }
+}
+
+// The strips to scale, one row each, lit in turn
+.strips {
+    display: grid;
+    gap: 8px;
+    margin-top: 28px;
+    list-style: none;
+    font-size: var(--step-small);
+
+    li {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 16px;
+        row-gap: 4px;
+    }
+
+    .bar {
+        grid-column: 1 / -1;
+        display: block;
+        width: calc(var(--w) * 100%);
+        height: 4px;
+        border-radius: 2px;
+        background: var(--line);
+        transition:
+            background 500ms var(--ease),
+            box-shadow 500ms var(--ease);
+        transition-delay: calc(700ms + var(--i) * 140ms);
+    }
+
+    .label {
+        color: var(--muted);
+
+        b {
+            color: var(--ink);
+            font-weight: 600;
+        }
+    }
+
+    .metres {
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+:global(.in) .strips .bar {
+    background: var(--led);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--led) 70%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chip,
+    .diffuser,
+    .light,
+    .strips .bar {
+        transition: none;
+    }
+
+    :global(.in) .light {
+        animation: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .led {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

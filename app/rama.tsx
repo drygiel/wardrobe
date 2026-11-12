@@ -3,6 +3,7 @@ import { Icon } from '@/editor/icons';
 import { FrameShowcase } from '@/components/FrameShowcase';
 import Showcase from '@/sections/Showcase';
 import CutList from '@/sections/CutList';
+import LedSection from '@/sections/LedSection';
 import Footer from '@/sections/Footer';
 import Meta from '@/sections/Meta';
 import NextPage from '@/sections/NextPage';
@@ -48,6 +49,7 @@ export default function RamaPage() {
       />
       <main>
         <CutList />
+        <LedSection />
         <NextPage after="/rama" />
       </main>
       <Footer />
