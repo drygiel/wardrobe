@@ -15,6 +15,13 @@ const PATHS = {
   vr: 'M1.5 4.5h13v7H10.5L9 9.5H7l-1.5 2H1.5ZM4.75 7.5h1M10.25 7.5h1',
   pin: 'M5 2h6M6 2v5l-2 3h8l-2-3V2M8 10v4.5',
   undo: 'M6 2.5 2.5 6 6 9.5M2.5 6h7a3.75 3.75 0 0 1 0 7.5H6',
+  // Site pages: links, downloads and the phone menu
+  arrow: 'M2 8h11.5M9.5 4l4 4-4 4',
+  down: 'M8 2v11.5M4 9.5l4 4 4-4',
+  download: 'M8 2v8.5M4.5 7 8 10.5 11.5 7M2.5 13.5h11',
+  external: 'M9.5 2.5h4v4M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6',
+  menu: 'M2 4.5h12M2 8h12M2 11.5h12',
+  cross: 'M3.5 3.5l9 9M12.5 3.5l-9 9',
 };
 
 export type IconName = keyof typeof PATHS;

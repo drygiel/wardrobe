@@ -1,134 +1,674 @@
-.cutlist {
+// The frame's order list on /rama: a board map, a ticket per piece, a plain table for print
+$measured: #e01410; // the red of the active hole, the same as the measured edge in the drawings
+
+.order {
     position: relative;
     z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: var(--gap);
     padding: var(--section) var(--m) 0;
     background: var(--bg);
 }
 
+.sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+// Header: the brief, then the five numbers the joiner quotes from
 .head {
-    grid-column: 1 / 8;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gap);
+    align-items: end;
 
     h2 {
-        font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem);
-        margin-bottom: 16px;
+        grid-column: 1 / 8;
+        font-family: var(--font-display);
+        font-size: var(--step-head);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 0.95;
+    }
+}
+
+.kicker {
+    grid-column: 1 / -1;
+    margin-bottom: 18px;
+    color: var(--muted);
+    font-size: var(--step-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.lead {
+    grid-column: 8 / -1;
+    color: var(--muted);
+    font-size: var(--step-body);
+    max-width: 46ch;
+}
+
+.stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin-top: clamp(40px, 5vw, 72px);
+    border-top: 1px solid var(--line);
+
+    div {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 6px;
+        padding: 18px 16px 0 0;
     }
 
-    p {
+    div + div {
+        padding-left: 18px;
+        border-left: 1px solid var(--line);
+    }
+
+    dd {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 1.6rem + 3.6vw, 5rem);
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    dt {
         color: var(--muted);
-        max-width: 60ch;
+        font-size: var(--step-small);
     }
 }
 
 .actions {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-top: 24px;
-}
-
-.wrap {
     grid-column: 1 / -1;
-    overflow-x: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 28px;
+    margin-top: 36px;
+
+    :global(.btn) svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
 }
 
-.table {
-    width: 100%;
-    min-width: 760px;
-    border-collapse: collapse;
+// The desk: the map stays in view while the ticket scrolls beside it
+.desk {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(24px, 3vw, 56px);
+    margin-top: clamp(56px, 7vw, 104px);
+    align-items: start;
+}
+
+.map {
+    position: sticky;
+    top: 12vh;
+}
+
+.mapHead {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 14px;
+    color: var(--muted);
     font-size: var(--step-small);
+}
+
+.progress {
+    display: inline-flex;
+    white-space: nowrap;
+    align-items: center;
+    gap: 10px;
+    font-variant-numeric: tabular-nums;
+
+    i {
+        display: block;
+        width: 72px;
+        height: 3px;
+        background: var(--line);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    b {
+        display: block;
+        height: 100%;
+        background: var(--ink);
+        transition: width 400ms var(--ease);
+    }
+}
+
+.placeholder {
+    aspect-ratio: 3 / 2;
+    background: var(--surface);
+    border-radius: 6px;
+}
+
+.boards {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.sheet {
+    fill: var(--board);
+    stroke: var(--line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+
+.sheetName {
+    fill: var(--muted);
+    font-size: 96px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+.cut {
+    cursor: pointer;
+
+    .cutFill {
+        fill: transparent;
+        transition: fill 200ms;
+    }
+
+    .cutEdges {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+        transition: stroke 200ms;
+    }
+
+    .cutCode {
+        fill: var(--muted);
+        font-weight: 600;
+        pointer-events: none;
+        font-variant-numeric: tabular-nums;
+        transition: fill 200ms;
+    }
+
+    &:hover .cutFill {
+        fill: color-mix(in srgb, var(--ink) 10%, transparent);
+    }
+
+    &:hover .cutEdges,
+    &:hover .cutCode {
+        stroke: var(--ink);
+        fill: var(--ink);
+    }
+
+    &:hover .cutEdges {
+        fill: none;
+    }
+}
+
+.cutDone .cutCode {
+    fill: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.cutOn {
+    .cutFill,
+    &:hover .cutFill {
+        fill: var(--ink);
+    }
+
+    .cutEdges,
+    &:hover .cutEdges {
+        stroke: var(--bg);
+    }
+
+    .cutCode,
+    &:hover .cutCode {
+        fill: var(--bg);
+    }
+}
+
+.codes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 6px;
+    margin-top: 22px;
+    list-style: none;
+
+    button {
+        width: 100%;
+        padding: 7px 0;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: none;
+        color: var(--muted);
+        font: inherit;
+        font-size: var(--step-small);
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        transition: color 150ms, border-color 150ms, background 150ms;
+
+        &:hover {
+            color: var(--ink);
+            border-color: var(--muted);
+        }
+    }
+
+    .codeDone {
+        color: var(--ink);
+        border-style: dashed;
+    }
+
+    .codeOn,
+    .codeOn:hover {
+        color: var(--bg);
+        background: var(--ink);
+        border-color: var(--ink);
+    }
+}
+
+// The ticket of the chosen piece
+@keyframes rise {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+}
+
+.ticket {
+    padding: clamp(20px, 2.4vw, 36px);
+    background: var(--surface);
+    border-radius: 8px;
+    animation: rise 420ms var(--ease);
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+.ticketHead {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(18px, 2.4vw, 36px);
+
+    h3 {
+        font-size: var(--step-lead);
+        font-weight: 500;
+        margin-top: 6px;
+    }
+}
+
+.code {
+    font-family: var(--font-display);
+    font-size: clamp(4.5rem, 2.6rem + 6vw, 8.5rem);
+    line-height: 0.78;
+    letter-spacing: -0.04em;
+}
+
+.size {
+    margin-top: 6px;
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.25rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+
+    small {
+        color: var(--muted);
+        font-size: var(--step-small);
+        font-weight: 400;
+    }
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+    list-style: none;
+
+    li {
+        padding: 3px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+
+    .chipLed {
+        color: var(--accent);
+        border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+    }
+}
+
+.views {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 14px;
+    margin-top: clamp(22px, 2.6vw, 36px);
+
+    figcaption {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: var(--step-small);
+    }
+}
+
+.paper svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.locator {
+    display: flex;
+    flex-direction: column;
+}
+
+.locatorView {
+    flex: 1;
+    min-height: 180px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--ink) 6%, transparent), transparent 70%);
+}
+
+// Operations, numbered like a work order
+.ops {
+    counter-reset: op;
+    margin-top: clamp(22px, 2.6vw, 36px);
+    list-style: none;
+
+    > li {
+        counter-increment: op;
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        column-gap: 10px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+
+        &::before {
+            content: counter(op, decimal-leading-zero);
+            grid-row: span 2;
+            color: var(--muted);
+            font-size: var(--step-small);
+            font-variant-numeric: tabular-nums;
+            padding-top: 2px;
+        }
+
+        b {
+            font-weight: 500;
+        }
+
+        span {
+            color: var(--muted);
+        }
+    }
+
+    table {
+        width: 100%;
+        margin-top: 10px;
+        border-collapse: collapse;
+        font-size: var(--step-small);
+        font-variant-numeric: tabular-nums;
+    }
 
     th,
     td {
-        padding: 12px 16px 12px 0;
-        border-bottom: 1px solid var(--line, rgba(127, 127, 127, 0.25));
+        padding: 7px 12px 7px 0;
         text-align: left;
-        vertical-align: top;
         font-weight: 400;
+        vertical-align: top;
     }
 
     thead th {
         color: var(--muted);
-        white-space: nowrap;
+        border-bottom: 1px solid var(--line);
     }
 
-    tbody th {
-        font-weight: 600;
-        font-variant-numeric: tabular-nums;
+    tbody tr {
+        cursor: default;
+        box-shadow: inset 2px 0 0 transparent;
+        transition: background 150ms, box-shadow 150ms;
+
+        th {
+            padding-left: 10px;
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--muted);
+        }
+
+        &:focus-visible {
+            outline: none;
+        }
     }
 
-    tbody td {
-        color: var(--muted);
-    }
+    .holeOn {
+        background: color-mix(in srgb, #{$measured} 12%, transparent);
+        box-shadow: inset 2px 0 0 #{$measured};
 
-    tbody td:nth-child(2),
-    tbody td:nth-child(3) {
-        color: var(--ink);
-    }
-
-    tfoot th,
-    tfoot td {
-        border-bottom: 0;
-        color: var(--ink);
+        td {
+            color: var(--ink);
+        }
     }
 }
 
-.number {
+.opLed b {
+    color: var(--accent);
+}
+
+.ticketFoot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+    margin-top: 10px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+}
+
+.nav {
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--step-small);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 150ms;
+
+    &:hover {
+        border-color: var(--ink);
+    }
+
+    &:last-child {
+        margin-left: auto;
+    }
 }
 
-.work {
-    list-style: none;
-    display: grid;
-    gap: 4px;
+.check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: var(--step-small);
 
-    summary {
+    input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--ink);
         cursor: pointer;
     }
+}
 
-    details ul {
-        list-style: none;
-        margin: 6px 0 0 16px;
-        display: grid;
-        gap: 2px;
-        font-variant-numeric: tabular-nums;
+.editor {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-size: var(--step-small);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--line);
+    transition: text-decoration-color 150ms;
+
+    &:hover {
+        text-decoration-color: var(--ink);
+    }
+
+    svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
     }
 }
 
-// Printing the page prints only the list, with every hole spelled out
+.printTable {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .head {
+        h2,
+        .lead {
+            grid-column: 1 / -1;
+        }
+
+        .lead {
+            margin-top: 20px;
+        }
+    }
+
+    .desk {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .map {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+        row-gap: 18px;
+
+        div:nth-child(4) {
+            padding-left: 0;
+            border-left: 0;
+        }
+    }
+
+    .views {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .locatorView {
+        min-height: 220px;
+    }
+
+    .nav:last-child {
+        margin-left: 0;
+    }
+}
+
+// Printing the page prints only the plain list, with every hole spelled out
 @media print {
     :global(body *) {
         visibility: hidden;
     }
 
-    .cutlist,
-    .cutlist * {
-        visibility: visible;
-    }
-
-    .cutlist {
+    .order {
         position: absolute;
         inset: 0 auto auto 0;
         width: 100%;
         padding: 0;
-        color: #000;
         background: #fff;
     }
 
-    .actions,
-    summary::marker {
+    .printTable,
+    .printTable * {
+        visibility: visible;
+    }
+
+    .head,
+    .desk {
         display: none;
     }
 
-    .table td,
-    .table th {
-        color: #000 !important;
+    .printTable {
+        display: table;
+        width: 100%;
+        border-collapse: collapse;
+        color: #000;
+        font-size: 9pt;
+
+        caption {
+            text-align: left;
+            font-weight: 600;
+            padding-bottom: 8pt;
+        }
+
+        th,
+        td {
+            padding: 4pt 8pt 4pt 0;
+            border-bottom: 0.5pt solid #999;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        tr {
+            break-inside: avoid;
+        }
+    }
+}
+
+// Hovered from the code buttons below the map: lit like the pointer over the piece itself
+.cutHover:not(.cutOn) {
+    .cutFill {
+        fill: color-mix(in srgb, var(--ink) 10%, transparent);
     }
 
-    .wrap {
-        overflow: visible;
+    .cutEdges {
+        stroke: var(--ink);
+    }
+
+    .cutCode {
+        fill: var(--ink);
+    }
+}
+
+.callout {
+    pointer-events: none;
+
+    path {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 1;
+        vector-effect: non-scaling-stroke;
+    }
+
+    text {
+        fill: var(--ink);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
     }
 }

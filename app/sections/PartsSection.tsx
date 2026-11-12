@@ -24,7 +24,7 @@ const GROUPS: Group[] = [
 
 type Result = { nodes: Record<string, THREE.Mesh> };
 
-function Preview({ active }: { active: string[] }) {
+export function Preview({ active }: { active: string[] }) {
   const { nodes } = useGLTF(FRAME_GLB) as unknown as Result;
   const pieces = useMemo(() => GROUPS.flatMap(g => g.pieces), []);
   const materials = useMemo(

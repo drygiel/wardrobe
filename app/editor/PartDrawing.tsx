@@ -18,6 +18,14 @@ const INK = '#161412';
 const DIM = '#5a544b';
 const MEASURED = '#e01410'; // the red of the measured edge in the model
 const FONT = 'Switzer, system-ui, sans-serif';
+const GROOVE = '#f0b35a'; // the LED amber, only on the strip's groove
+
+// Machining drawn over the part, in its own axes: dowel holes (entry point, inward axis) and LED grooves
+export type DrawingMarks = {
+  holes: { id: number; at: THREE.Vector3; dir: THREE.Vector3; r: number; depth: number }[];
+  grooves: { min: THREE.Vector3; max: THREE.Vector3 }[];
+  active?: number | null;
+};
 
 const edgeCache = new WeakMap<THREE.BufferGeometry, ArrayLike<number>>();
 
@@ -57,6 +65,8 @@ export function PartDrawing({
   lines,
   onEdge,
   onEdgeClick,
+  marks,
+  snap,
   ref,
 }: {
   geometry: THREE.BufferGeometry;
@@ -67,6 +77,8 @@ export function PartDrawing({
   lines?: LineData[]; // the part's measurable edges; hovering one on the sheet reports it
   onEdge?: (line: LineData | null) => void;
   onEdgeClick?: (line: LineData) => void;
+  marks?: DrawingMarks;
+  snap?: number; // mm: rounds the dimensions, which Draco's quantisation leaves a tenth off
   ref?: Ref<SVGSVGElement>;
 }) {
   const drawing = useMemo(() => {
@@ -100,7 +112,7 @@ export function PartDrawing({
       d += `M${px(X(p))} ${px(YP(p))}L${px(X(q))} ${px(YP(q))}`;
       d += `M${px(XS(p))} ${px(Y(p))}L${px(XS(q))} ${px(Y(q))}`;
     }
-    const dimension = (axis: number) => inUnit(size[axis] * 1000, unit);
+    const dimension = (axis: number) => inUnit(snap ? Math.round((size[axis] * 1000) / snap) * snap : size[axis] * 1000, unit);
     // Screen right × screen up points at the viewer; (a, b, c) may be an odd permutation of the axes
     const cyclic = (b - a + 3) % 3 === 1 ? 1 : -1;
     const views = [
@@ -118,8 +130,8 @@ export function PartDrawing({
         contour += `M${px(fx)} ${px(fy)}L${px(tx)} ${px(ty)}`;
       }
     });
-    return { d, contour, edges, views, x0, y0, wa, wb, wc, xSide, yPlan, a, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [dimension(a), dimension(b), dimension(c)] };
-  }, [geometry, unit, grain]);
+    return { d, contour, edges, views, scale, x0, y0, wa, wb, wc, xSide, yPlan, a, markSize: 0.12 + 0.2 * markScale(size[a], size[b]), labels: [dimension(a), dimension(b), dimension(c)] };
+  }, [geometry, unit, grain, snap]);
 
   // The measured edge in each view: solid where visible, dashed where it lies under something, a dot when seen end-on
   const measured = useMemo(() => {
@@ -160,6 +172,33 @@ export function PartDrawing({
     );
   }, [lines, drawing]);
 
+  // Holes as circles where the view looks down them, as dashed bores elsewhere; grooves as amber boxes in every view
+  const machining = useMemo(() => {
+    if (!marks) return null;
+    const { views, scale } = drawing;
+    const grooves = marks.grooves.flatMap((g, i) =>
+      views.map((view, v) => {
+        const corners = [0, 1, 2, 3, 4, 5, 6, 7].map(k => view.at([k & 1 ? g.max.x : g.min.x, k & 2 ? g.max.y : g.min.y, k & 4 ? g.max.z : g.min.z]));
+        const xs = corners.map(c => c[0]);
+        const ys = corners.map(c => c[1]);
+        return { key: `${i}-${v}`, x: Math.min(...xs), y: Math.min(...ys), w: Math.max(...xs) - Math.min(...xs), h: Math.max(...ys) - Math.min(...ys) };
+      }),
+    );
+    const holes = marks.holes.flatMap(hole =>
+      views.map((view, v) => {
+        const [x, y] = view.at(hole.at.toArray());
+        if (Math.abs(hole.dir.getComponent(view.axis)) > 0.9) return { key: `${hole.id}-${v}`, id: hole.id, circle: { x, y, r: Math.max(1.6, hole.r * scale) } };
+        const end = view.at(hole.at.clone().addScaledVector(hole.dir, hole.depth).toArray());
+        const len = Math.hypot(end[0] - x, end[1] - y) || 1;
+        const nx = ((-(end[1] - y) / len) * hole.r * scale) || 0;
+        const ny = (((end[0] - x) / len) * hole.r * scale) || 0;
+        const bore = `M${px(x + nx)} ${px(y + ny)}L${px(end[0] + nx)} ${px(end[1] + ny)}M${px(x - nx)} ${px(y - ny)}L${px(end[0] - nx)} ${px(end[1] - ny)}M${px(end[0] + nx)} ${px(end[1] + ny)}L${px(end[0] - nx)} ${px(end[1] - ny)}`;
+        return { key: `${hole.id}-${v}`, id: hole.id, entry: { x, y }, bore, axisLine: `M${px(x)} ${px(y)}L${px(end[0])} ${px(end[1])}` };
+      }),
+    );
+    return { grooves, holes };
+  }, [marks, drawing]);
+
   const { d, contour, x0, y0, wa, wb, wc, xSide, a, markSize, labels } = drawing;
 
   // Double-headed arrow along the grain, the usual mark on a cutting drawing
@@ -176,6 +215,26 @@ export function PartDrawing({
       <rect width={W} height={H} fill={PAPER} />
       <path d={d} fill="none" stroke={INK} strokeWidth={0.7} strokeLinecap="round" />
       <path d={contour} fill="none" stroke={INK} strokeWidth={1.1} strokeLinecap="round" />
+      {machining?.grooves.map(g => (
+        <rect key={g.key} x={g.x} y={g.y} width={Math.max(g.w, 1.2)} height={Math.max(g.h, 1.2)} fill={GROOVE} fillOpacity={0.45} stroke={GROOVE} strokeWidth={0.8} />
+      ))}
+      {machining?.holes.map(h => {
+        const on = h.id === marks?.active;
+        const color = on ? MEASURED : DIM;
+        return h.circle ? (
+          <g key={h.key}>
+            {on && <circle cx={h.circle.x} cy={h.circle.y} r={h.circle.r + 5} fill="none" stroke={MEASURED} strokeWidth={1.2} />}
+            <circle cx={h.circle.x} cy={h.circle.y} r={h.circle.r} fill={on ? MEASURED : PAPER} fillOpacity={on ? 0.25 : 1} stroke={color} strokeWidth={on ? 1.4 : 0.9} />
+            <path d={`M${px(h.circle.x - h.circle.r - 2)} ${px(h.circle.y)}H${px(h.circle.x + h.circle.r + 2)}M${px(h.circle.x)} ${px(h.circle.y - h.circle.r - 2)}V${px(h.circle.y + h.circle.r + 2)}`} stroke={color} strokeWidth={0.5} />
+          </g>
+        ) : (
+          <g key={h.key} fill="none" stroke={color} strokeWidth={on ? 1.3 : 0.7}>
+            {on && h.entry && <circle cx={h.entry.x} cy={h.entry.y} r={5} strokeWidth={1.2} />}
+            <path d={h.bore} strokeDasharray="2.5 2" />
+            <path d={h.axisLine} strokeDasharray="6 2 1 2" strokeWidth={0.4} />
+          </g>
+        );
+      })}
       {grainArrow && <path d={grainArrow} fill="none" stroke={INK} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />}
       <Dimension x1={x0} y1={y0 - 11} x2={x0 + wa} y2={y0 - 11} label={labels[0]} />
       <Dimension x1={x0 - 11} y1={y0} x2={x0 - 11} y2={y0 + wb} label={labels[1]} vertical />

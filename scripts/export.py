@@ -164,7 +164,13 @@ def cut_list(pieces):
             floor = [w for w in world if abs(w[thin] - bottom) < 1e-5 and slo[across] - 1e-4 <= w[across] <= shi[across] + 1e-4]
             start = min(w[length] for w in floor) if floor else slo[length]
             end = max(w[length] for w in floor) if floor else shi[length]
+            box_lo = [0.0] * 3
+            box_hi = [0.0] * 3
+            box_lo[length], box_hi[length] = start, end
+            box_lo[across], box_hi[across] = slo[across], shi[across]
+            box_lo[thin], box_hi[thin] = min(bottom, face_at), max(bottom, face_at)
             grooves.append({
+                'min': [mm(box_lo[i] - lo[i]) for i in range(3)], 'max': [mm(box_hi[i] - lo[i]) for i in range(3)],
                 'face': faces[(thin, side)], 'width': mm(shi[across] - slo[across]), 'depth': mm(abs(bottom - face_at)),
                 'from': mm(start - lo[length]), 'to': mm(end - lo[length]), 'along': along[length],
                 'offset': mm(slo[across] - lo[across]), 'offsetAlong': along[across],
@@ -198,12 +204,13 @@ def cut_list(pieces):
             nax = max(range(3), key=lambda i: abs(normal[i]))
             others = [i for i in range(3) if i != ax]
             holes.append({
+                'entry': [mm(hit[i] - lo[i]) for i in range(3)], 'axis': ax, 'into': -1 if direction[ax] > 0 else 1,
                 'dowel': d.name[:3], 'face': faces[(nax, 0 if normal[nax] < 0 else 1)] if square else 'ścięcie 45°',
                 'd': mm(min(ext[i] for i in others)), 'depth': mm(dist),
                 'at': [[mm(hit[i] - lo[i]), along[i]] for i in others],
             })
         holes.sort(key=lambda h: (h['dowel'], h['face'], h['at']))
-        rows.append({'name': o.name, 'length': size[0], 'width': size[1], 'thickness': size[2], 'board': board,
+        rows.append({'name': o.name, 'box': [mm(hi[i] - lo[i]) for i in range(3)], 'length': size[0], 'width': size[1], 'thickness': size[2], 'board': board,
                      'mitres': mitres, 'grooves': grooves, 'holes': holes})
     return rows
 
