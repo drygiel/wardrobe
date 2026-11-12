@@ -7,7 +7,6 @@ import Footer from '@/sections/Footer';
 import Meta from '@/sections/Meta';
 import NextPage from '@/sections/NextPage';
 import { COUNTS, pageAt, SIZE } from '@/site';
-import { picture, renderSmall } from '@/assets';
 
 export default function RamaPage() {
   return (
@@ -25,13 +24,25 @@ export default function RamaPage() {
           </Link>
         }
         id="rozkroj"
-        title="Z płyty do ramy"
-        steps={['Trzy płyty 3000 × 620 mm', `Rozkrój na ${COUNTS.framePieces} formatek`, 'Formatki wstają z płyt', `Rama ${SIZE.height} mm do sufitu`]}
-        photos={[
-          [picture('boards'), renderSmall(19)],
-          [renderSmall(12), picture('led')],
-          [renderSmall(8), renderSmall(14)],
-          [renderSmall(26), renderSmall(24)],
+        label="Z płyty do ramy"
+        chapters={[
+          {
+            title: 'Trzy płyty z litego dębu',
+            text: `Cała rama mieści się na trzech płytach 3000 × 620 × 40 mm. Rozbieramy ją od góry, formatka po formatce, i odkładamy każdą tam, skąd została wycięta.`,
+          },
+          {
+            title: `Rozkrój na ${COUNTS.framePieces} formatek`,
+            text: 'Formatki ułożone tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz. Każda ma swój kod, od P01 do P15.',
+          },
+          {
+            title: 'Montaż od podłogi',
+            text: 'Najpierw wieńce dolne, potem boki i słupki, wnęka C z półką, na końcu wieńce górne. Każda formatka wchodzi na swoje miejsce z góry.',
+          },
+          {
+            title: `Rama ${SIZE.height} mm do sufitu`,
+            text: 'Frezy pod LED i ścięcia 45° składają się w jedną ramę. Wymiary i otwory każdej formatki są niżej, w liście do stolarni.',
+            link: { to: '#zamowienie', label: 'Lista do stolarni' },
+          },
         ]}
         scene={progress => <FrameShowcase progress={progress} />}
       />

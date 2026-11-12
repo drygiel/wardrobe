@@ -80,61 +80,32 @@
     overflow: hidden;
 }
 
-.steps {
+// One chapter of the story at a time, on the left; the scene keeps to the right of it (above it on a phone)
+.chapter {
     position: absolute;
-    top: 7svh;
-    left: 50%;
-    transform: translateX(-50%);
-    list-style: none;
-    text-align: center;
-    font-size: var(--step-lead);
-    line-height: 1.3;
-    white-space: nowrap;
-
-    li {
-        color: var(--muted);
-        transition: color 300ms;
-    }
-
-    li + li {
-        margin-top: 6px;
-    }
-
-    li.on {
-        color: var(--ink);
-    }
+    left: var(--m);
+    bottom: 14svh;
+    width: min(26rem, 34vw);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: auto;
 
     h2 {
-        font-family: var(--font-display);
-        font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
-        margin-bottom: 14px;
-    }
-}
-
-.photo {
-    position: absolute;
-    width: clamp(150px, 14vw, 230px);
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-        opacity 500ms var(--ease),
-        transform 600ms var(--ease);
-
-    &.on {
-        opacity: 1;
-        transform: none;
+        font-size: var(--step-head);
+        line-height: 1;
+        letter-spacing: -0.025em;
     }
 
-    &.left {
-        left: var(--m);
-        top: 42svh;
+    p {
+        margin: 18px 0 22px;
+        color: var(--muted);
     }
 
-    &.right {
-        right: var(--m);
-        top: 60svh;
+    .count {
+        margin: 0 0 14px;
+        font-size: var(--step-small);
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.04em;
     }
 }
 
@@ -166,25 +137,22 @@
             flex: 1;
         }
     }
+}
 
-    .steps {
-        top: auto;
-        bottom: 5svh;
+// Same test as `narrow` in FrameShowcase: the copy goes under the scene
+@media (max-width: 767px), (max-aspect-ratio: 9/10) {
+    .chapter {
         left: 20px;
         right: 20px;
-        transform: none;
-        text-align: left;
-        white-space: normal;
-        font-size: var(--step-body);
-    }
+        bottom: 24px;
+        width: auto;
 
-    .photo.left {
-        display: none;
-    }
+        h2 {
+            font-size: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+        }
 
-    .photo.right {
-        width: 32vw;
-        top: 16px;
-        right: 16px;
+        p {
+            margin: 12px 0 16px;
+        }
     }
 }

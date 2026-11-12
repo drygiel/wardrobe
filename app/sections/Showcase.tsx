@@ -1,4 +1,5 @@
 import { type ReactNode, type RefObject, Suspense, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { Canvas } from '@react-three/fiber';
 import cn from 'classnames';
 import type { ShowcaseProgress } from '@/components/schematic';
@@ -13,32 +14,32 @@ type Props = {
   facts: string;
   hint: string;
   actions: ReactNode;
-  // Scroll section that follows the hero
+  // Scroll section that follows the hero: one chapter per screen of scrolling, its copy beside the model
   id: string;
-  title: string;
-  steps: string[];
-  photos: [string, string][];
+  label: string;
+  chapters: Chapter[];
   scene: (progress: RefObject<ShowcaseProgress>) => ReactNode;
 };
+
+export type Chapter = { title: string; text: string; link?: { to: string; label: string } };
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 
 // Hero and scroll-driven steps share one fixed canvas, so the model moves on without a cut
-export default function Showcase({ current, heading, facts, hint, actions, id, title, steps, photos, scene }: Props) {
+export default function Showcase({ current, heading, facts, hint, actions, id, label, chapters, scene }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null!);
   const heroRef = useRef<HTMLElement>(null!);
   const sectionRef = useRef<HTMLElement>(null!);
-  const stepsRef = useRef<HTMLOListElement>(null!);
-  const photosRef = useRef<HTMLDivElement>(null!);
+  const chaptersRef = useRef<HTMLDivElement>(null!);
+  const canvasRef = useRef<HTMLDivElement>(null!);
   const progress = useRef<ShowcaseProgress>({ T: 0, yaw: 0 });
   const invalidate = useRef<() => void>(() => {});
   const [visible, setVisible] = useState(true);
   const [ready, setReady] = useState(false);
-  const count = steps.length;
+  const count = chapters.length;
 
   useEffect(() => {
     let raf = 0;
-    let active = -2;
 
     const update = () => {
       raf = 0;
@@ -49,15 +50,17 @@ export default function Showcase({ current, heading, facts, hint, actions, id, t
       const length = sectionRef.current.offsetHeight - vh;
       const t = clamp01((y - top) / Math.max(1, length)) * count;
       progress.current.T = y < top ? clamp01(y / heroH) : 1 + t;
+      // Past the last chapter the scene leaves with the page, the frame standing on its floor, as the chapter's copy does
+      canvasRef.current.style.transform = `translateY(${-Math.max(0, y - top - length)}px)`;
 
-      const next = y < top - vh * 0.3 ? -1 : Math.min(count, Math.max(0, Math.ceil(t - 0.15)));
-      if (next !== active) {
-        active = next;
-        [...stepsRef.current.children].forEach((li, i) => li.classList.toggle(styles.on, i === active));
-        [...photosRef.current.children].forEach(img =>
-          img.classList.toggle(styles.on, (img as HTMLElement).dataset.step === String(active)),
-        );
-      }
+      // Each chapter's copy fades in once its step is under way and out before the next; the last one stays
+      [...chaptersRef.current.children].forEach((el, i) => {
+        const shown = Math.min(clamp01((t - i - 0.04) / 0.14), i === count - 1 ? 1 : clamp01((i + 0.96 - t) / 0.14));
+        const chapter = el as HTMLElement;
+        chapter.style.opacity = String(shown);
+        chapter.style.transform = `translateY(${(1 - shown) * 16}px)`;
+        chapter.style.visibility = shown > 0.01 ? 'visible' : 'hidden';
+      });
       invalidate.current();
     };
 
@@ -107,7 +110,7 @@ export default function Showcase({ current, heading, facts, hint, actions, id, t
 
   return (
     <div ref={wrapRef} className={styles.wrap}>
-      <div className={cn(styles.canvas, { [styles.hidden]: !visible })} aria-hidden="true">
+      <div ref={canvasRef} className={cn(styles.canvas, { [styles.hidden]: !visible })} aria-hidden="true">
         <Canvas
           dpr={[1, 1.75]}
           frameloop={visible ? 'demand' : 'never'}
@@ -142,22 +145,22 @@ export default function Showcase({ current, heading, facts, hint, actions, id, t
         <div className={styles.actions}>{actions}</div>
       </header>
 
-      <section id={id} ref={sectionRef} className={styles.breakdown} style={{ height: `calc(100svh + ${count} * 45vh)` }} aria-labelledby={`${id}-h`}>
-        <div className={styles.sticky}>
-          <ol ref={stepsRef} className={styles.steps}>
-            <li>
-              <h2 id={`${id}-h`}>{title}</h2>
-            </li>
-            {steps.map(step => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
-          <div ref={photosRef}>
-            {photos.flatMap(([left, right], i) => [
-              <img key={`${i}l`} className={cn(styles.photo, styles.left)} data-step={i + 1} src={left} alt="" width="1280" height="800" loading="lazy" />,
-              <img key={`${i}r`} className={cn(styles.photo, styles.right)} data-step={i + 1} src={right} alt="" width="1280" height="800" loading="lazy" />,
-            ])}
-          </div>
+      <section id={id} ref={sectionRef} className={styles.breakdown} style={{ height: `${100 + count * 100}svh` }} aria-label={label}>
+        <div ref={chaptersRef} className={styles.sticky}>
+          {chapters.map((chapter, i) => (
+            <article key={chapter.title} className={styles.chapter}>
+              <p className={styles.count}>
+                {String(i + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
+              </p>
+              <h2>{chapter.title}</h2>
+              <p>{chapter.text}</p>
+              {chapter.link && (
+                <Link className="link" to={chapter.link.to}>
+                  {chapter.link.label}
+                </Link>
+              )}
+            </article>
+          ))}
         </div>
       </section>
     </div>

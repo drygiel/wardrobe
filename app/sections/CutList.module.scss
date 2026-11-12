@@ -19,23 +19,27 @@
 // Header: the brief, then the five numbers the joiner quotes from
 .head {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    column-gap: var(--gap);
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        'kicker kicker'
+        'title actions'
+        'lead stats';
+    gap: 0 clamp(24px, 4vw, 64px);
     align-items: end;
 
     h2 {
-        grid-column: 1 / 8;
+        grid-area: title;
         font-family: var(--font-display);
-        font-size: var(--step-head);
+        font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
         font-weight: 400;
         letter-spacing: -0.02em;
-        line-height: 0.95;
+        line-height: 1;
     }
 }
 
 .kicker {
-    grid-column: 1 / -1;
-    margin-bottom: 18px;
+    grid-area: kicker;
+    margin-bottom: 12px;
     color: var(--muted);
     font-size: var(--step-small);
     letter-spacing: 0.14em;
@@ -43,52 +47,53 @@
 }
 
 .lead {
-    grid-column: 8 / -1;
+    grid-area: lead;
+    margin-top: 14px;
     color: var(--muted);
-    font-size: var(--step-body);
-    max-width: 46ch;
+    font-size: var(--step-small);
+    max-width: 58ch;
 }
 
+// The totals as a drawing's title block: one ruled row of small cells, not a wall of figures
 .stats {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    margin-top: clamp(40px, 5vw, 72px);
-    border-top: 1px solid var(--line);
+    grid-area: stats;
+    display: flex;
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
 
     div {
         display: flex;
         flex-direction: column-reverse;
-        gap: 6px;
-        padding: 18px 16px 0 0;
+        gap: 2px;
+        padding: 8px 14px;
     }
 
     div + div {
-        padding-left: 18px;
         border-left: 1px solid var(--line);
     }
 
     dd {
         font-family: var(--font-display);
-        font-size: clamp(2.5rem, 1.6rem + 3.6vw, 5rem);
-        line-height: 0.9;
-        letter-spacing: -0.03em;
+        font-size: 1.375rem;
+        line-height: 1;
         font-variant-numeric: tabular-nums;
     }
 
     dt {
         color: var(--muted);
-        font-size: var(--step-small);
+        font-size: 0.75rem;
+        white-space: nowrap;
     }
 }
 
 .actions {
-    grid-column: 1 / -1;
+    grid-area: actions;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 28px;
-    margin-top: 36px;
+    justify-content: flex-end;
+    gap: 12px 24px;
 
     :global(.btn) svg {
         width: 16px;
@@ -105,7 +110,7 @@
 .desk {
     display: grid;
     gap: clamp(24px, 3vw, 56px);
-    margin-top: clamp(56px, 7vw, 104px);
+    margin-top: clamp(32px, 4vw, 56px);
 }
 
 .mapHead {
@@ -503,25 +508,34 @@
 
 @media (max-width: 1024px) {
     .head {
-        h2,
-        .lead {
-            grid-column: 1 / -1;
-        }
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            'kicker'
+            'title'
+            'lead'
+            'stats'
+            'actions';
+    }
 
-        .lead {
-            margin-top: 20px;
-        }
+    .stats {
+        justify-self: start;
+    }
+
+    .actions {
+        justify-content: flex-start;
+        margin-top: 20px;
     }
 }
 
 @media (max-width: 640px) {
+    // Five cells across a phone: narrower padding, and the row may wrap onto a second line
     .stats {
-        grid-template-columns: repeat(3, 1fr);
-        row-gap: 18px;
+        flex-wrap: wrap;
+        justify-self: stretch;
 
-        div:nth-child(4) {
-            padding-left: 0;
-            border-left: 0;
+        div {
+            flex: 1 0 auto;
+            padding: 8px 10px;
         }
     }
 

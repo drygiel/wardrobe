@@ -373,12 +373,12 @@ export default function CutList() {
           ))}
         </dl>
         <div className={styles.actions}>
+          <button className="link" onClick={() => window.print()}>
+            Drukuj listę
+          </button>
           <button className="btn" onClick={() => download(toCsv(), 'rama-formatki.csv')}>
             <Icon name="download" />
             Pobierz CSV
-          </button>
-          <button className="link" onClick={() => window.print()}>
-            Drukuj listę
           </button>
         </div>
       </header>
