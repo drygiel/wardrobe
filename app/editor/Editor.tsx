@@ -7,6 +7,7 @@ import { useEventListener } from '@/hooks/useEventListener';
 import Scene from '@/components/Scene';
 import { Model as Wardrobe } from '@/components/Wardrobe';
 import Mark from '@/sections/Mark';
+import { EnterOnArrival } from '@/xr/XRLinks';
 import { HoverPulse } from './HoverPulse';
 import { Icon, type IconName } from './icons';
 import { Inspector } from './Inspector';
@@ -139,6 +140,7 @@ export default function Editor() {
           }}
         >
           <XR store={app.xr}>
+            <EnterOnArrival />
             <Scene editorCamera link={link} orbitCenter={selection.orbitCenter}>
               <Wardrobe />
               <HoverPulse />

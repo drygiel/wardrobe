@@ -11,6 +11,7 @@ import { dragTarget, measuring, progressAt, STAGE_VH, stopFor, YAW_MAX, YAW_MIN 
 import { DRAFT_LABELS } from './draft';
 import { type HeroProgress, HomeScene } from './HomeScene';
 import { LAYERS } from './layers';
+import { XRLinks } from '@/xr/XRLinks';
 import cn from 'classnames';
 import styles from './Home.module.scss';
 
@@ -362,10 +363,13 @@ export default function HomeStage() {
             <span className="drag-cue" aria-hidden="true" />
             Przeciągnij, aby obrócić. Kliknij drzwi, aby je otworzyć.
           </p>
-          <Link className="btn" to="/pomiar">
-            <Icon name="measure" />
-            Zmierz szafę
-          </Link>
+          <div className={styles.actions}>
+            <Link className="btn" to="/pomiar">
+              <Icon name="measure" />
+              Zmierz szafę
+            </Link>
+            <XRLinks className={styles.xr} />
+          </div>
         </div>
 
         {/* Shown by HomeScene together with its lines, on their own clock */}
