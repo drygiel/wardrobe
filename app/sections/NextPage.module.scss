@@ -1,7 +1,8 @@
 .next {
     position: relative;
     z-index: 1;
-    padding: var(--section) var(--m) 0;
+    // Half a section: it closes the page rather than opening a new chapter
+    padding: calc(var(--section) / 2) var(--m) 0;
     background: var(--bg);
 
     a {

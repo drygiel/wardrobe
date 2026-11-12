@@ -3,7 +3,6 @@ import { Icon } from '@/editor/icons';
 import { FrameShowcase } from '@/components/FrameShowcase';
 import Showcase from '@/sections/Showcase';
 import CutList from '@/sections/CutList';
-import PlanSection from '@/sections/PlanSection';
 import Footer from '@/sections/Footer';
 import Meta from '@/sections/Meta';
 import NextPage from '@/sections/NextPage';
@@ -38,14 +37,6 @@ export default function RamaPage() {
       />
       <main>
         <CutList />
-        <PlanSection
-          title="Rozkrój i wymiary"
-          rows={[
-            { view: 'cut', name: 'Rozkrój na płyty', value: '3 × 3000 × 620 mm', text: `${COUNTS.framePieces} formatek ułożonych tak, żeby zostało jak najmniej odpadu. Między listwami 5 mm na rzaz.` },
-            { view: 'front', name: 'Widok z przodu', value: `${SIZE.width} × ${SIZE.height} mm`, text: 'Cała szafa bez frontów, rama razem z wnętrzem.' },
-            { view: 'side', name: 'Widok z boku', value: `${SIZE.depthOverall} × ${SIZE.height} mm`, text: `Głębokość ramy ${SIZE.depth} mm, z uchwytami razem ${SIZE.depthOverall} mm.` },
-          ]}
-        />
         <NextPage after="/rama" />
       </main>
       <Footer />
