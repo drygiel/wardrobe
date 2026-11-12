@@ -95,3 +95,39 @@
 .holes b {
     color: var(--hole);
 }
+
+.mitre b {
+    color: var(--mitre);
+}
+
+// Out to the shop that sells the dowels: a quiet outlined button at the right of the table
+.shop {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    grid-column: 2; // under the table, not in the narrow column of the step number
+    justify-self: end;
+    margin-top: 12px;
+    padding: 7px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--ink);
+    font-size: var(--step-small);
+    text-decoration: none;
+    transition: border-color 150ms;
+
+    &:hover {
+        border-color: var(--ink);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    svg {
+        flex: none;
+        width: 16px;
+        height: 16px;
+    }
+}

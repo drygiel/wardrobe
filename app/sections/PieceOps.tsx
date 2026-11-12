@@ -1,9 +1,13 @@
 import cn from 'classnames';
 import type { Unit } from '@/contexts/AppContext';
+import { Icon } from '@/editor/icons';
 import { mm } from '@/editor/labels';
 import type { MarkHover } from '@/editor/PartDrawing';
 import { grooveText, type Piece, plural, position } from './orderList';
 import styles from './PieceOps.module.scss';
+
+// Where the frame's dowels are bought: wolfcraft 2908000, beech 8 x 40 mm, DIN 68150, 40 in a pack for the frame's 36
+const DOWELS = 'https://www.elektrykasklep.pl/towar/2908000-wolfcraft-kolek-drewniany-bukowy/';
 
 // The hole or the groove in focus, by the ids the drawing's marks carry; hovering either side sets it
 export type Focus = { hole: number | null; groove: number | null };
@@ -19,7 +23,7 @@ export function PieceOps({ piece, focus, onFocus, unit = 'mm', className }: { pi
   return (
     <ol className={cn(styles.ops, className)}>
       {piece.mitres > 0 && (
-        <li>
+        <li className={styles.mitre}>
           <b>Ścięcia 45°</b>
           <span>
             {piece.mitres} {plural(piece.mitres, 'koniec', 'końce', 'końców')} pod kątem, tam gdzie formatka spotyka sąsiednią
@@ -65,6 +69,10 @@ export function PieceOps({ piece, focus, onFocus, unit = 'mm', className }: { pi
               ))}
             </tbody>
           </table>
+          <a className={styles.shop} href={DOWELS} target="_blank" rel="noopener noreferrer" title="Sklep elektrykasklep.pl, wolfcraft 2908000, otwiera się w nowej karcie">
+            <Icon name="cart" />
+            Kołki wolfcraft 8 × 40 mm
+          </a>
         </li>
       )}
     </ol>

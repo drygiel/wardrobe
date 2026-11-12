@@ -22,6 +22,7 @@ const GRAIN = '#8a5a2b'; // oak brown for the grain arrow
 const GROOVE = '#f0b35a'; // the LED amber, only on the strip's groove
 const HOLE = '#2f6690'; // the site's --hole on paper: dowel holes apart from the outline
 const HOLE_ON = '#1c6fc0'; // the hole in focus, a brighter blue of the same family
+const MITRE = '#6a47a8'; // the site's --mitre on paper: the 45° cuts traced over the outline
 const GROOVE_ON = '#c47f1c'; // the groove in focus: its amber, deepened for the outline
 
 // Machining drawn over the part, in its own axes: dowel holes (entry point, inward axis), LED grooves, mitres traced bold
@@ -394,7 +395,7 @@ export function PartDrawing({
       <path d={d} fill="none" stroke={INK} strokeWidth={0.7} strokeLinecap="round" />
       <path d={contour} fill="none" stroke={INK} strokeWidth={1.1} strokeLinecap="round" />
       {breakLines && <path d={breakLines} fill="none" stroke={INK} strokeWidth={0.7} strokeLinejoin="round" />}
-      {marks?.mitres && <path d={slant} fill="none" stroke={INK} strokeWidth={2.2} strokeLinecap="round" />}
+      {marks?.mitres && <path d={slant} fill="none" stroke={MITRE} strokeWidth={2.2} strokeLinecap="round" />}
       {machining?.grooves.map(g => {
         const on = g.id === marks?.activeGroove;
         return (

@@ -45,6 +45,7 @@
     --board: #2a2622;
     --led: #ffd9a0; // the lit strip itself
     --hole: #8db8dc; // dowel holes, a cool blue against the warm wood and LED
+    --mitre: #b9a0e6; // 45° cuts, violet beside the holes' blue and the LED amber
 
     --font-display: 'Erode', Georgia, serif;
     --font-text: 'Switzer', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -74,6 +75,7 @@
     --board: #d5cfc3;
     --led: #e09a35;
     --hole: #2f6690;
+    --mitre: #6a47a8;
 }
 
 *,

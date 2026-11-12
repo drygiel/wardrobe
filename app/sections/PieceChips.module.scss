@@ -40,6 +40,11 @@ button.chip {
         border-color: color-mix(in srgb, var(--hole) 60%, transparent);
     }
 
+    &.mitre {
+        color: var(--mitre);
+        border-color: color-mix(in srgb, var(--mitre) 60%, transparent);
+    }
+
     // Off: the layer is hidden on the drawing, the chip goes quiet and dashed
     &[aria-pressed='false'] {
         color: var(--muted);

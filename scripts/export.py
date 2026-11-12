@@ -123,6 +123,10 @@ def cut_list(pieces):
     def mm(v):
         return round(v * 1000, 1)
 
+    # mm drilled past each end of a dowel: room for the glue and the air it pushes, so the joint closes fully.
+    # The 8 x 40 dowels (wolfcraft 2908000) sit in 2 x 21 mm holes
+    CLEARANCE = 1.0
+
     sheets = {o.name.split('-')[-1]: box(o) for o in bpy.data.collections['CutPlan'].objects if o.name.startswith('Plan_Sheet')}
     copies = {o.name[5:]: o for o in bpy.data.collections['CutPlan'].objects if re.match(r'Plan_P\d\d$', o.name)}
     strips = [o for o in bpy.data.collections['5_LED'].objects if o.type == 'MESH']
@@ -206,7 +210,7 @@ def cut_list(pieces):
             holes.append({
                 'entry': [mm(hit[i] - lo[i]) for i in range(3)], 'axis': ax, 'into': -1 if direction[ax] > 0 else 1,
                 'dowel': d.name[:3], 'face': faces[(nax, 0 if normal[nax] < 0 else 1)] if square else 'ścięcie 45°',
-                'd': mm(min(ext[i] for i in others)), 'depth': mm(dist),
+                'd': mm(min(ext[i] for i in others)), 'depth': mm(dist) + CLEARANCE,
                 'at': [[mm(hit[i] - lo[i]), along[i]] for i in others],
             })
         holes.sort(key=lambda h: (h['dowel'], h['face'], h['at']))

@@ -54,7 +54,7 @@ export function PieceChips({ piece, layers, onToggle, className }: { piece: Piec
   return (
     <ul className={cn(styles.chips, className)} aria-label="Obróbka na rysunku">
       {piece.board && <li className={styles.chip}>Płyta {piece.board}</li>}
-      {piece.mitres > 0 && chip('mitres', `${piece.mitres} × ścięcie 45°`)}
+      {piece.mitres > 0 && chip('mitres', `${piece.mitres} × ścięcie 45°`, styles.mitre)}
       {piece.grooves.length > 0 && chip('grooves', 'Frez LED', styles.led)}
       {piece.holes.length > 0 && chip('holes', `${piece.holes.length} ${plural(piece.holes.length, 'otwór', 'otwory', 'otworów')}`, styles.hole)}
     </ul>

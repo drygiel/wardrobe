@@ -22,6 +22,7 @@ const PATHS = {
   external: 'M9.5 2.5h4v4M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6',
   menu: 'M2 4.5h12M2 8h12M2 11.5h12',
   cross: 'M3.5 3.5l9 9M12.5 3.5l-9 9',
+  cart: 'M1.5 2.5h2l1.75 7.5h7.25l1.5-5.5H4.25M6.5 13.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.5 13.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z',
 };
 
 export type IconName = keyof typeof PATHS;
