@@ -64,6 +64,7 @@ export function partLabel(name: string): string {
   if ((match = /^Door_Magnet_(F\d\d)$/.exec(name))) return `Magnes czujnika ${match[1]}`;
   if ((match = /^Door_Wire_(.+)$/.exec(name))) return `Przewód czujników ${match[1]}`;
   if ((match = /^(J\d\d)_Dowel/.exec(name))) return `Kołek 8×40, złącze ${match[1]}`;
+  if ((match = /^DW_(.+)__(.+)_\d+$/.exec(name))) return `Kołek 8×30: ${partLabel(`IN_${match[1]}`)} – ${partLabel(/^P\d\d_/.test(match[2]) ? match[2] : `IN_${match[2]}`).toLowerCase()}`;
   if ((match = /^(H\d\d)_F\d\d_(Arm|Cup|Plate)$/.exec(name))) return `${HINGE_PARTS[match[2]]} zawiasu ${match[1]}`;
   if ((match = /^MB(\d)_/.exec(name))) return `Klocek montażowy ${match[1]}`;
   if ((match = /^PIN_(.+)_(\d)$/.exec(name))) return `Podpórka ${match[2]}, ${partLabel(`IN_${match[1]}`).toLowerCase()}`;
@@ -102,6 +103,8 @@ export function treePath(name: string, group: string, columns: string[]): string
       return [name.includes('Filler') ? 'Maskownice' : 'Drzwi'];
     case 'dowels':
       return ['Kołki', `Złącze ${name.slice(0, 3)}`];
+    case 'interiorDowels':
+      return [column, 'Kołki'];
     case 'pins':
       return [column, partLabel(`IN_${name.slice(4, -2)}`)];
     case 'hinges':

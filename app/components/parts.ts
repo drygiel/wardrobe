@@ -30,6 +30,7 @@ export const GROUPS = [
   { id: 'back', label: 'Plecy i panel boczny' },
   { id: 'led', label: 'Taśmy LED' },
   { id: 'dowels', label: 'Kołki' },
+  { id: 'interiorDowels', label: 'Kołki wnętrza' },
   { id: 'hinges', label: 'Zawiasy' },
   { id: 'pins', label: 'Podpórki półek' },
   { id: 'blocks', label: 'Klocki montażowe' },
@@ -38,7 +39,7 @@ export const GROUPS = [
 export type GroupId = (typeof GROUPS)[number]['id'];
 
 // Off until switched on, on every page
-export const HIDDEN_GROUPS: GroupId[] = ['dowels', 'hinges', 'blocks', 'electric'];
+export const HIDDEN_GROUPS: GroupId[] = ['dowels', 'interiorDowels', 'hinges', 'blocks', 'electric'];
 
 export const groupOf = (name: string): GroupId => {
   // Before kindOf: the cables are named LED_Wire*
@@ -46,6 +47,7 @@ export const groupOf = (name: string): GroupId => {
   if (/^J\d\d_/.test(name)) return 'dowels';
   if (/^H\d\d_/.test(name)) return 'hinges';
   if (name.startsWith('PIN_')) return 'pins';
+  if (name.startsWith('DW_')) return 'interiorDowels';
   if (/^MB\d_/.test(name)) return 'blocks';
   const kind = kindOf(name);
   if (kind === 'front' || kind === 'handle') return 'fronts';
@@ -66,7 +68,7 @@ const columnCache = new WeakMap<THREE.Object3D, Column[]>();
 export function columnsOf(node: THREE.Object3D): Column[] {
   const cached = columnCache.get(node);
   if (cached) return cached;
-  const tag = /^(?:[PF]\d\d|IN|DR|LED|MB\d|PIN)_([ABCD])_/.exec(node.name)?.[1] ?? (node.name.startsWith('A_') ? 'A' : undefined);
+  const tag = /^(?:[PF]\d\d|IN|DR|LED|MB\d|PIN|DW)_([ABCD])_/.exec(node.name)?.[1] ?? (node.name.startsWith('A_') ? 'A' : undefined);
   const door = DOOR_COLUMN[/F\d\d/.exec(node.name)?.[0] ?? ''];
   let columns: Column[];
   if (tag) columns = [tag as Column];

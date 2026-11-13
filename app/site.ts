@@ -3,7 +3,7 @@
 // tests/site.test.ts counts and measures them again in the exported models.
 export const SIZE = { width: 2688, height: 2650, depth: 530, depthOverall: 560 };
 export const SIZE_TEXT = `${SIZE.width} × ${SIZE.height} × ${SIZE.depth} mm`;
-export const COUNTS = { parts: 98, sections: 4, framePieces: 15, boards: 3, drawers: 6, hinges: 17, hingedDoors: 7, shelfPins: 36, adjustableShelves: 9 };
+export const COUNTS = { parts: 98, sections: 4, framePieces: 15, boards: 3, drawers: 6, hinges: 17, hingedDoors: 7, shelfPins: 48, adjustableShelves: 9, pinnedShelves: 12, interiorDowels: 103 };
 
 export const SITE_URL = 'https://drygiel.github.io/wardrobe/';
 export const REPO_URL = 'https://github.com/drygiel/wardrobe';

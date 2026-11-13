@@ -172,6 +172,17 @@
     }
 }
 
+// The shelf pin section under the heading of .buy
+.pinFigure {
+    max-width: 440px;
+    margin-top: 40px;
+
+    figcaption {
+        margin-top: 8px;
+        color: var(--muted);
+    }
+}
+
 // What to look for when buying: the model gives sizes, not makers
 .buy {
     display: grid;

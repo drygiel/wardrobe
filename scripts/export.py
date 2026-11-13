@@ -3,7 +3,7 @@
 # Wardrobe.glb: every Wardrobe mesh with the "Baked" UV map except the frame pieces, plus the door pivots their clips rotate.
 # Frame.glb: the frame pieces P01-P14 and their laid-out copies on the boards (CutPlan).
 # Electric.glb: the Electric collection, cables as meshes, no UVs: the site colours it by name, it never enters the atlas.
-# Hardware.glb: dowels, hinges, mount blocks and shelf pins, no UVs: the editor colours them by name, they never enter the atlas.
+# Hardware.glb: frame and interior dowels, hinges, mount blocks and shelf pins, no UVs: the editor colours them by name, they never enter the atlas.
 # app/components/grain.json: grain direction of every wooden part, read from its UVMap.
 # app/components/cutlist.json: the frame's order list (sizes, boards, 45° cuts, LED grooves, dowel holes) for /rama.
 import json
@@ -22,7 +22,7 @@ parts = [o for o in wardrobe
          if (o.type == 'MESH' and 'Baked' in o.data.uv_layers and o not in pieces) or o.name.endswith('_Pivot')]
 plan = [o for o in bpy.data.collections['CutPlan'].all_objects if o.type == 'MESH']
 electric = list(bpy.data.collections['Electric'].objects)
-hardware = [o for name in ('1a_Dowels', '3_Hinges', '4a_ShelfPins') for o in bpy.data.collections[name].all_objects if o.type == 'MESH']
+hardware = [o for name in ('1a_Dowels', '3_Hinges', '4a_ShelfPins', '4b_Dowels') for o in bpy.data.collections[name].all_objects if o.type == 'MESH']
 
 cut = view_layer.layer_collection.children['CutPlan']
 

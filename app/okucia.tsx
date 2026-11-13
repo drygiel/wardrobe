@@ -14,7 +14,7 @@ import NextPage from '@/sections/NextPage';
 import { COUNTS, pageAt } from '@/site';
 import styles from '@/okucia/Okucia.module.scss';
 
-const SHELF_PINS = 'https://allegro.pl/produkt/podporki-do-polek-bolce-kolki-pod-polki-metalowe-ocynk-fi-5-x-16-mm-paczka-393ebad9-2a0d-421f-a5d0-5937760a16c6?offerId=18171323510';
+const SHELF_PINS = 'https://sklep.merkuryam.pl/Podporka-polki-szyby-fi-5x16-z-otulina-gumka-50szt-p8946';
 const DEPTH = 487; // drawer depth in Szafa4.blend
 const SLIDE = Math.round(DEPTH * 0.7); // how far the site and the bake slide a drawer out (parts.ts, scripts/bake.py)
 
@@ -366,6 +366,36 @@ function Tables() {
   );
 }
 
+// The shelf pin in section through the side and the shelf end, in millimetres; the pin sits 4 mm under the shelf
+// as in Szafa4.blend (ShelfPin: steel Ø5 × 7.5 in the hole, rubber sleeve Ø8 × 8.5). Reuses HingeSection's #hatch.
+function PinDrawing() {
+  return (
+    <figure className={styles.pinFigure}>
+      <svg className={styles.drawing} viewBox="-46 -44 92 74" role="img" aria-label="Przekrój podpórki półki: bolec w otworze boku, półka leży na gumowej otulinie">
+        <g transform="scale(1 -1)">
+          <polygon className={styles.cut} points="-18,-6 0,-6 0,-2.5 -8,-2.5 -8,2.5 0,2.5 0,28 -18,28" />
+          <rect className={styles.cut} x={0.5} y={4} width={46} height={18} />
+          <rect className={styles.part} x={-7.5} y={-2.5} width={7.5} height={5} />
+          <rect className={styles.part} x={0} y={-4} width={8.5} height={8} rx={1.5} />
+        </g>
+        <Label at={[-44, 30]} to={[-10, 22]} text="Bok 18 mm" />
+        <Label at={[-14, -16]} to={[-8, -2.5]} text="Otwór Ø5 × 8" end />
+        <Label at={[-14, -24]} to={[-4, -1]} text="Bolec Ø5" end />
+        <Label at={[44, 27]} to={[36, 22]} text="Półka 18 mm" end />
+        <Label at={[14, 36]} to={[0.25, 14]} text="Luz 0,5 mm" />
+        <Label at={[12, -26]} to={[7, -3]} text="Otulina Ø8" />
+        <g className={styles.label}>
+          <polyline points="-7.5,7 -7.5,9 8.5,9 8.5,5" />
+          <text x={0.5} y={14} textAnchor="middle">
+            16
+          </text>
+        </g>
+      </svg>
+      <figcaption className={styles.note}>Przekrój przez bok i koniec półki, wymiary w mm.</figcaption>
+    </figure>
+  );
+}
+
 export default function OkuciaPage() {
   return (
     <>
@@ -375,9 +405,10 @@ export default function OkuciaPage() {
         <header className={styles.intro}>
           <h1>Okucia</h1>
           <p>
-            Szuflady, zawiasy i podpórki półek: {COUNTS.drawers} szuflad, {COUNTS.hinges} zawiasów na{' '}
-            {COUNTS.hingedDoors} drzwiach i {COUNTS.shelfPins} podpórek pod {COUNTS.adjustableShelves}{' '}
-            półkami przestawnymi. Wszystkie wymiary pochodzą z modelu 3D szafy.
+            Szuflady, zawiasy, podpórki i kołki półek: {COUNTS.drawers} szuflad, {COUNTS.hinges} zawiasów
+            na {COUNTS.hingedDoors} drzwiach, {COUNTS.shelfPins} podpórek pod {COUNTS.pinnedShelves}{' '}
+            półkami i {COUNTS.interiorDowels} kołków we wnętrzu. Wszystkie wymiary pochodzą z modelu 3D
+            szafy.
           </p>
         </header>
         <HingeSection />
@@ -392,7 +423,10 @@ export default function OkuciaPage() {
           <Tables />
         </Suspense>
         <section className={styles.buy} aria-labelledby="dobor-h">
-          <h2 id="dobor-h">Dobór okuć</h2>
+          <div>
+            <h2 id="dobor-h">Dobór okuć</h2>
+            <PinDrawing />
+          </div>
           <ul>
             <li>
               <b>Zawias</b>
@@ -412,13 +446,28 @@ export default function OkuciaPage() {
             <li id="podporki">
               <b>Podpórki półek</b>
               <span>
-                Metalowe, ocynkowane, Ø5 × 16 mm z kołnierzem. {COUNTS.shelfPins} sztuk, po cztery pod
-                każdą z {COUNTS.adjustableShelves} półek przestawnych. Otwory Ø5 mm, głębokie na 8 mm, są
-                w bokach i przegrodach pod półką, około 50 mm od jej przedniej i tylnej krawędzi. Półkę
-                przestawia się razem z podpórkami i otworami. W pomiarze podpórki są zielone.{' '}
-                <a href={SHELF_PINS} target="_blank" rel="noopener noreferrer" title="Allegro, otwiera się w nowej karcie">
-                  Podpórki Ø5 × 16 mm na Allegro
+                Stalowy bolec Ø5 × 16 mm z gumową otuliną, na której leży półka. {COUNTS.shelfPins} sztuk,
+                po cztery pod {COUNTS.adjustableShelves} półkami przestawnymi i pod półkami 06, 08 i 09
+                szafy D, które leżą między słupami ramy i nie dadzą się wsunąć na kołki. Otwory Ø5 mm,
+                głębokie na 8 mm, są w bokach i przegrodach pod półką, około 50 mm od jej przedniej i
+                tylnej krawędzi. Półka na podpórkach jest o 1 mm krótsza od prześwitu, po 0,5 mm luzu z
+                każdej strony. W pomiarze podpórki są zielone.{' '}
+                <a href={SHELF_PINS} target="_blank" rel="noopener noreferrer" title="Sklep merkuryam.pl, otwiera się w nowej karcie">
+                  Podpórki Ø5 × 16 mm z gumką, sklep Merkury
                 </a>
+              </span>
+            </li>
+            <li id="kolki">
+              <b>Kołki wnętrza</b>
+              <span>
+                Bukowe Ø8 × 30 mm, {COUNTS.interiorDowels} sztuk: 12 mm w licu boku lub przegrody, 20 mm w
+                krawędzi półki, po 1 mm luzu na klej. Dwa lub trzy na połączenie: 37 mm od przodu, 60 mm
+                od tyłu (za pasem kabli) i w środku głębokich półek. Gdzie półki stoją po obu stronach
+                jednej płyty na tej samej wysokości, kołki są przesunięte, żeby otwory się nie spotkały.
+                Wnętrze szafy B składa się na podłodze w jeden moduł na kołkach i klej (najpierw środek,
+                na końcu oba boki), stawia i wsuwa w ramę od frontu; moduł jest o 1 mm niższy i 1 mm węższy od otworu.
+                Półki wnęki C wchodzą na kołki w boku B, a bok wnęki zamyka je od strony D. Półki 02–05
+                szafy D wchodzą na kołki w słupach ramy i są przykręcone do ściany przez plecy.
               </span>
             </li>
             <li>
